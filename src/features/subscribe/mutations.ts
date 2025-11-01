@@ -15,11 +15,11 @@ export function useToggleClubSubscription(
 
   return useMutation({
     mutationFn: subscribeApi.toggleClubSubscription,
-    onSuccess: (data, clubId, context) => {
+    onSuccess: (data, clubId, context, mutation) => {
       queryClient.invalidateQueries({
         queryKey: subscribeKeys.userSubscribes(),
       })
-      options?.onSuccess?.(data, clubId, context as never)
+      options?.onSuccess?.(data, clubId, context as never, mutation as never)
     },
     ...options,
   })

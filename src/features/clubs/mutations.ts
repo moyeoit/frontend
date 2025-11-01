@@ -26,11 +26,11 @@ export function useUpdateClub(
       const { data } = await apiClient.patch(`/api/v1/clubs/${clubId}`, body)
       return data
     },
-    onSuccess: (data, variables, context) => {
+    onSuccess: (data, variables, context, mutation) => {
       queryClient.invalidateQueries({
         queryKey: clubKeys.detail(variables.clubId),
       })
-      options?.onSuccess?.(data, variables, context as never)
+      options?.onSuccess?.(data, variables, context as never, mutation as never)
     },
     ...options,
   })
@@ -47,7 +47,7 @@ export function useToggleClubSubscription(
       const { data } = await apiClient.post(`/api/v1/clubs/${clubId}/subscribe`)
       return data
     },
-    onSuccess: (data, clubId, context) => {
+    onSuccess: (data, clubId, context, mutation) => {
       queryClient.invalidateQueries({
         queryKey: clubKeys.userSubscriptionCheck(clubId),
       })
@@ -56,10 +56,10 @@ export function useToggleClubSubscription(
         queryKey: subscribeKeys.userSubscribes(),
       })
 
-      options?.onSuccess?.(data, clubId, context as never)
+      options?.onSuccess?.(data, clubId, context as never, mutation as never)
     },
-    onError: (error, clubId, context) => {
-      options?.onError?.(error, clubId, context as never)
+    onError: (error, clubId, context, mutation) => {
+      options?.onError?.(error, clubId, context as never, mutation as never)
     },
     ...options,
   })

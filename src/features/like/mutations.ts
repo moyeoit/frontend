@@ -24,7 +24,7 @@ export function useToggleLike(
 
   return useMutation({
     mutationFn: ({ reviewId, reviewType }) => toggleLike(reviewId, reviewType),
-    onSuccess: (data, variables, context) => {
+    onSuccess: (data, variables, context, mutation) => {
       // 성공한 경우에만 쿼리 무효화
       if (data.status === 'SUCCESS') {
         // 리뷰 목록 쿼리들 무효화 (좋아요 수가 변경되므로)
@@ -36,7 +36,7 @@ export function useToggleLike(
         })
       }
 
-      options?.onSuccess?.(data, variables, context as never)
+      options?.onSuccess?.(data, variables, context as never, mutation as never)
     },
     ...options,
   })

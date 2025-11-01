@@ -20,12 +20,12 @@ export function usePostBasicReview(
 
   return useMutation({
     mutationFn: postBasicReview,
-    onSuccess: (data, variables, context) => {
+    onSuccess: (data, variables, context, mutation) => {
       // 베이직 후기 목록 쿼리 무효화
       queryClient.invalidateQueries({
         queryKey: reviewKeys.basicLists(),
       })
-      options?.onSuccess?.(data, variables, context as never)
+      options?.onSuccess?.(data, variables, context as never, mutation as never)
     },
     ...options,
   })
@@ -47,12 +47,12 @@ export function usePostPremiumReview(
 
   return useMutation({
     mutationFn: postPremiumReview,
-    onSuccess: (data, variables, context) => {
+    onSuccess: (data, variables, context, mutation) => {
       // 프리미엄 후기 목록 쿼리 무효화
       queryClient.invalidateQueries({
         queryKey: reviewKeys.premiumLists(),
       })
-      options?.onSuccess?.(data, variables, context as never)
+      options?.onSuccess?.(data, variables, context as never, mutation as never)
     },
     ...options,
   })

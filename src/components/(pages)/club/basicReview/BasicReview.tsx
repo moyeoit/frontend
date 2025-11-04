@@ -21,6 +21,9 @@ export default function BasicReview({
   recruitsData,
   clubId,
 }: BasicReviewProps) {
+  console.log('🚀 BasicReview 컴포넌트 렌더링 시작')
+  console.log('📋 Props:', { recruitsData, clubId })
+
   const router = useRouter()
 
   const [review, setReview] = useQueryState('review')
@@ -118,6 +121,13 @@ export default function BasicReview({
     part: part && part !== '' && part !== 'all' ? part : undefined,
     result: result && result !== '' && result !== 'all' ? result : undefined,
     sort: currentSort,
+  })
+
+  console.log('📊 리뷰 데이터 상태:', {
+    isLoading,
+    error: error?.message,
+    dataLength: basicReviewsData?.content?.length || 0,
+    hasData: !!basicReviewsData?.content,
   })
 
   const handleRecommend = () => {
@@ -240,47 +250,51 @@ export default function BasicReview({
       <div className="space-y-8">
         {basicReviewsData?.content && basicReviewsData.content.length > 0 ? (
           <div className="space-y-4">
-            {basicReviewsData.content.map((review, index) => (
-              <StandardReview
-                key={review.reviewId || index}
-                className="pt-8 pb-8 px-6 border-b border-light-color-3 w-full"
-              >
-                <div className="flex gap-6 w-full">
-                  <StandardReview.Left>
-                    <StandardReview.Profile
-                      nickname={review.nickname}
-                      clubName={review.clubName}
-                      generation={review.cohort}
-                      part={review.part}
-                      profileImage={review.position}
-                    />
-                    <StandardReview.Questions
-                      questions={review.qaPreviews.map((qa) => ({
-                        question: qa.questionTitle,
-                        answers: [qa.answerValue],
-                      }))}
-                    />
-                  </StandardReview.Left>
+            {basicReviewsData.content.map((review, index) => {
+              return (
+                <StandardReview
+                  key={review.reviewId || index}
+                  className="pt-8 pb-8 px-6 border-b border-light-color-3 w-full"
+                >
+                  <div className="flex gap-6 w-full">
+                    <StandardReview.Left>
+                      <StandardReview.Profile
+                        nickname={review.nickname}
+                        clubName={review.clubName}
+                        generation={review.cohort}
+                        part={review.part}
+                        profileImage={review.position}
+                      />
+                      <StandardReview.Questions
+                        questions={review.qaPreviews.slice(0, 3).map((qa) => ({
+                          question: qa.questionTitle,
+                          answers: [qa.answerValue],
+                        }))}
+                      />
+                    </StandardReview.Left>
 
-                  <StandardReview.Right>
-                    <StandardReview.Meta
-                      rating={review.rate}
-                      reviewType={review.reviewCategory}
-                      date={`작성날짜 (${formatDateToYYMMDD(review.createdAt)})`}
-                    />
-                    <StandardReview.Content
-                      title={review.oneLineComment}
-                      content={review.impressiveContentPreview}
-                    />
-                  </StandardReview.Right>
-                </div>
+                    <StandardReview.Right>
+                      <StandardReview.Meta
+                        rating={review.rate}
+                        reviewType={review.reviewCategory}
+                        date={`작성날짜 (${formatDateToYYMMDD(review.createdAt)})`}
+                      />
+                      <StandardReview.Content
+                        title={review.qaPreviews[3]?.answerValue || ''}
+                        content={review.qaPreviews[4]?.answerValue || ''}
+                      />
+                    </StandardReview.Right>
+                  </div>
 
-                <StandardReview.Bottom>
-                  <StandardReview.Likes likeCount={review.likeCount} />
-                  <StandardReview.Recommend onRecommend={handleRecommend} />
-                </StandardReview.Bottom>
-              </StandardReview>
-            ))}
+                  <StandardReview.Bottom>
+                    <StandardReview.Likes
+                      likeCount={review.likeCount ? review.likeCount : 0}
+                    />
+                    <StandardReview.Recommend onRecommend={handleRecommend} />
+                  </StandardReview.Bottom>
+                </StandardReview>
+              )
+            })}
           </div>
         ) : (
           <div className="flex items-center justify-center py-8">

@@ -63,7 +63,7 @@ export function Card({
         data-slot="card"
         className={cn(
           base,
-          'gap-[var(--card-gap)] p-[var(--card-pad)] rounded-[12px]',
+          'gap-(--card-gap) p-(--card-pad) rounded-[12px]',
           border && 'border-light-color-3',
           className,
         )}

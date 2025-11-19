@@ -29,7 +29,7 @@ const HERO_IMAGES = {
 } as const
 
 const SORT_OPTIONS: TabOption[] = [
-  { label: '모집중', value: '모집중' },
+  { label: '마감순', value: '마감순' },
   { label: '이름순', value: '이름순' },
   { label: '인기순', value: '인기순' },
 ]
@@ -265,7 +265,7 @@ export function Explore() {
               <div className="flex">
                 <Tab
                   options={SORT_OPTIONS}
-                  value={currentSort as '모집중' | '이름순' | '인기순'}
+                  value={currentSort as '마감순' | '이름순' | '인기순'}
                   onChange={(value) => setSort(value)}
                 />
               </div>

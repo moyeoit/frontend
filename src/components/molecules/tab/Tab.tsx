@@ -5,18 +5,18 @@ import { Tabs, TabsList, TabsTrigger } from '@radix-ui/react-tabs'
 import { cn } from '@/shared/utils/cn'
 
 export type Tab =
-  | 'recruit'
+  | 'deadline'
   | 'name'
   | 'popular'
   | 'latest'
-  | '모집중'
+  | '마감순'
   | '이름순'
   | '인기순'
   | '최신순'
 export type TabOption = { label: string; value: Tab; disabled?: boolean }
 
 const OPTIONS: TabOption[] = [
-  { label: '모집중', value: 'recruit' },
+  { label: '마감순', value: 'deadline' },
   { label: '이름순', value: 'name' },
   { label: '인기순', value: 'popular' },
   { label: '최신순', value: 'latest' },

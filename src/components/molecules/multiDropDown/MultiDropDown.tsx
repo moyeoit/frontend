@@ -198,8 +198,8 @@ const MultiDropDown: React.FC<Props> = ({
               className={cn(
                 'typo-button-m',
                 selected.length > 0
-                  ? 'text-[var(--moyeoit-main-1)]'
-                  : 'text-[var(--moyeoit-grey-2)]',
+                  ? 'text-main-color-1'
+                  : 'text-grey-color-2',
               )}
             >
               {open ? <ChevronUp /> : <ChevronDown />}
@@ -212,7 +212,7 @@ const MultiDropDown: React.FC<Props> = ({
           align="start"
           sideOffset={4}
           avoidCollisions={false}
-          className="w-fit mt-2 border border-[var(--moyeoit-light-3)] shadow-none bg-[var(--moyeoit-white)] typo-button-m whitespace-nowrap p-4 space-y-4 rounded-2xl"
+          className="w-fit mt-2 border border-light-color-3 shadow-none bg-white-color typo-button-m whitespace-nowrap p-4 space-y-4 rounded-2xl"
           onOpenAutoFocus={(e) => e.preventDefault()}
           onCloseAutoFocus={(e) => e.preventDefault()}
         >
@@ -220,7 +220,7 @@ const MultiDropDown: React.FC<Props> = ({
             {byGroup.map(({ group }) => (
               <div key={group.title || 'default'} className="space-y-2">
                 {group.title && (
-                  <div className="text-[var(--moyeoit-grey-4)] typo-caption-m">
+                  <div className="text-grey-color-4 typo-caption-m">
                     {group.title}
                   </div>
                 )}

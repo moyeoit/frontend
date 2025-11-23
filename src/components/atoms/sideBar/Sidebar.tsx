@@ -44,7 +44,7 @@ export function SideBar({
                 className={cn(
                   'block w-full py-3 px-5',
                   'cursor-pointer select-none',
-                  'peer-data-[state=checked]:bg-white rounded-[8px]',
+                  'peer-data-[state=checked]:bg-light-color-2 ',
                 )}
               >
                 {o.label}

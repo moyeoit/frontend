@@ -4,13 +4,16 @@ import * as React from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { SideBar, type SideOption } from '@/components/atoms/sideBar/Sidebar'
-import { Card } from '@/components/molecules/card'
+import CardOverlay from '@/components/molecules/card/CardOverlay'
 import {
   MultiDropDown,
   type Group,
 } from '@/components/molecules/multiDropDown/MultiDropDown'
 import { Tab, type TabOption } from '@/components/molecules/tab/Tab'
+import { useToggleClubSubscription } from '@/features/clubs/mutations'
 import { useExploreClubs } from '@/features/explore/queries'
+import { useUserSubscribes } from '@/features/subscribe/queries'
+import useMediaQuery from '@/shared/hooks/useMediaQuery'
 import useQueryState from '@/shared/hooks/useQueryState'
 
 const CATEGORY_OPTIONS: SideOption[] = [
@@ -81,6 +84,7 @@ const TARGET_OPTIONS: Group[] = [
 ]
 
 export function Explore() {
+  const { isDesktop } = useMediaQuery()
   const router = useRouter()
   const [field, setField] = useQueryState('field')
   const [sort, setSort] = useQueryState('sort')
@@ -185,8 +189,21 @@ export function Explore() {
     error: queryError,
   } = useExploreClubs(queryParams)
 
+  const { data: subscribesData } = useUserSubscribes()
+  const toggleSubscription = useToggleClubSubscription()
+
   const clubs = clubsData?.content || []
+  const subscribes = subscribesData?.data?.content || []
+  const subscribedClubIds = new Set(subscribes.map((s) => s.clubId))
   const error = queryError ? '동아리를 불러오는데 실패했습니다.' : null
+
+  const handleBookmarkClick = React.useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>, clubId: number) => {
+      e.stopPropagation()
+      toggleSubscription.mutate(clubId)
+    },
+    [toggleSubscription],
+  )
 
   const fieldLabel = React.useMemo(() => {
     return currentField === 'all' ? '전체' : currentField
@@ -289,57 +306,37 @@ export function Explore() {
                   </div>
 
                   {/* 카드 그리드 */}
-                  <div className="grid grid-cols-[repeat(3,17.625rem)] gap-x-4 gap-y-12">
+                  <div
+                    className={`grid ${isDesktop ? 'grid-cols-3 gap-8 pt-0 pb-12' : 'grid-cols-1 gap-4'}`}
+                  >
                     {clubs.map((club) => (
-                      <Card
+                      <CardOverlay
                         key={club.clubId}
-                        size="col3Desktop"
-                        orientation="vertical"
-                        border={true}
-                        gap="12px"
-                        className="group cursor-pointer relative"
-                        onClick={() => router.push(`/club/${club.clubId}`)}
-                      >
-                        <Card.Image
-                          logoUrl={club.logoUrl || '/images/default.svg'}
-                          alt={club.clubName}
-                          interactive
-                          className="transition-transform duration-300 ease-out"
-                        />
-                        <Card.Content className="px-[6px]">
-                          <Card.Title className="">{club.clubName}</Card.Title>
-                          <Card.Description>
-                            {club.description}
-                          </Card.Description>
-                          <Card.Meta part={club.categories.join(' · ')} />
-                        </Card.Content>
-                        {club.isRecruiting && (
-                          <div className="w-[61px] h-[29px] absolute top-[16px] left-[16px] bg-white text-grey-color-5 typo-caption-sb rounded-[73px] border border-light-color-3 z-10 px-3 py-1.5 text-center flex items-center justify-center leading-none">
-                            모집중
-                          </div>
-                        )}
-                      </Card>
+                        club={club}
+                        isSubscribed={subscribedClubIds.has(club.clubId)}
+                        onBookmarkClick={handleBookmarkClick}
+                      />
                     ))}
                   </div>
                 </div>
-              </div>
 
-              {/* 빈 상태 표시 */}
-              {clubs.length === 0 && (
-                <div className="text-center py-20">
-                  <div className="w-16 h-16 bg-light-color-2 rounded-full flex items-center justify-center mx-auto mb-4"></div>
-                  <h3 className="text-lg font-semibold mb-2">
-                    {currentField === 'all'
-                      ? '동아리를 찾을 수 없습니다'
-                      : `${fieldLabel} 카테고리의 동아리가 없습니다`}
-                  </h3>
-                  <p className="text-grey-color-2">
-                    {currentField === 'all'
-                      ? '다른 필터를 시도해보세요.'
-                      : '다른 카테고리를 선택해보세요.'}
-                  </p>
-                </div>
-              )}
+                {/* 빈 상태 표시 */}
+                {clubs.length === 0 && (
+                  <div className="text-center py-20">
+                    <div className="w-16 h-16 bg-light-color-2 rounded-full flex items-center justify-center mx-auto mb-4"></div>
+                    <h3 className="text-lg font-semibold mb-2">
+                      {currentField === 'all'
+                        ? '동아리를 찾을 수 없습니다'
+                        : `${fieldLabel} 카테고리의 동아리가 없습니다`}
+                    </h3>
+                    <p className="text-grey-color-2">
+                      {currentField === 'all'
+                        ? '다른 필터를 시도해보세요.'
+                        : '다른 카테고리를 선택해보세요.'}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </>
         )}

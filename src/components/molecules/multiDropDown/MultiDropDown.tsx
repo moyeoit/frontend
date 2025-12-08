@@ -23,10 +23,11 @@ function summarize(labels: string[], maxShown = 2, empty = '선택') {
 
 const triggerVariants = cva(
   // 공통
-  'justify-between border py-2 px-3 rounded-full gap-1',
+  'justify-between border py-2 px-3 rounded-full gap-1 typo-button-m',
   {
     variants: {
       variant: {
+        selected: 'bg-main-color-3 border-main-color-1 text-main-color-1',
         outline:
           'border-[var(--moyeoit-light-3)] bg-[var(--moyeoit-light-2)] text-[var(--moyeoit-black)]',
         solid:
@@ -67,9 +68,6 @@ const MultiDropDown: React.FC<Props> = ({
   const [inner, setInner] = React.useState<string[]>(defaultValue)
   const selected = isControlled ? value! : inner
 
-  // 디버깅용 로그
-  // console.log('MultiDropDown Props:', { value, isControlled, inner, selected })
-
   const allOptions = React.useMemo(
     () =>
       groups
@@ -100,8 +98,6 @@ const MultiDropDown: React.FC<Props> = ({
 
   const toggleOne = React.useCallback(
     (val: string, next: boolean) => {
-      // console.log('toggleOne called:', { val, next, selected, allOptions })
-
       if (val === 'all' && next) {
         // "전체" 선택 시 모든 옵션 선택
         const newSelection = [...allOptions, 'all']
@@ -166,12 +162,8 @@ const MultiDropDown: React.FC<Props> = ({
   )
 
   const triggerClass = React.useMemo(
-    () =>
-      cn(
-        triggerVariants({ variant: hasSelected ? 'solid' : variant }),
-        open ? 'bg-[var(--moyeoit-white)]' : 'bg-[var(--moyeoit-light-2)]',
-      ),
-    [hasSelected, variant, open],
+    () => cn(triggerVariants({ variant: hasSelected ? 'selected' : variant })),
+    [hasSelected, variant],
   )
 
   const handleOpenChange = React.useCallback((newOpen: boolean) => {

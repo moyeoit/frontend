@@ -1,4 +1,4 @@
-//TODO: 디자인 토큰 정의 필요
+//TODO: 디자인 토큰 추가
 
 'use client'
 
@@ -80,7 +80,7 @@ export function MobileCard({
           {clubName && (
             <div
               data-slot="mobile-card-club-name"
-              className="typo-body-3-sb text-black-color line-clamp-1"
+              className="typo-body-3-1-sb text-black-color line-clamp-1"
             >
               {clubName}
             </div>
@@ -88,7 +88,7 @@ export function MobileCard({
           {description && (
             <div
               data-slot="mobile-card-description"
-              className="typo-caption-m text-grey-color-2 line-clamp-1"
+              className="typo-body-4-m text-grey-color-3 line-clamp-1"
             >
               {description}
             </div>
@@ -98,7 +98,7 @@ export function MobileCard({
         {categories.length > 0 && (
           <div
             data-slot="mobile-card-categories"
-            className="typo-caption-m text-main-color-1 line-clamp-1"
+            className="typo-body-4-m text-main-color-1 line-clamp-1"
           >
             {categories.join('\u2009·\u2009')}
           </div>

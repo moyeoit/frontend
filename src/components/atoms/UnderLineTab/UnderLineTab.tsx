@@ -123,7 +123,7 @@ export function UnderLineTab({
             </TabsTrigger>
           ))}
         </TabsList>
-        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-grey-color-1" />
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-grey-color-1" />
         {activeTabRef && (
           <div
             className="absolute h-0.5 bg-black-color transition-all duration-200"

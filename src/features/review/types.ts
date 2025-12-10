@@ -176,6 +176,52 @@ export interface ReviewsQueryParams {
   sort?: string
 }
 
+// Review Search (탐색) Types
+export interface ReviewAnswerSummary {
+  questionTitleSummary: string
+  answerSummary: string
+}
+
+export interface ReviewSearchItem {
+  reviewId?: number
+  clubName: string
+  generation: number
+  jobName: string
+  rate: number
+  title: string
+  answerSummaries: ReviewAnswerSummary[]
+  likeCount: number
+  commentCount: number
+  category?: string
+  result?: string
+  createdAt?: string
+}
+
+export interface ReviewSearchPage {
+  content: ReviewSearchItem[]
+  totalElements: number
+  totalPages: number
+  size: number
+  number: number
+  first: boolean
+  last: boolean
+  numberOfElements: number
+  empty: boolean
+  sort: PageableSort
+  pageable: Pageable
+}
+
+export interface ReviewSearchParams {
+  title?: string
+  category?: string
+  clubId?: number
+  generation?: number
+  result?: string
+  sort?: string
+  page?: number
+  size?: number
+}
+
 // Review Creation Types
 export interface BasicReviewCreateRequest {
   /**

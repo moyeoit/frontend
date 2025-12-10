@@ -8,6 +8,8 @@ import {
   PremiumReviewCreateResponse,
   PremiumReviewsPage,
   ReviewsQueryParams,
+  ReviewSearchPage,
+  ReviewSearchParams,
 } from './types'
 
 // 프리미엄 후기 목록 조회
@@ -88,6 +90,19 @@ export async function postPremiumReview(
   const res = await apiClient.post<ApiResponse<PremiumReviewCreateResponse>>(
     '/api/v1/review/premium',
     data,
+  )
+  return res.data.data
+}
+
+// 후기 탐색 검색
+export async function searchReviews(
+  params?: ReviewSearchParams,
+): Promise<ReviewSearchPage> {
+  const res = await apiClient.get<ApiResponse<ReviewSearchPage>>(
+    '/api/v1/review/search',
+    {
+      params,
+    },
   )
   return res.data.data
 }

@@ -5,6 +5,8 @@ import {
   PremiumReviewDetail,
   PremiumReviewsPage,
   ReviewsQueryParams,
+  ReviewSearchPage,
+  ReviewSearchParams,
 } from './types'
 
 // 후기 탐색 페이지 (/review/explore) - 모든 프리미엄 후기 필터링
@@ -49,4 +51,10 @@ export function usePopularPremiumReviews(): UseQueryResult<
   Error
 > {
   return useQuery(reviewQueries.popularPremium())
+}
+
+export function useSearchReviews(
+  params?: ReviewSearchParams,
+): UseQueryResult<ReviewSearchPage, Error> {
+  return useQuery(reviewQueries.searchList(params))
 }

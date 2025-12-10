@@ -10,6 +10,12 @@ import {
 } from '@/assets/icons'
 import { cn } from '@/shared/utils/cn'
 
+//TODO: 디자인 토큰 추가
+
+//TODO: 디자인 토큰 추가
+
+//TODO: 디자인 토큰 추가
+
 export interface MobileCardProps extends React.HTMLAttributes<HTMLDivElement> {
   logoUrl?: string | null
   fallbackSrc?: string | null

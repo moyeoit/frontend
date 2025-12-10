@@ -6,10 +6,9 @@ import z from 'zod'
 import { usePostBasicReview } from '@/features/review/mutations'
 import {
   ReviewCategory,
-  ReviewType,
   QuestionType,
   type BasicReviewCreateRequest,
-  type AnswerRequest,
+  type ReviewAnswerRequest,
   ResultType,
 } from '@/features/review/types'
 import AppPath from '@/shared/configs/appPath'
@@ -138,74 +137,81 @@ export const usePaperForm = () => {
   const transformToApiRequest = (
     data: PaperFormType,
   ): BasicReviewCreateRequest => {
-    const questions: AnswerRequest[] = [
+    const answers: ReviewAnswerRequest[] = [
       {
-        questionId: 1, // Q1: 중요 어필
-        questionType: QuestionType.MultipleChoice,
+        sequence: 1,
+        question_id: 1, // Q1: 중요 어필
+        question_type: QuestionType.MultipleChoice,
         value: data.q1ImportantAppeal,
       },
       {
-        questionId: 2, // Q2: 참고 정보
-        questionType: QuestionType.SingleChoice,
+        sequence: 2,
+        question_id: 2, // Q2: 참고 정보
+        question_type: QuestionType.SingleChoice,
         value: data.q2ReferenceInfo,
       },
       {
-        questionId: 3, // Q3: 기술 역량 서술
-        questionType: QuestionType.SingleChoice,
+        sequence: 3,
+        question_id: 3, // Q3: 기술 역량 서술
+        question_type: QuestionType.SingleChoice,
         value: data.q3TechDescription,
       },
       {
-        questionId: 19, // 한줄평
-        questionType: QuestionType.Subjective,
+        sequence: 4,
+        question_id: 19, // 한줄평
+        question_type: QuestionType.SingleSubjective,
         value: data.oneLineComment,
       },
     ]
 
     // 동적 QA 항목 추가
     data.qaItems.forEach((qa, index) => {
-      questions.push({
-        questionId: 100 + index, // 동적 QA용 ID
-        questionType: QuestionType.Subjective,
+      answers.push({
+        sequence: answers.length + 1,
+        question_id: 100 + index, // 동적 QA용 ID
+        question_type: QuestionType.SingleSubjective,
         value: `Q: ${qa.question}\nA: ${qa.answer}`,
       })
     })
 
     if (data.tip) {
-      questions.push({
-        questionId: 20,
-        questionType: QuestionType.Subjective,
+      answers.push({
+        sequence: answers.length + 1,
+        question_id: 20,
+        question_type: QuestionType.SingleSubjective,
         value: data.tip,
       })
     }
 
     if (data.freeReview) {
-      questions.push({
-        questionId: 21,
-        questionType: QuestionType.Subjective,
+      answers.push({
+        sequence: answers.length + 1,
+        question_id: 21,
+        question_type: QuestionType.SingleSubjective,
         value: data.freeReview,
       })
     }
 
     // resultType 변환
-    let resultType = ResultType.Ready
+    let result = ResultType.Ready
     if (data.resultType === ResultType.Pass) {
-      resultType = ResultType.Pass
+      result = ResultType.Pass
     } else if (
       data.resultType === ResultType.Fail ||
       data.resultType === 'NOT_PARTICIPATED'
     ) {
-      resultType = ResultType.Fail
+      result = ResultType.Fail
     }
 
     return {
+      title: data.oneLineComment,
+      category: ReviewCategory.Document,
+      rate: data.rate,
+      result,
       clubId: data.clubId,
       generation: data.generation,
       jobId: data.jobId,
-      questions,
-      rate: data.rate,
-      resultType,
-      reviewCategory: ReviewCategory.Document,
-      reviewType: ReviewType.Basic,
+      answers,
     }
   }
 

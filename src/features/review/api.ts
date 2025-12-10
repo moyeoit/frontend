@@ -68,7 +68,7 @@ export async function getClubBasicReviews(
 export async function postBasicReview(
   data: BasicReviewCreateRequest,
 ): Promise<void> {
-  await apiClient.post<ApiResponse<void>>('/api/v1/review/basic', data)
+  await apiClient.post('/v1/review', data)
 }
 
 // 프리미엄 후기 상세 조회

@@ -14,8 +14,7 @@ import { cn } from '@/shared/utils/cn'
 import { getProfileImage } from '@/shared/utils/profile'
 
 // 메인 컨테이너
-export interface StandardReviewProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+export interface StandardReviewProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
 }
 
@@ -52,8 +51,7 @@ export function StandardReviewLeft({
 }
 
 // 오른쪽 영역 (별점, 태그, 한줄평)
-interface StandardReviewRightProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+interface StandardReviewRightProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
 }
 
@@ -73,8 +71,7 @@ export function StandardReviewRight({
 }
 
 // 하단 영역 (좋아요, 추천 버튼)
-interface StandardReviewBottomProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+interface StandardReviewBottomProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
 }
 
@@ -94,8 +91,7 @@ export function StandardReviewBottom({
 }
 
 // 프로필 영역
-interface StandardReviewProfileProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+interface StandardReviewProfileProps extends React.HTMLAttributes<HTMLDivElement> {
   nickname: string
   clubName: string
   generation: string
@@ -151,8 +147,7 @@ export function StandardReviewProfile({
 }
 
 // 질문 목록 영역
-interface StandardReviewQuestionsProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+interface StandardReviewQuestionsProps extends React.HTMLAttributes<HTMLDivElement> {
   questions: Array<{
     question: string
     answers: string[]
@@ -265,8 +260,7 @@ export function StandardReviewMeta({
 }
 
 // 한줄평 영역
-interface StandardReviewContentProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+interface StandardReviewContentProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string
   content: string
 }
@@ -358,8 +352,7 @@ export function StandardReviewContent({
 }
 
 // 좋아요 영역
-interface StandardReviewLikesProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+interface StandardReviewLikesProps extends React.HTMLAttributes<HTMLDivElement> {
   likeCount: number
   onLike?: () => void
 }
@@ -389,8 +382,7 @@ export function StandardReviewLikes({
 }
 
 // 추천 버튼
-interface StandardReviewRecommendProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+interface StandardReviewRecommendProps extends React.HTMLAttributes<HTMLDivElement> {
   onRecommend?: () => void
   likeCount?: number
 }

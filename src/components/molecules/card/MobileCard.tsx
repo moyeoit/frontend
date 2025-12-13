@@ -1,7 +1,6 @@
-//TODO: 디자인 토큰 추가
-
 'use client'
 
+//TODO: 디자인 토큰 추가
 import * as React from 'react'
 import Image from 'next/image'
 import {
@@ -9,14 +8,6 @@ import {
   BookmarkMobileEmptyIcon,
 } from '@/assets/icons'
 import { cn } from '@/shared/utils/cn'
-
-//TODO: 디자인 토큰 추가
-
-//TODO: 디자인 토큰 추가
-
-//TODO: 디자인 토큰 추가
-
-//TODO: 디자인 토큰 추가
 
 export interface MobileCardProps extends React.HTMLAttributes<HTMLDivElement> {
   logoUrl?: string | null

@@ -1,24 +1,24 @@
 'use client'
 
 import * as React from 'react'
+import { MessageCircle, ThumbsUp } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { MessageCircle, ThumbsUp } from 'lucide-react'
-import { SideBar } from '@/components/atoms/sideBar/Sidebar'
 import { StarRating } from '@/components/atoms/StarRating/StarRating'
+import { SideBar } from '@/components/atoms/sideBar/Sidebar'
+import { Card } from '@/components/molecules/card'
 import MobileFilterBar from '@/components/molecules/filterBar/MobileFilterBar'
 import { MultiDropDown } from '@/components/molecules/multiDropDown/MultiDropDown'
 import { PaginationWithHook } from '@/components/molecules/pagination'
 import TabOverlay from '@/components/molecules/tab/TabOverlay'
-import { Card } from '@/components/molecules/card'
 import { useSearchReviews } from '@/features/review/queries'
+import { HERO_IMAGES } from '@/shared/constants/category'
 import {
   RESULT_FILTER_OPTIONS,
   REVIEW_CATEGORY_OPTIONS,
   REVIEW_SORT_OPTIONS,
 } from '@/shared/constants/reviewFilters'
-import { HERO_IMAGES } from '@/shared/constants/category'
 import useMediaQuery from '@/shared/hooks/useMediaQuery'
 import useQueryState from '@/shared/hooks/useQueryState'
 import { cn } from '@/shared/utils/cn'
@@ -129,7 +129,9 @@ export function Explore() {
           </div>
         )}
 
-        <div className={`${isDesktop ? 'px-5 mt-8 pt-6 pb-12' : 'pt-4 w-full'}`}>
+        <div
+          className={`${isDesktop ? 'px-5 mt-8 pt-6 pb-12' : 'pt-4 w-full'}`}
+        >
           <div className="mx-auto max-w-[calc(17.625rem*3+1rem*2)]">
             <div
               className={`flex flex-row items-center justify-between gap-2 ${isDesktop ? 'mb-12' : 'pl-5 mb-6'}`}
@@ -140,7 +142,9 @@ export function Explore() {
                     <MultiDropDown
                       groups={RESULT_FILTER_OPTIONS}
                       value={resultArray}
-                      onChange={(value) => handleResultChange(value as string[])}
+                      onChange={(value) =>
+                        handleResultChange(value as string[])
+                      }
                       placeholder="결과"
                       maxSummary={1}
                       className="w-auto"
@@ -233,7 +237,10 @@ export function Explore() {
               ) : reviewsData && reviewsData.content.length > 0 ? (
                 <div className="flex flex-col gap-4">
                   {reviewsData.content.map((review) => (
-                    <ReviewListItem key={`${review.title}-${review.clubName}`} review={review} />
+                    <ReviewListItem
+                      key={`${review.title}-${review.clubName}`}
+                      review={review}
+                    />
                   ))}
                 </div>
               ) : (

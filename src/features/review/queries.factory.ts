@@ -5,6 +5,7 @@ import {
   getClubPremiumReviews,
   getClubBasicReviews,
   getPremiumReviewDetail,
+  searchReviews,
 } from './api'
 import { reviewKeys } from './keys'
 import {
@@ -12,6 +13,8 @@ import {
   PremiumReviewDetail,
   PremiumReviewsPage,
   ReviewsQueryParams,
+  ReviewSearchPage,
+  ReviewSearchParams,
 } from './types'
 
 export const reviewQueries = {
@@ -64,6 +67,14 @@ export const reviewQueries = {
       queryKey: reviewKeys.popularPremium(),
       queryFn: () => getPremiumReviews({ size: 4, sort: '인기순' }),
       staleTime: 60_000,
+    }),
+
+  // Search reviews (탐색)
+  searchList: (params?: ReviewSearchParams) =>
+    queryOptions<ReviewSearchPage>({
+      queryKey: reviewKeys.searchList(params),
+      queryFn: () => searchReviews(params),
+      staleTime: 30_000,
     }),
 } as const
 

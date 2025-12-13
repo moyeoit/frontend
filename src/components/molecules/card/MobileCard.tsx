@@ -1,7 +1,6 @@
-//TODO: 디자인 토큰 추가
-
 'use client'
 
+//TODO: 디자인 토큰 추가
 import * as React from 'react'
 import Image from 'next/image'
 import {

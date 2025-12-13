@@ -1,5 +1,6 @@
+import { Suspense } from 'react'
 import type { Metadata } from 'next'
-import { ConstructionPage } from '@/components/pages/common'
+import { Explore } from '@/components/(pages)/review/explore/Explore'
 
 export const metadata: Metadata = {
   title: '후기 탐색',
@@ -20,5 +21,9 @@ export const metadata: Metadata = {
 }
 
 export default function Page() {
-  return <ConstructionPage />
+  return (
+    <Suspense fallback={null}>
+      <Explore />
+    </Suspense>
+  )
 }

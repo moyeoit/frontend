@@ -1,4 +1,4 @@
-import { ReviewsQueryParams } from './types'
+import { ReviewsQueryParams, ReviewSearchParams } from './types'
 
 export const reviewKeys = {
   all: () => ['reviews'] as const,
@@ -31,6 +31,11 @@ export const reviewKeys = {
 
   // Popular premium reviews - 메인 페이지 (/)
   popularPremium: () => [...reviewKeys.all(), 'popular-premium'] as const,
+
+  // Review search - 후기 탐색 페이지 (/review/explore)
+  searchLists: () => [...reviewKeys.lists(), 'search'] as const,
+  searchList: (params?: ReviewSearchParams) =>
+    [...reviewKeys.searchLists(), params ?? {}] as const,
 } as const
 
 export type ReviewKeys = typeof reviewKeys

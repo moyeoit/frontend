@@ -6,10 +6,9 @@ import z from 'zod'
 import { usePostBasicReview } from '@/features/review/mutations'
 import {
   ReviewCategory,
-  ReviewType,
   QuestionType,
   type BasicReviewCreateRequest,
-  type AnswerRequest,
+  type ReviewAnswerRequest,
   ResultType,
 } from '@/features/review/types'
 import AppPath from '@/shared/configs/appPath'
@@ -133,64 +132,70 @@ export const useActivityForm = () => {
   const transformToApiRequest = (
     data: ActivityFormType,
   ): BasicReviewCreateRequest => {
-    const questions: AnswerRequest[] = [
+    const answers: ReviewAnswerRequest[] = [
       {
-        questionId: 8, // Q1: 주간 시간
-        questionType: QuestionType.SingleChoice,
+        sequence: 1,
+        question_id: 8, // Q1: 주간 시간
+        question_type: QuestionType.SingleChoice,
         value: data.q1WeeklyHours,
       },
       {
-        questionId: 9, // Q2: 난이도
-        questionType: QuestionType.SingleChoice,
+        sequence: 2,
+        question_id: 9, // Q2: 난이도
+        question_type: QuestionType.SingleChoice,
         value: data.q2Difficulty,
       },
       {
-        questionId: 10, // Q3: 만족감
-        questionType: QuestionType.MultipleChoice,
+        sequence: 3,
+        question_id: 10, // Q3: 만족감
+        question_type: QuestionType.MultipleChoice,
         value: data.q3Satisfaction,
       },
       {
-        questionId: 19, // 한줄평
-        questionType: QuestionType.Subjective,
+        sequence: 4,
+        question_id: 19, // 한줄평
+        question_type: QuestionType.SingleSubjective,
         value: data.oneLineComment,
       },
     ]
 
     // 동적 QA 항목 추가
     data.qaItems.forEach((qa, index) => {
-      questions.push({
-        questionId: 100 + index,
-        questionType: QuestionType.Subjective,
+      answers.push({
+        sequence: answers.length + 1,
+        question_id: 100 + index,
+        question_type: QuestionType.SingleSubjective,
         value: `Q: ${qa.question}\nA: ${qa.answer}`,
       })
     })
 
     if (data.tip) {
-      questions.push({
-        questionId: 20,
-        questionType: QuestionType.Subjective,
+      answers.push({
+        sequence: answers.length + 1,
+        question_id: 20,
+        question_type: QuestionType.SingleSubjective,
         value: data.tip,
       })
     }
 
     if (data.freeReview) {
-      questions.push({
-        questionId: 21,
-        questionType: QuestionType.Subjective,
+      answers.push({
+        sequence: answers.length + 1,
+        question_id: 21,
+        question_type: QuestionType.SingleSubjective,
         value: data.freeReview,
       })
     }
 
-    // 활동 후기는 resultType이 없으므로 Pass로 설정
     return {
+      title: data.oneLineComment,
+      category: ReviewCategory.Activity,
+      rate: data.rate,
+      result: ResultType.Pass,
       clubId: data.clubId,
       generation: data.generation,
       jobId: data.jobId,
-      questions,
-      rate: data.rate,
-      resultType: ResultType.Pass,
-      reviewCategory: ReviewCategory.Activity,
-      reviewType: ReviewType.Basic,
+      answers,
     }
   }
 

@@ -2,7 +2,6 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { QuickButton } from '@/components/atoms/quickButton'
 import { Card } from '@/components/molecules/card'
 import { usePopularClubs } from '@/features/clubs/queries'
 import { usePopularPremiumReviews } from '@/features/review/queries'
@@ -29,23 +28,6 @@ export default function HomePage() {
 
       {/* 하단 푸터 제외한 컨테이너 내용물 전체 */}
       <div className=" py-8 max-w-[1100px] w-full mx-auto">
-        {/* 상단 버튼 2개  */}
-        <div className="flex flex-row gap-4 justify-center items-center p-6">
-          <QuickButton
-            icon="/icons/subscribe.svg"
-            title="구독"
-            description="구독한 IT 활동 모아보기"
-            href="/subscribe"
-          />
-          <QuickButton
-            icon="/icons/clubMatching.svg"
-            title="동아리 매칭"
-            description="아직 준비중이에요"
-            href="/"
-            onClick={() => alert('준비중인 기능입니다')}
-          />
-        </div>
-
         {/* 인기 IT 동아리  */}
         <div className={`${isDesktop ? 'mt-12' : 'mt-8'} px-5 pb-4`}>
           <div className="flex flex-row justify-between items-center">
@@ -137,16 +119,14 @@ export default function HomePage() {
         </div>
 
         {/* 하단 광고 배너 */}
-        <div className="mx-5 mb-12">
-          <div
-            className={`w-full ${isDesktop ? 'h-full' : 'h-44'} rounded-[24px] p-6 flex items-center justify-between`}
-          >
-            <img
-              src="/icons/main.svg"
-              alt="main"
-              className="w-full h-full object-cover rounded-[24px]"
-            />
-          </div>
+        <div className="mx-5 mb-12 pb-8">
+          <Image
+            src="/icons/main.svg"
+            alt="main"
+            className="w-full h-full object-cover rounded-[24px]"
+            width={1060}
+            height={264}
+          />
         </div>
       </div>
     </div>

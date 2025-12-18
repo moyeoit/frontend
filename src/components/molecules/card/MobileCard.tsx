@@ -86,7 +86,7 @@ export function MobileCard({
           {description && (
             <div
               data-slot="mobile-card-description"
-              className="typo-smallbody-1.5 text-grey-color-3 line-clamp-1"
+              className="typo-smallbody-1-5 text-grey-color-3 line-clamp-1"
             >
               {description}
             </div>
@@ -96,7 +96,7 @@ export function MobileCard({
         {categories.length > 0 && (
           <div
             data-slot="mobile-card-categories"
-            className="typo-smallbody-1.5 text-main-color-1 line-clamp-1"
+            className="typo-smallbody-1-5 text-main-color-1 line-clamp-1"
           >
             {categories.join('\u2009·\u2009')}
           </div>

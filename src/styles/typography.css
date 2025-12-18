@@ -10,7 +10,7 @@
   font-weight: 600;
 }
 
-@utility typo-smallbody-1.5 {
+@utility typo-smallbody-1-5 { 
   font-size: var(--text-body-4);
   line-height: 1.5;
   font-weight: 500;

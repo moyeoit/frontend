@@ -13,7 +13,8 @@ export const CommunityCardCtx = React.createContext<{
   type: 'horizontal',
 })
 
-export interface CommunityCardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface CommunityCardProps
+  extends React.HTMLAttributes<HTMLDivElement> {
   type?: CommunityCardType
 }
 
@@ -72,7 +73,8 @@ export function CommunityCardDescription({
   )
 }
 
-export interface CommunityCardImageProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface CommunityCardImageProps
+  extends React.HTMLAttributes<HTMLDivElement> {
   logoUrl?: string | null
   alt?: string
 }

@@ -8,8 +8,7 @@ export type TagSize = 'small' | 'large' | 'none'
 export type TagColor = 'white' | 'lightPurple' | 'purple'
 
 export interface TagProps
-  extends
-    React.HTMLAttributes<HTMLSpanElement>,
+  extends React.HTMLAttributes<HTMLSpanElement>,
     VariantProps<typeof tagVariants> {
   label?: string | null
   kind?: TagKind

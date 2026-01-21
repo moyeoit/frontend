@@ -15,7 +15,7 @@ export default function OAuthCallbackPage() {
   const params = useParams()
   const { login } = useAuth()
   const [isProcessing, setIsProcessing] = useState(true)
-
+  const [error, setError] = useState<string | null>(null)
   // provider는 URL 파라미터에서 추출
   const provider = params.provider as OAuthProvider
 
@@ -34,13 +34,17 @@ export default function OAuthCallbackPage() {
 
     if (errorParam) {
       console.error('OAuth error:', errorParam)
+      setError('소셜 로그인 중 오류가 발생했습니다.')
       setIsProcessing(false)
+      setTimeout(() => router.push(AppPath.login()), 3000)
       return
     }
 
     if (!code) {
       console.error('No authorization code received')
+      setError('유효한 인증코드를 받지 못했습니다.')
       setIsProcessing(false)
+      setTimeout(() => router.push(AppPath.login()), 3000)
       return
     }
 
@@ -52,7 +56,7 @@ export default function OAuthCallbackPage() {
       try {
         setIsProcessing(true)
         const loginData = await oauthApi.login(
-          code,
+          code!,
           state || '1', // state가 없으면 기본값 '1' 사용
           redirectUri,
           provider,
@@ -112,7 +116,10 @@ export default function OAuthCallbackPage() {
         }
       } catch (err) {
         console.error('OAuth login error:', err)
+        setError('소셜 로그인 중 오류가 발생했습니다.')
         setIsProcessing(false)
+        // 로그인 실패 시 3초 후 로그인 페이지로 이동 (무한로딩 방지)
+        setTimeout(() => router.push(AppPath.login()), 3000)
       }
     }
 
@@ -126,6 +133,17 @@ export default function OAuthCallbackPage() {
         <div className="text-center">
           <div className="w-12 h-12 mx-auto mb-4 border-b-2 border-gray-900 rounded-full animate-spin"></div>
           <p className="text-gray-600">소셜 로그인 처리 중...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p className="text-gray-600">로그인 처리 중 오류가 발생했습니다.</p>
+          <p className="text-gray-600">잠시 후 로그인 페이지로 이동합니다.</p>
         </div>
       </div>
     )

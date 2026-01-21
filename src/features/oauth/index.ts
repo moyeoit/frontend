@@ -1,5 +1,11 @@
 // Types
-export type { OAuthProvider, OAuthCallbackParams } from './types'
+export type {
+  OAuthProvider,
+  OAuthCallbackParams,
+  OAuthAuthorizeResponse,
+  OAuthLoginRequest,
+  OAuthLoginResponse,
+} from './types'
 
 // API
 export { oauthApi } from './api'

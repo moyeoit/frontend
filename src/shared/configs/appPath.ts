@@ -6,13 +6,14 @@ const AppPath = {
   login: () => '/login' as const,
   logout: () => '/logout' as const,
   signup: () => '/signup' as const,
-  oauthCallback: (provider: 'google' | 'kakao') => `/oauth-callback/` as const,
+  oauthCallback: (provider: 'google' | 'kakao') =>
+    `/oauth-callback/${provider}` as const,
   kakaoLogin: () =>
     `${Environment.apiAddress()}/api/users/oauth2/authorize/kakao/login` as const,
   googleLogin: () =>
     `${Environment.apiAddress()}/api/users/oauth2/authorize/google/login` as const,
   oauthAuthorize: (provider: 'google' | 'kakao') =>
-    `${Environment.apiAddress()}/api/oauth2/authorize/${provider}` as const,
+    `${Environment.apiAddress()}/api/v1/auth/${provider}/authorize` as const,
   clubExplore: () => '/club/explore' as const,
   clubDetail: (clubId: string) => `/club/${clubId}` as const,
   reviewExplore: () => '/review/explore' as const,
@@ -21,6 +22,7 @@ const AppPath = {
     `/review/new${kind ? `/${kind}` : ''}` as const,
   reviewEdit: (reviewId: string) => `/review/${reviewId}/edit` as const,
   reviewSubmitted: () => '/review/submitted' as const,
+  bookmark: () => '/bookmark' as const,
 } as const
 
 type AppPathReturnType = {

@@ -17,16 +17,25 @@ export function useToggleBookmark(
   return useMutation({
     mutationFn: (data: BookmarkRequest) => toggleBookmark(data),
     onSuccess: (data, variables, onMutateResult, context) => {
-      if (data.status === 'SUCCESS') {
-        if (variables.type === 'CLUB') {
-          queryClient.invalidateQueries({
-            queryKey: bookmarkKeys.clubs(),
-          })
-        }
+      // 북마크 토글 성공 시 모든 관련 쿼리를 invalidate
+      if (variables.type === 'CLUB') {
         queryClient.invalidateQueries({
-          queryKey: bookmarkKeys.all,
+          queryKey: bookmarkKeys.clubs(),
+        })
+      } else if (
+        variables.type === 'INTERVIEW_REVIEW' ||
+        variables.type === 'ACTIVITY_REVIEW'
+      ) {
+        // 모든 리뷰 쿼리를 invalidate (page, size 상관없이)
+        queryClient.invalidateQueries({
+          queryKey: bookmarkKeys.reviews(),
         })
       }
+
+      // 전체 북마크 쿼리도 invalidate
+      queryClient.invalidateQueries({
+        queryKey: bookmarkKeys.all,
+      })
 
       options?.onSuccess?.(data, variables, onMutateResult, context)
     },

@@ -8,9 +8,8 @@ import CardOverlay from '@/components/molecules/card/CardOverlay'
 import MobileFilterBar from '@/components/molecules/filterBar/MobileFilterBar'
 import { MultiDropDown } from '@/components/molecules/multiDropDown/MultiDropDown'
 import TabOverlay from '@/components/molecules/tab/TabOverlay'
-import { useToggleClubSubscription } from '@/features/clubs/mutations'
+import { useToggleBookmark, useBookmarkedClubs } from '@/features/bookmark'
 import { useExploreClubs } from '@/features/explore/queries'
-import { useUserSubscribes } from '@/features/subscribe/queries'
 import { CATEGORY_OPTIONS, HERO_IMAGES } from '@/shared/constants/category'
 import {
   PART_OPTIONS,
@@ -123,19 +122,19 @@ export function Explore() {
 
   const { data: clubsData } = useExploreClubs(queryParams)
 
-  const { data: subscribesData } = useUserSubscribes()
-  const toggleSubscription = useToggleClubSubscription()
+  const { data: bookmarkedClubsData } = useBookmarkedClubs()
+  const toggleBookmark = useToggleBookmark()
 
   const clubs = clubsData?.content || []
-  const subscribes = subscribesData?.data?.content || []
-  const subscribedClubIds = new Set(subscribes.map((s) => s.clubId))
+  const bookmarkedClubs = bookmarkedClubsData?.data?.content || []
+  const bookmarkedClubIds = new Set(bookmarkedClubs.map((club) => club.clubId))
 
   const handleBookmarkClick = React.useCallback(
     (e: React.MouseEvent<HTMLButtonElement>, clubId: number) => {
       e.stopPropagation()
-      toggleSubscription.mutate(clubId)
+      toggleBookmark.mutate({ targetId: clubId, type: 'CLUB' })
     },
-    [toggleSubscription],
+    [toggleBookmark],
   )
 
   const fieldLabel = React.useMemo(() => {
@@ -285,7 +284,7 @@ export function Explore() {
                 <CardOverlay
                   key={club.clubId}
                   club={club}
-                  isSubscribed={subscribedClubIds.has(club.clubId)}
+                  isSubscribed={bookmarkedClubIds.has(club.clubId)}
                   onBookmarkClick={handleBookmarkClick}
                 />
               ))}

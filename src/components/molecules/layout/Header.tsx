@@ -1,10 +1,15 @@
 'use client'
 
 import * as React from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ProfileIcon, SearchIcon } from '@/assets/icons'
+import {
+  ProfileIcon,
+  SearchIcon,
+  BookmarkMobileEmptyIcon,
+} from '@/assets/icons'
 import { MoyeoitFullLogo } from '@/assets/images'
 import { Button } from '@/components/atoms/Button'
 import { useUserProfile } from '@/features/user'
@@ -18,6 +23,11 @@ export default function Header() {
   const { setOpen } = useSearchUrlState()
   const { user } = useAuth()
   const { data: profile } = useUserProfile()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   return (
     <div className="w-full text-grey-color-5 max-desktop:hidden">
@@ -68,31 +78,47 @@ export default function Header() {
                 aria-label="search"
               />
             </Button>
-            {user ? (
-              <Button
-                variant="none"
-                size="none"
-                aria-label="profile"
-                className="w-full h-full rounded-full grid place-items-center transition-colors hover:opacity-50 focus:opacity-50"
-                onClick={() => router.push(AppPath.myPage())}
-              >
-                {profile?.profileImageUrl ? (
-                  <Image
-                    src={profile.profileImageUrl}
-                    alt="profile"
-                    className="w-full h-full object-cover rounded-full"
-                    width={40}
-                    height={40}
-                  />
-                ) : (
-                  <ProfileIcon
-                    width={40}
-                    height={40}
+            {user && mounted ? (
+              <>
+                <Button
+                  variant="none"
+                  size="none"
+                  aria-label="bookmark"
+                  className="w-full h-full rounded-full grid place-items-center transition-colors hover:opacity-50 focus:opacity-50"
+                  onClick={() => router.push(AppPath.bookmark())}
+                >
+                  <BookmarkMobileEmptyIcon
+                    width={24}
+                    height={24}
                     role="img"
-                    aria-label="profile"
+                    aria-label="bookmark"
                   />
-                )}
-              </Button>
+                </Button>
+                <Button
+                  variant="none"
+                  size="none"
+                  aria-label="profile"
+                  className="w-full h-full rounded-full grid place-items-center transition-colors hover:opacity-50 focus:opacity-50"
+                  onClick={() => router.push(AppPath.myPage())}
+                >
+                  {profile?.profileImageUrl ? (
+                    <Image
+                      src={profile.profileImageUrl}
+                      alt="profile"
+                      className="w-full h-full object-cover rounded-full"
+                      width={40}
+                      height={40}
+                    />
+                  ) : (
+                    <ProfileIcon
+                      width={40}
+                      height={40}
+                      role="img"
+                      aria-label="profile"
+                    />
+                  )}
+                </Button>
+              </>
             ) : (
               <Link
                 href={AppPath.login()}

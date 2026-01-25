@@ -12,6 +12,15 @@ export const reviewKeys = {
   premiumDetail: (premiumReviewId: number) =>
     [...reviewKeys.premiumDetails(), premiumReviewId] as const,
 
+  // Review detail - /review/[reviewId]
+  details: () => [...reviewKeys.all(), 'detail'] as const,
+  detail: (reviewId: number) => [...reviewKeys.details(), reviewId] as const,
+
+  // Review comments - /review/[reviewId]
+  commentLists: () => [...reviewKeys.all(), 'comments'] as const,
+  commentList: (reviewId: number) =>
+    [...reviewKeys.commentLists(), reviewId] as const,
+
   // Club premium reviews - 동아리 상세 페이지 프리미엄 후기 탭 (/club/[clubId])
   clubPremiumLists: () => [...reviewKeys.lists(), 'club-premium'] as const,
   clubPremiumList: (

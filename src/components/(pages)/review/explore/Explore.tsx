@@ -1,7 +1,6 @@
 'use client'
 
 import * as React from 'react'
-import { MessageCircle, ThumbsUp } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -22,6 +21,15 @@ import {
 import useMediaQuery from '@/shared/hooks/useMediaQuery'
 import useQueryState from '@/shared/hooks/useQueryState'
 import { cn } from '@/shared/utils/cn'
+import { BlogReviewCard, ReviewListItem } from './ReviewCards'
+
+// 모바일 탭 옵션
+const MOBILE_TAB_OPTIONS = [
+  { value: 'all', label: '전체' },
+  { value: 'DOCUMENT', label: '서류/면접' },
+  { value: 'ACTIVITY', label: '활동' },
+  { value: 'BLOG', label: '블로그' },
+]
 
 const DEFAULT_SIZE_DESKTOP = 9
 const DEFAULT_SIZE_MOBILE = 6
@@ -99,12 +107,30 @@ export function Explore() {
     [currentCategory],
   )
 
+  const isAllCategory = currentCategory === 'all'
+  const isBlogCategory = currentCategory === 'BLOG'
+  const isDocumentCategory = currentCategory === 'DOCUMENT'
+  const useBlogLayout = isAllCategory || isBlogCategory
+  const useDocumentLayout = isDocumentCategory
+  const listTitle = isAllCategory ? '블로그 후기' : fieldLabel
+
+  // BEST 후기는 전체 카테고리에서만 표시
+  const showBestReviews = isAllCategory
   const showHero = isDesktop || currentCategory === 'all'
+
+  // 모바일 탭 변경 핸들러
+  const handleMobileTabChange = React.useCallback(
+    (value: string) => {
+      setCategory(value === 'all' ? null : value)
+    },
+    [setCategory],
+  )
 
   return (
     <div className="bg-white-color">
-      {showHero && (
-        <div className="relative h-[280px] flex items-end justify-center px-5 py-18 overflow-hidden">
+      {/* 데스크탑 히어로 이미지 */}
+      {isDesktop && (
+        <div className="relative h-70 flex items-end justify-center px-5 py-18 overflow-hidden">
           <Image
             src={HERO_IMAGES.all}
             alt={`${fieldLabel} 히어로 이미지`}
@@ -112,6 +138,36 @@ export function Explore() {
             className="object-cover"
             priority
           />
+        </div>
+      )}
+
+      {/* 모바일 히어로 섹션 */}
+      {!isDesktop && (
+        <div className="bg-grey-color-5 flex flex-col items-center justify-center px-5 h-32">
+          <p className="typo-title-2-b text-white-color w-full px-5">후기</p>
+        </div>
+      )}
+
+      {/* 모바일 탭 메뉴 */}
+      {!isDesktop && (
+        <div className="px-5 border-b border-light-color-4">
+          <div className="flex gap-1">
+            {MOBILE_TAB_OPTIONS.map((tab) => (
+              <button
+                key={tab.value}
+                type="button"
+                onClick={() => handleMobileTabChange(tab.value)}
+                className={cn(
+                  'px-3 py-2.5 typo-body-2-sb whitespace-nowrap',
+                  currentCategory === tab.value
+                    ? 'text-black-color border-b-2 border-black-color'
+                    : 'text-grey-color-1',
+                )}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
@@ -150,8 +206,9 @@ export function Explore() {
                       className="w-auto"
                     />
                     <button
+                      type="button"
                       onClick={() => resetFilters()}
-                      className="flex items-center gap-1 px-3 py-2 text-grey-color-2 typo-button-m h-[32px] cursor-pointer"
+                      className="flex items-center gap-1 px-3 py-2 text-grey-color-2 typo-button-m h-8 cursor-pointer"
                     >
                       <Image
                         src="/icons/reset.svg"
@@ -202,27 +259,29 @@ export function Explore() {
               )}
             </div>
 
-            {bestReviewsData?.content && bestReviewsData.content.length > 0 && (
-              <section className={`${isDesktop ? 'mb-10' : 'mb-8 px-5'}`}>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="typo-title-2">BEST 후기</h2>
-                  <span className="typo-body-4-m text-grey-color-3">
-                    인기순 Top {bestReviewsData.content.length}
-                  </span>
-                </div>
-                <div
-                  className={`grid ${isDesktop ? 'grid-cols-3 gap-6' : 'grid-cols-1 gap-4'}`}
-                >
-                  {bestReviewsData.content.map((review) => (
-                    <BestReviewCard key={review.title} review={review} />
-                  ))}
-                </div>
-              </section>
-            )}
+            {showBestReviews &&
+              bestReviewsData?.content &&
+              bestReviewsData.content.length > 0 && (
+                <section className={`${isDesktop ? 'mb-10' : 'mb-8 px-5'}`}>
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="typo-title-2">BEST 후기</h2>
+                    <span className="typo-body-4-m text-grey-color-3">
+                      인기순 Top {bestReviewsData.content.length}
+                    </span>
+                  </div>
+                  <div
+                    className={`grid ${isDesktop ? 'grid-cols-3 gap-6' : 'grid-cols-1 gap-4'}`}
+                  >
+                    {bestReviewsData.content.map((review) => (
+                      <BestReviewCard key={review.title} review={review} />
+                    ))}
+                  </div>
+                </section>
+              )}
 
             <section className={`${isDesktop ? '' : 'px-5'}`}>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="typo-title-2">블로그 후기</h2>
+                <h2 className="typo-title-2">{listTitle}</h2>
                 {isListFetching && (
                   <span className="typo-body-4-m text-grey-color-3">
                     불러오는 중...
@@ -235,13 +294,31 @@ export function Explore() {
                   후기 목록을 불러오는 중입니다.
                 </div>
               ) : reviewsData && reviewsData.content.length > 0 ? (
-                <div className="flex flex-col gap-4">
-                  {reviewsData.content.map((review) => (
-                    <ReviewListItem
-                      key={`${review.title}-${review.clubName}`}
-                      review={review}
-                    />
-                  ))}
+                <div
+                  className={cn(
+                    'flex flex-col',
+                    useBlogLayout ? (isDesktop ? 'gap-6' : 'gap-4') : 'gap-4',
+                  )}
+                >
+                  {reviewsData.content.map((review) => {
+                    if (useBlogLayout) {
+                      return (
+                        <BlogReviewCard
+                          key={`${review.title}-${review.clubName}`}
+                          review={review}
+                          isDesktop={isDesktop}
+                        />
+                      )
+                    }
+                    // 서류/면접 후기 또는 기타 카테고리
+                    return (
+                      <ReviewListItem
+                        key={`${review.title}-${review.clubName}`}
+                        review={review}
+                        isDesktop={isDesktop}
+                      />
+                    )
+                  })}
                 </div>
               ) : (
                 <div className="flex items-center justify-center py-10 text-grey-color-4">
@@ -327,76 +404,4 @@ function BestReviewCard({
   }
 
   return content
-}
-
-function ReviewListItem({
-  review,
-}: {
-  review: {
-    reviewId?: number
-    clubName: string
-    jobName: string
-    generation: number
-    title: string
-    answerSummaries: { answerSummary: string }[]
-    rate: number
-    likeCount: number
-    commentCount: number
-    category?: string
-  }
-}) {
-  const snippet = review.answerSummaries?.[0]?.answerSummary || ''
-  const href = review.reviewId ? `/review/${review.reviewId}` : '#'
-  const meta = [review.clubName, `${review.generation}기`, review.jobName]
-    .filter(Boolean)
-    .join(' · ')
-
-  return (
-    <Link href={href} className="block">
-      <div className="w-full border border-light-color-3 rounded-2xl p-4 bg-white transition-all hover:shadow-md">
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <div className="typo-body-4-m text-grey-color-3">{meta}</div>
-            <div className="flex items-center gap-2">
-              <StarRating
-                value={review.rate}
-                onChange={() => {}}
-                disabled
-                className="[&>button]:p-0"
-              />
-              <span className="typo-body-4-m text-grey-color-3">
-                {review.rate.toFixed(1)}
-              </span>
-            </div>
-          </div>
-          <div className="typo-body-1 text-black-color line-clamp-1">
-            {review.title}
-          </div>
-          <div className="typo-body-3-3r text-grey-color-4 line-clamp-2">
-            {snippet}
-          </div>
-          <div className="flex items-center justify-between">
-            <span
-              className={cn(
-                'px-3 py-1 rounded-full border text-xs',
-                'border-light-color-3 text-grey-color-4',
-              )}
-            >
-              {review.category || '후기'}
-            </span>
-            <div className="flex items-center gap-3 text-grey-color-3 typo-caption-m">
-              <span className="flex items-center gap-1">
-                <ThumbsUp className="w-4 h-4" />
-                {review.likeCount}
-              </span>
-              <span className="flex items-center gap-1">
-                <MessageCircle className="w-4 h-4" />
-                {review.commentCount}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Link>
-  )
 }

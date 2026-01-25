@@ -12,3 +12,9 @@ export async function toggleLike(
   )
   return res.data.data
 }
+
+export async function toggleReviewLike(reviewId: number): Promise<void> {
+  await apiClient.post(`/api/v1/review/like/${reviewId}`, null, {
+    params: { reviewId },
+  })
+}

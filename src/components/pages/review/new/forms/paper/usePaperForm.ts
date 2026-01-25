@@ -17,9 +17,9 @@ import { appValidation } from '@/shared/configs/appValidation'
 // 서류 결과 옵션
 export const PAPER_RESULT_OPTIONS = [
   { id: ResultType.Pass, label: '합격' },
-  { id: ResultType.Fail, label: '불합격' },
-  { id: 'NOT_PARTICIPATED', label: '합격 후 참여하지않음' },
-  { id: ResultType.Ready, label: '결과 대기중' },
+  { id: ResultType.Failure, label: '불합격' },
+  { id: ResultType.NotParticipateAfterPass, label: '합격 후 참여하지않음' },
+  { id: ResultType.Waiting, label: '결과 대기중' },
 ] as const
 
 // Q1: 지원서 작성에 있어 가장 중요하게 어필한 것은 무엇이었나요?
@@ -140,44 +140,44 @@ export const usePaperForm = () => {
     const answers: ReviewAnswerRequest[] = [
       {
         sequence: 1,
-        question_id: 1, // Q1: 중요 어필
+        question_id: 1, // Q1: 중요 어필 (MULTIPLE_CHOICE)
         question_type: QuestionType.MultipleChoice,
         value: data.q1ImportantAppeal,
       },
       {
         sequence: 2,
-        question_id: 2, // Q2: 참고 정보
+        question_id: 2, // Q2: 참고 정보 (SINGLE_CHOICE)
         question_type: QuestionType.SingleChoice,
         value: data.q2ReferenceInfo,
       },
       {
         sequence: 3,
-        question_id: 3, // Q3: 기술 역량 서술
+        question_id: 3, // Q3: 기술 역량 서술 (SINGLE_CHOICE)
         question_type: QuestionType.SingleChoice,
         value: data.q3TechDescription,
       },
       {
         sequence: 4,
-        question_id: 19, // 한줄평
+        question_id: 6, // 한줄평 (SINGLE_SUBJECTIVE)
         question_type: QuestionType.SingleSubjective,
         value: data.oneLineComment,
       },
     ]
 
-    // 동적 QA 항목 추가
-    data.qaItems.forEach((qa, index) => {
+    // 동적 QA 항목 추가 (MULTIPLE_SUBJECTIVE)
+    data.qaItems.forEach((qa) => {
       answers.push({
         sequence: answers.length + 1,
-        question_id: 100 + index, // 동적 QA용 ID
-        question_type: QuestionType.SingleSubjective,
-        value: `Q: ${qa.question}\nA: ${qa.answer}`,
+        question_id: 4,
+        question_type: QuestionType.MultipleSubjective,
+        value: [`Q: ${qa.question}`, `A: ${qa.answer}`],
       })
     })
 
     if (data.tip) {
       answers.push({
         sequence: answers.length + 1,
-        question_id: 20,
+        question_id: 5, // TIP (SINGLE_SUBJECTIVE)
         question_type: QuestionType.SingleSubjective,
         value: data.tip,
       })
@@ -186,21 +186,20 @@ export const usePaperForm = () => {
     if (data.freeReview) {
       answers.push({
         sequence: answers.length + 1,
-        question_id: 21,
+        question_id: 6, // 자유후기 (SINGLE_SUBJECTIVE)
         question_type: QuestionType.SingleSubjective,
         value: data.freeReview,
       })
     }
 
     // resultType 변환
-    let result = ResultType.Ready
+    let result: ResultType = ResultType.Waiting
     if (data.resultType === ResultType.Pass) {
       result = ResultType.Pass
-    } else if (
-      data.resultType === ResultType.Fail ||
-      data.resultType === 'NOT_PARTICIPATED'
-    ) {
-      result = ResultType.Fail
+    } else if (data.resultType === ResultType.Failure) {
+      result = ResultType.Failure
+    } else if (data.resultType === ResultType.NotParticipateAfterPass) {
+      result = ResultType.NotParticipateAfterPass
     }
 
     return {

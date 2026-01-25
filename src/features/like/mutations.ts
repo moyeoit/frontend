@@ -4,7 +4,7 @@ import {
   UseMutationResult,
   useQueryClient,
 } from '@tanstack/react-query'
-import { toggleLike } from './api'
+import { toggleLike, toggleReviewLike } from './api'
 import { likeKeys } from './keys'
 import { LikeResponse } from './types'
 
@@ -38,6 +38,15 @@ export function useToggleLike(
 
       options?.onSuccess?.(data, variables, onMutateResult, context)
     },
+    ...options,
+  })
+}
+
+export function useToggleReviewLike<TContext = { previous?: unknown }>(
+  options?: UseMutationOptions<void, Error, number, TContext>,
+): UseMutationResult<void, Error, number, TContext> {
+  return useMutation<void, Error, number, TContext>({
+    mutationFn: (reviewId) => toggleReviewLike(reviewId),
     ...options,
   })
 }

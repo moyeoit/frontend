@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { useRouter } from 'next/navigation'
 import { UnderLineTab } from '@/components/atoms/UnderLineTab'
 import CardOverlay from '@/components/molecules/card/CardOverlay'
 import Review from '@/components/organisms/review/Review'
@@ -9,9 +10,11 @@ import {
   useBookmarkedInterviewReviews,
   useToggleBookmark,
 } from '@/features/bookmark'
+import AppPath from '@/shared/configs/appPath'
 import useMediaQuery from '@/shared/hooks/useMediaQuery'
 
 export function Bookmark() {
+  const router = useRouter()
   const { isDesktop } = useMediaQuery()
   const { data: bookmarkedClubsData, isPending: isClubsLoading } =
     useBookmarkedClubs()
@@ -57,6 +60,13 @@ export function Bookmark() {
       })
     },
     [toggleBookmark],
+  )
+
+  const handleReviewDetailClick = React.useCallback(
+    (reviewId: number) => {
+      router.push(AppPath.reviewDetail(String(reviewId)))
+    },
+    [router],
   )
 
   const tabs = [
@@ -122,7 +132,7 @@ export function Bookmark() {
                     title: review.title,
                     likeCount: review.likeCount,
                     commentCount: review.commentCount,
-                    qaPreviews: review.answerSummaries.map((summary, idx) => ({
+                    qaPreviews: review.answerSummaries.map((summary) => ({
                       questionTitle: summary.questionTitleSummary,
                       answerValue: summary.answerSummary,
                     })),
@@ -130,6 +140,11 @@ export function Bookmark() {
                   isBookmarked={true}
                   onBookmarkClick={() =>
                     handleInterviewReviewBookmarkClick(review.reviewId)
+                  }
+                  onDetailClick={
+                    review.reviewId
+                      ? () => handleReviewDetailClick(review.reviewId)
+                      : undefined
                   }
                 />
               ))}

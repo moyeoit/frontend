@@ -1,7 +1,6 @@
 'use client'
 
 import * as React from 'react'
-import { MessageCircle, ThumbsUp } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -12,6 +11,7 @@ import MobileFilterBar from '@/components/molecules/filterBar/MobileFilterBar'
 import { MultiDropDown } from '@/components/molecules/multiDropDown/MultiDropDown'
 import { PaginationWithHook } from '@/components/molecules/pagination'
 import TabOverlay from '@/components/molecules/tab/TabOverlay'
+import { BlogReviewCard, ReviewListItem } from './ReviewCards'
 import { useSearchReviews } from '@/features/review/queries'
 import { HERO_IMAGES } from '@/shared/constants/category'
 import {
@@ -98,6 +98,11 @@ export function Explore() {
         ?.label || '전체',
     [currentCategory],
   )
+
+  const isAllCategory = currentCategory === 'all'
+  const isBlogCategory = currentCategory === 'BLOG'
+  const useBlogLayout = isAllCategory || isBlogCategory
+  const listTitle = isAllCategory ? '블로그 후기' : fieldLabel
 
   const showHero = isDesktop || currentCategory === 'all'
 
@@ -202,7 +207,9 @@ export function Explore() {
               )}
             </div>
 
-            {bestReviewsData?.content && bestReviewsData.content.length > 0 && (
+            {isAllCategory &&
+              bestReviewsData?.content &&
+              bestReviewsData.content.length > 0 && (
               <section className={`${isDesktop ? 'mb-10' : 'mb-8 px-5'}`}>
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="typo-title-2">BEST 후기</h2>
@@ -222,7 +229,7 @@ export function Explore() {
 
             <section className={`${isDesktop ? '' : 'px-5'}`}>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="typo-title-2">블로그 후기</h2>
+                <h2 className="typo-title-2">{listTitle}</h2>
                 {isListFetching && (
                   <span className="typo-body-4-m text-grey-color-3">
                     불러오는 중...
@@ -235,13 +242,30 @@ export function Explore() {
                   후기 목록을 불러오는 중입니다.
                 </div>
               ) : reviewsData && reviewsData.content.length > 0 ? (
-                <div className="flex flex-col gap-4">
-                  {reviewsData.content.map((review) => (
-                    <ReviewListItem
-                      key={`${review.title}-${review.clubName}`}
-                      review={review}
-                    />
-                  ))}
+                <div
+                  className={cn(
+                    'flex flex-col',
+                    useBlogLayout
+                      ? isDesktop
+                        ? 'gap-6'
+                        : 'gap-4'
+                      : 'gap-4',
+                  )}
+                >
+                  {reviewsData.content.map((review) =>
+                    useBlogLayout ? (
+                      <BlogReviewCard
+                        key={`${review.title}-${review.clubName}`}
+                        review={review}
+                        isDesktop={isDesktop}
+                      />
+                    ) : (
+                      <ReviewListItem
+                        key={`${review.title}-${review.clubName}`}
+                        review={review}
+                      />
+                    ),
+                  )}
                 </div>
               ) : (
                 <div className="flex items-center justify-center py-10 text-grey-color-4">
@@ -327,76 +351,4 @@ function BestReviewCard({
   }
 
   return content
-}
-
-function ReviewListItem({
-  review,
-}: {
-  review: {
-    reviewId?: number
-    clubName: string
-    jobName: string
-    generation: number
-    title: string
-    answerSummaries: { answerSummary: string }[]
-    rate: number
-    likeCount: number
-    commentCount: number
-    category?: string
-  }
-}) {
-  const snippet = review.answerSummaries?.[0]?.answerSummary || ''
-  const href = review.reviewId ? `/review/${review.reviewId}` : '#'
-  const meta = [review.clubName, `${review.generation}기`, review.jobName]
-    .filter(Boolean)
-    .join(' · ')
-
-  return (
-    <Link href={href} className="block">
-      <div className="w-full border border-light-color-3 rounded-2xl p-4 bg-white transition-all hover:shadow-md">
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <div className="typo-body-4-m text-grey-color-3">{meta}</div>
-            <div className="flex items-center gap-2">
-              <StarRating
-                value={review.rate}
-                onChange={() => {}}
-                disabled
-                className="[&>button]:p-0"
-              />
-              <span className="typo-body-4-m text-grey-color-3">
-                {review.rate.toFixed(1)}
-              </span>
-            </div>
-          </div>
-          <div className="typo-body-1 text-black-color line-clamp-1">
-            {review.title}
-          </div>
-          <div className="typo-body-3-3r text-grey-color-4 line-clamp-2">
-            {snippet}
-          </div>
-          <div className="flex items-center justify-between">
-            <span
-              className={cn(
-                'px-3 py-1 rounded-full border text-xs',
-                'border-light-color-3 text-grey-color-4',
-              )}
-            >
-              {review.category || '후기'}
-            </span>
-            <div className="flex items-center gap-3 text-grey-color-3 typo-caption-m">
-              <span className="flex items-center gap-1">
-                <ThumbsUp className="w-4 h-4" />
-                {review.likeCount}
-              </span>
-              <span className="flex items-center gap-1">
-                <MessageCircle className="w-4 h-4" />
-                {review.commentCount}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Link>
-  )
 }

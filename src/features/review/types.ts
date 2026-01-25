@@ -390,6 +390,7 @@ export interface ReviewData {
   likeCount?: number
   commentCount?: number
   result?: string
+  title?: string
   answers?: Array<{
     question: {
       title: string

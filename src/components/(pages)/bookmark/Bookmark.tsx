@@ -119,7 +119,7 @@ export function Bookmark() {
                     generation: review.generation,
                     part: review.jobName,
                     rate: review.rate,
-                    oneLineComment: review.title,
+                    title: review.title,
                     likeCount: review.likeCount,
                     commentCount: review.commentCount,
                     qaPreviews: review.answerSummaries.map((summary, idx) => ({

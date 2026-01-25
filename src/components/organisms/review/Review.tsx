@@ -38,6 +38,7 @@ export default function Review({
   const nickname = data.nickname
   const oneLineComment = data.oneLineComment
   const qaPreviews = data.qaPreviews
+  const title = data.title
 
   const profileImageUrl = getProfileImage(position)
   const displayName = nickname || clubName.charAt(0)
@@ -84,15 +85,27 @@ export default function Review({
         return questionTitle
       })
     }
-    // 기존 qaPreviews 호환
+    // 기존 qaPreviews 호환 (북마크 API 응답)
     if (qaPreviews && qaPreviews.length > 0) {
-      return qaPreviews.slice(0, 3).map((qa) => qa.questionTitle)
+      return qaPreviews.slice(0, 3).map((qa) => {
+        const questionTitle = qa.questionTitle
+        const answerValue = qa.answerValue
+        if (answerValue) {
+          return `${questionTitle} | ${answerValue}`
+        }
+        return questionTitle
+      })
     }
     return []
   }, [answers, qaPreviews])
 
   // 한줄평 추출: "다음 지원자들을 위한 서류 TIP" 또는 "자유 후기"의 value
   const reviewContent = React.useMemo(() => {
+    // 북마크 API 응답의 title 필드 우선 사용
+    if (title) {
+      return title
+    }
+
     if (answers && answers.length > 0) {
       // "다음 지원자들을 위한 서류 TIP" 찾기
       const tipAnswer = answers.find(
@@ -132,7 +145,7 @@ export default function Review({
     }
     // 기존 oneLineComment 호환
     return oneLineComment || ''
-  }, [answers, oneLineComment])
+  }, [title, answers, oneLineComment])
 
   return (
     <div

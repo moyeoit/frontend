@@ -6,12 +6,16 @@ export enum QuestionType {
   Subjective = 'SUBJECTIVE',
   SingleChoice = 'SINGLE_CHOICE',
   SingleSubjective = 'SINGLE_SUBJECTIVE',
+  MultipleSubjective = 'MULTIPLE_SUBJECTIVE',
 }
 
 export enum ResultType {
-  Fail = 'FAIL',
   Pass = 'PASS',
-  Ready = 'READY',
+  Failure = 'FAILURE',
+  NotParticipateAfterPass = 'NOT_PARTICIPATE_AFTER_PASS',
+  Waiting = 'WAITING',
+  Activity = 'ACTIVITY',
+  EndActivity = 'END_ACTIVITY',
 }
 
 export enum ReviewCategory {

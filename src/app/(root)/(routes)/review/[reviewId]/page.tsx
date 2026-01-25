@@ -6,8 +6,7 @@ import { Bookmark, Heart, ThumbsUp } from 'lucide-react'
 import { ProfileIcon } from '@/assets/icons'
 import { StarRating } from '@/components/atoms/StarRating/StarRating'
 import {
-  BookmarkTargetType,
-  BookmarkToggleData,
+  BookmarkType,
   useToggleBookmark,
 } from '@/features/bookmark'
 import { useToggleReviewLike } from '@/features/like'
@@ -99,7 +98,7 @@ export default function Page({
   const [commentInput, setCommentInput] = useState('')
   const [replyTargetId, setReplyTargetId] = useState<number | null>(null)
   const [replyInput, setReplyInput] = useState('')
-  const bookmarkType: BookmarkTargetType = 'INTERVIEW_REVIEW'
+  const bookmarkType: BookmarkType = 'INTERVIEW_REVIEW'
   const { mutate: postComment, isPending: isPostingComment } =
     usePostReviewComment(numericReviewId, {
       onSuccess: () => setCommentInput(''),
@@ -110,7 +109,11 @@ export default function Page({
     liked: false,
     likeCount: 0,
   })
-  const [bookmarkState, setBookmarkState] = useState<BookmarkToggleData>({
+  const [bookmarkState, setBookmarkState] = useState<{
+    isBookmarked: boolean
+    type: BookmarkType
+    targetId: number
+  }>({
     isBookmarked: false,
     type: bookmarkType,
     targetId: numericReviewId,
@@ -146,14 +149,20 @@ export default function Page({
         }))
         return { previous }
       },
-      onError: (_error, _variables, context) => {
-        if (context?.previous) setBookmarkState(context.previous)
-      },
-      onSuccess: (data) => {
-        setBookmarkState((prev) => ({
-          ...prev,
-          isBookmarked: data.isBookmarked,
-        }))
+      onError: (_error, _variables, onMutateResult) => {
+        if (
+          onMutateResult &&
+          typeof onMutateResult === 'object' &&
+          'previous' in onMutateResult
+        ) {
+          setBookmarkState(
+            onMutateResult.previous as {
+              isBookmarked: boolean
+              type: BookmarkType
+              targetId: number
+            },
+          )
+        }
       },
     })
 

@@ -427,3 +427,49 @@ export interface PremiumReviewCreateResponse {
    */
   savedReviewId: number
 }
+
+export interface ReviewData {
+  club?: {
+    clubName: string
+  }
+  clubName?: string
+  job?: {
+    name: string
+  }
+  part?: string
+  generation?: string | number
+  cohort?: string | number
+  rate: number
+  likeCount?: number
+  commentCount?: number
+  result?: string
+  title?: string
+  answers?: Array<{
+    question: {
+      title: string
+      elements?: Array<{
+        id: number
+        title: string
+      }>
+    }
+    value: string | number | number[]
+    answerType: string
+  }>
+  position?: string
+  nickname?: string
+  oneLineComment?: string
+  qaPreviews?: Array<{
+    questionTitle: string
+    answerValue?: string
+  }>
+}
+
+export interface ReviewProps {
+  data: ReviewData
+  className?: string
+  isBookmarked?: boolean
+  onDetailClick?: () => void
+  onLikeClick?: () => void
+  onCommentClick?: () => void
+  onBookmarkClick?: () => void
+}

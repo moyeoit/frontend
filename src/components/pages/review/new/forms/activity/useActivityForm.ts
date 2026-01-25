@@ -16,8 +16,8 @@ import { appValidation } from '@/shared/configs/appValidation'
 
 // 활동 여부 옵션
 export const ACTIVITY_STATUS_OPTIONS = [
-  { id: 'ACTIVE', label: '활동 중' },
-  { id: 'COMPLETED', label: '활동 종료' },
+  { id: ResultType.Activity, label: '활동 중' },
+  { id: ResultType.EndActivity, label: '활동 종료' },
 ] as const
 
 // Q1: 활동 목표를 달성하기 위해 실제로 투입해야했던 주간 평균 시간은 어느정도였나요?
@@ -135,44 +135,44 @@ export const useActivityForm = () => {
     const answers: ReviewAnswerRequest[] = [
       {
         sequence: 1,
-        question_id: 8, // Q1: 주간 시간
+        question_id: 2, // Q1: 주간 시간 (SINGLE_CHOICE)
         question_type: QuestionType.SingleChoice,
         value: data.q1WeeklyHours,
       },
       {
         sequence: 2,
-        question_id: 9, // Q2: 난이도
+        question_id: 3, // Q2: 난이도 (SINGLE_CHOICE)
         question_type: QuestionType.SingleChoice,
         value: data.q2Difficulty,
       },
       {
         sequence: 3,
-        question_id: 10, // Q3: 만족감
+        question_id: 1, // Q3: 만족감 (MULTIPLE_CHOICE)
         question_type: QuestionType.MultipleChoice,
         value: data.q3Satisfaction,
       },
       {
         sequence: 4,
-        question_id: 19, // 한줄평
+        question_id: 6, // 한줄평 (SINGLE_SUBJECTIVE)
         question_type: QuestionType.SingleSubjective,
         value: data.oneLineComment,
       },
     ]
 
-    // 동적 QA 항목 추가
-    data.qaItems.forEach((qa, index) => {
+    // 동적 QA 항목 추가 (MULTIPLE_SUBJECTIVE)
+    data.qaItems.forEach((qa) => {
       answers.push({
         sequence: answers.length + 1,
-        question_id: 100 + index,
-        question_type: QuestionType.SingleSubjective,
-        value: `Q: ${qa.question}\nA: ${qa.answer}`,
+        question_id: 4,
+        question_type: QuestionType.MultipleSubjective,
+        value: [`Q: ${qa.question}`, `A: ${qa.answer}`],
       })
     })
 
     if (data.tip) {
       answers.push({
         sequence: answers.length + 1,
-        question_id: 20,
+        question_id: 5, // TIP (SINGLE_SUBJECTIVE)
         question_type: QuestionType.SingleSubjective,
         value: data.tip,
       })
@@ -181,17 +181,23 @@ export const useActivityForm = () => {
     if (data.freeReview) {
       answers.push({
         sequence: answers.length + 1,
-        question_id: 21,
+        question_id: 6, // 자유후기 (SINGLE_SUBJECTIVE)
         question_type: QuestionType.SingleSubjective,
         value: data.freeReview,
       })
     }
 
+    // activityStatus를 result로 변환
+    const result =
+      data.activityStatus === ResultType.Activity
+        ? ResultType.Activity
+        : ResultType.EndActivity
+
     return {
       title: data.oneLineComment,
       category: ReviewCategory.Activity,
       rate: data.rate,
-      result: ResultType.Pass,
+      result,
       clubId: data.clubId,
       generation: data.generation,
       jobId: data.jobId,

@@ -146,7 +146,7 @@ export default function DynamicQASection<T extends FieldValues>({
       <button
         type="button"
         onClick={handleAddQuestion}
-        className="w-full py-3 bg-grey-color-1 rounded-lg text-primary-color typo-button-m hover:bg-grey-color-2 transition-colors"
+        className="w-full py-3 bg-main-color-3 rounded-lg text-main-color-1 typo-button-m transition-colors"
       >
         + 문항 추가
       </button>

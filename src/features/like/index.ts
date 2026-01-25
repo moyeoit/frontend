@@ -1,10 +1,10 @@
 // Like Feature Exports
 
 // API
-export { toggleLike } from './api'
+export { toggleLike, toggleReviewLike } from './api'
 
 // Mutations
-export { useToggleLike } from './mutations'
+export { useToggleLike, useToggleReviewLike } from './mutations'
 
 // Hooks
 export { useLike } from './hooks/useLike'

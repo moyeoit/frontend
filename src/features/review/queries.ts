@@ -7,6 +7,8 @@ import {
   ReviewsQueryParams,
   ReviewSearchPage,
   ReviewSearchParams,
+  ReviewView,
+  ReviewComment,
 } from './types'
 
 // 후기 탐색 페이지 (/review/explore) - 모든 프리미엄 후기 필터링
@@ -29,6 +31,18 @@ export function usePremiumReviewDetail(
   premiumReviewId: number,
 ): UseQueryResult<PremiumReviewDetail, Error> {
   return useQuery(reviewQueries.premiumDetail(premiumReviewId))
+}
+
+export function useReviewDetail(
+  reviewId: number,
+): UseQueryResult<ReviewView, Error> {
+  return useQuery(reviewQueries.detail(reviewId))
+}
+
+export function useReviewComments(
+  reviewId: number,
+): UseQueryResult<ReviewComment[], Error> {
+  return useQuery(reviewQueries.commentList(reviewId))
 }
 
 export function useBasicReviews(

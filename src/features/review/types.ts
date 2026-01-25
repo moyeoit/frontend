@@ -6,12 +6,16 @@ export enum QuestionType {
   Subjective = 'SUBJECTIVE',
   SingleChoice = 'SINGLE_CHOICE',
   SingleSubjective = 'SINGLE_SUBJECTIVE',
+  MultipleSubjective = 'MULTIPLE_SUBJECTIVE',
 }
 
 export enum ResultType {
-  Fail = 'FAIL',
   Pass = 'PASS',
-  Ready = 'READY',
+  Failure = 'FAILURE',
+  NotParticipateAfterPass = 'NOT_PARTICIPATE_AFTER_PASS',
+  Waiting = 'WAITING',
+  Activity = 'ACTIVITY',
+  EndActivity = 'END_ACTIVITY',
 }
 
 export enum ReviewCategory {
@@ -220,6 +224,55 @@ export interface ReviewSearchParams {
   sort?: string
   page?: number
   size?: number
+}
+
+// Review Detail (v1/review/{reviewId}) Types
+export interface ReviewClubSummary {
+  clubName: string
+  imageUrl: string | null
+}
+
+export interface ReviewAnswer {
+  id: number
+  question: Question
+  value: ReviewAnswerValue
+  answerType: string
+}
+
+export type ReviewAnswerItem = ReviewAnswer | string
+
+export interface ReviewView {
+  title: string
+  rate: number
+  result: ResultType
+  job: Job
+  club: ReviewClubSummary
+  generation: number
+  likeCount: number
+  liked?: boolean
+  isBookmarked?: boolean
+  commentCount: number
+  answers: ReviewAnswerItem[]
+}
+
+export interface ReviewComment {
+  id: number
+  nickname: string
+  profileImageUrl: string | null
+  content: string
+  createDate: string
+  children?: ReviewComment[]
+  deleted: boolean
+}
+
+export interface ReviewCommentCreateRequest {
+  reviewId: number
+  content: string
+  parentCommentId?: number | null
+}
+
+export interface ReviewCommentUpdateRequest {
+  content: string
 }
 
 // Review Creation Types

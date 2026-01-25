@@ -5,6 +5,8 @@ import {
   getClubPremiumReviews,
   getClubBasicReviews,
   getPremiumReviewDetail,
+  getReviewDetail,
+  getReviewComments,
   searchReviews,
 } from './api'
 import { reviewKeys } from './keys'
@@ -15,6 +17,8 @@ import {
   ReviewsQueryParams,
   ReviewSearchPage,
   ReviewSearchParams,
+  ReviewView,
+  ReviewComment,
 } from './types'
 
 export const reviewQueries = {
@@ -43,6 +47,23 @@ export const reviewQueries = {
       queryKey: reviewKeys.premiumDetail(premiumReviewId),
       queryFn: () => getPremiumReviewDetail(premiumReviewId),
       staleTime: 60_000,
+    }),
+
+  // Review detail
+  detail: (reviewId: number) =>
+    queryOptions<ReviewView>({
+      queryKey: reviewKeys.detail(reviewId),
+      queryFn: () => getReviewDetail(reviewId),
+      staleTime: 60_000,
+    }),
+
+  // Review comments
+  commentList: (reviewId: number) =>
+    queryOptions<ReviewComment[]>({
+      queryKey: reviewKeys.commentList(reviewId),
+      queryFn: () => getReviewComments(reviewId),
+      enabled: Number.isFinite(reviewId),
+      staleTime: 30_000,
     }),
 
   // Basic reviews

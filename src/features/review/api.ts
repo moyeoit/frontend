@@ -10,6 +10,10 @@ import {
   ReviewsQueryParams,
   ReviewSearchPage,
   ReviewSearchParams,
+  ReviewView,
+  ReviewComment,
+  ReviewCommentCreateRequest,
+  ReviewCommentUpdateRequest,
 } from './types'
 
 // 프리미엄 후기 목록 조회
@@ -70,7 +74,7 @@ export async function getClubBasicReviews(
 export async function postBasicReview(
   data: BasicReviewCreateRequest,
 ): Promise<void> {
-  await apiClient.post('/v1/review', data)
+  await apiClient.post('/api/v1/review', data)
 }
 
 // 프리미엄 후기 상세 조회
@@ -81,6 +85,44 @@ export async function getPremiumReviewDetail(
     `/api/v1/review/premium/${premiumReviewId}`,
   )
   return res.data.data
+}
+
+// 후기 상세 조회
+export async function getReviewDetail(reviewId: number): Promise<ReviewView> {
+  const res = await apiClient.get<ApiResponse<ReviewView>>(
+    `/api/v1/review/${reviewId}`,
+  )
+  return res.data.data
+}
+
+// 후기 댓글 목록 조회
+export async function getReviewComments(
+  reviewId: number,
+): Promise<ReviewComment[]> {
+  const res = await apiClient.get<
+    ApiResponse<ReviewComment[]> | ReviewComment[]
+  >(`/api/v1/review/comment/${reviewId}`)
+  return Array.isArray(res.data) ? res.data : res.data.data
+}
+
+// 후기 댓글 생성
+export async function postReviewComment(
+  data: ReviewCommentCreateRequest,
+): Promise<void> {
+  await apiClient.post('/api/v1/review/comment', data)
+}
+
+// 후기 댓글 수정
+export async function putReviewComment(
+  commentId: number,
+  data: ReviewCommentUpdateRequest,
+): Promise<void> {
+  await apiClient.put(`/api/v1/review/comment/${commentId}`, data)
+}
+
+// 후기 댓글 삭제
+export async function deleteReviewComment(commentId: number): Promise<void> {
+  await apiClient.delete(`/api/v1/review/comment/${commentId}`)
 }
 
 // 프리미엄 후기 생성

@@ -5,10 +5,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Bookmark, Heart, ThumbsUp } from 'lucide-react'
 import { ProfileIcon } from '@/assets/icons'
 import { StarRating } from '@/components/atoms/StarRating/StarRating'
-import {
-  BookmarkType,
-  useToggleBookmark,
-} from '@/features/bookmark'
+import { BookmarkType, useToggleBookmark } from '@/features/bookmark'
 import { useToggleReviewLike } from '@/features/like'
 import {
   useDeleteReviewComment,

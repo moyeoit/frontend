@@ -8,16 +8,24 @@ import {
   BookmarkedInterviewReviewsResponse,
   BookmarkedActivityReviewsParams,
   BookmarkedActivityReviewsResponse,
+  BookmarkedBlogReviewsParams,
+  BookmarkedBlogReviewsResponse,
 } from './types'
 
 // 북마크 토글 API
 export async function toggleBookmark(
   data: BookmarkRequest,
 ): Promise<BookmarkResponse> {
+  console.log('📤 북마크 토글 API 호출 - 전달되는 데이터:', {
+    targetId: data.targetId,
+    type: data.type,
+    전체데이터: data,
+  })
   const res = await apiClient.post<ApiResponse<BookmarkResponse>>(
     '/api/v1/bookmarks',
     data,
   )
+  console.log('📥 북마크 토글 API 응답:', res.data)
   return res.data.data || res.data
 }
 
@@ -52,6 +60,23 @@ export async function getBookmarkedActivityReviews(
 ): Promise<BookmarkedActivityReviewsResponse> {
   const res = await apiClient.get<BookmarkedActivityReviewsResponse>(
     '/api/v1/bookmarks/reviews/activity',
+    {
+      params: {
+        page: params?.page ?? 0,
+        size: params?.size ?? 10,
+        sort: params?.sort,
+      },
+    },
+  )
+  return res.data
+}
+
+// 북마크한 블로그 후기 목록 조회 API
+export async function getBookmarkedBlogReviews(
+  params?: BookmarkedBlogReviewsParams,
+): Promise<BookmarkedBlogReviewsResponse> {
+  const res = await apiClient.get<BookmarkedBlogReviewsResponse>(
+    '/api/v1/bookmarks/reviews/blog',
     {
       params: {
         page: params?.page ?? 0,

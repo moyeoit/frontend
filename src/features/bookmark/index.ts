@@ -3,12 +3,14 @@ export {
   getBookmarkedClubs,
   getBookmarkedInterviewReviews,
   getBookmarkedActivityReviews,
+  getBookmarkedBlogReviews,
 } from './api'
 
 export {
   useBookmarkedClubs,
   useBookmarkedInterviewReviews,
   useBookmarkedActivityReviews,
+  useBookmarkedBlogReviews,
 } from './queries'
 
 export { useToggleBookmark } from './mutations'
@@ -36,4 +38,8 @@ export type {
   BookmarkedActivityReviewsPage,
   BookmarkedActivityReviewsParams,
   BookmarkedActivityReviewsResponse,
+  BookmarkedBlogReview,
+  BookmarkedBlogReviewsPage,
+  BookmarkedBlogReviewsParams,
+  BookmarkedBlogReviewsResponse,
 } from './types'

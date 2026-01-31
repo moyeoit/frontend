@@ -1,10 +1,9 @@
 'use client'
 
 import React from 'react'
-import { BlogReview } from '@/components/organisms/review/BlogReview'
+import { BlogReview } from '@/components/organisms/blogReview'
 import { useBlogReviewSearch } from '@/features/blog-review'
 import { BlogReviewSearchRequest } from '@/features/blog-review/types'
-
 
 export interface BlogReviewListProps {
   filters?: BlogReviewSearchRequest

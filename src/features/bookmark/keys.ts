@@ -1,6 +1,7 @@
 import {
   BookmarkedInterviewReviewsParams,
   BookmarkedActivityReviewsParams,
+  BookmarkedBlogReviewsParams,
 } from './types'
 
 export const bookmarkKeys = {
@@ -11,4 +12,6 @@ export const bookmarkKeys = {
     [...bookmarkKeys.reviews(), 'interview', params] as const,
   activityReviews: (params?: BookmarkedActivityReviewsParams) =>
     [...bookmarkKeys.reviews(), 'activity', params] as const,
+  blogReviews: (params?: BookmarkedBlogReviewsParams) =>
+    [...bookmarkKeys.reviews(), 'blog', params] as const,
 } as const

@@ -24,7 +24,8 @@ export function useToggleBookmark(
         })
       } else if (
         variables.type === 'INTERVIEW_REVIEW' ||
-        variables.type === 'ACTIVITY_REVIEW'
+        variables.type === 'ACTIVITY_REVIEW' ||
+        variables.type === 'BLOG_REVIEW'
       ) {
         // 모든 리뷰 쿼리를 invalidate (page, size 상관없이)
         queryClient.invalidateQueries({

@@ -3,6 +3,7 @@ import {
   getBookmarkedClubs,
   getBookmarkedInterviewReviews,
   getBookmarkedActivityReviews,
+  getBookmarkedBlogReviews,
 } from './api'
 import { bookmarkKeys } from './keys'
 import {
@@ -11,6 +12,8 @@ import {
   BookmarkedInterviewReviewsResponse,
   BookmarkedActivityReviewsParams,
   BookmarkedActivityReviewsResponse,
+  BookmarkedBlogReviewsParams,
+  BookmarkedBlogReviewsResponse,
 } from './types'
 
 // 북마크한 동아리 목록 조회
@@ -41,5 +44,15 @@ export function useBookmarkedActivityReviews(
   return useQuery({
     queryKey: bookmarkKeys.activityReviews(params),
     queryFn: () => getBookmarkedActivityReviews(params),
+  })
+}
+
+// 북마크한 블로그 후기 목록 조회
+export function useBookmarkedBlogReviews(
+  params?: BookmarkedBlogReviewsParams,
+): UseQueryResult<BookmarkedBlogReviewsResponse, Error> {
+  return useQuery({
+    queryKey: bookmarkKeys.blogReviews(params),
+    queryFn: () => getBookmarkedBlogReviews(params),
   })
 }

@@ -10,26 +10,30 @@ type CommunityCardType = 'vertical' | 'horizontal'
 
 export const CommunityCardCtx = React.createContext<{
   type: CommunityCardType
+  postType?: string
 }>({
   type: 'horizontal',
+  postType: undefined,
 })
 
 export interface CommunityCardProps extends React.HTMLAttributes<HTMLDivElement> {
   type?: CommunityCardType
+  postType?: string
 }
 
 export function CommunityCard({
   type = 'horizontal',
+  postType,
   className,
   children,
   ...props
 }: CommunityCardProps) {
   return (
-    <CommunityCardCtx.Provider value={{ type }}>
+    <CommunityCardCtx.Provider value={{ type, postType }}>
       <div
         data-slot="community-card"
         className={cn(
-          'w-full',
+          'w-full border-b border-light-color-3 py-4',
           type === 'vertical' ? 'flex flex-col' : 'flex flex-row items-start',
           className,
         )}
@@ -86,8 +90,11 @@ export function CommunityCardImage({
   ...props
 }: CommunityCardImageProps) {
   const [failed, setFailed] = React.useState(false)
-  const src = failed || !logoUrl ? '/images/default.svg' : logoUrl
   const { isDesktop } = useMediaQuery()
+
+  if (!logoUrl) {
+    return null
+  }
 
   return (
     <div
@@ -100,7 +107,7 @@ export function CommunityCardImage({
       {...props}
     >
       <Image
-        src={src}
+        src={logoUrl}
         alt={alt || ''}
         fill
         sizes={isDesktop ? '120px' : '64px'}
@@ -137,7 +144,7 @@ export function CommunityCardMeta({
       data-slot="community-card-meta"
       className={cn(
         'flex items-center text-grey-color-3',
-        isDesktop ? 'desktop:typo-body-3-3-r' : 'phone:typo-smallbody-1-5',
+        isDesktop ? 'typo-body-3-3-r' : 'typo-smallbody-0',
         className,
       )}
       {...props}
@@ -174,16 +181,29 @@ export function CommunityCardMeta({
   )
 }
 
-export function CommunityCardTitle({ ...props }: React.ComponentProps<'div'>) {
+export function CommunityCardTitle({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<'div'>) {
   const { isDesktop } = useMediaQuery()
+  const { postType } = React.useContext(CommunityCardCtx)
+  const isQuestion = postType === 'QUESTION'
+
   return (
     <div
       data-slot="community-card-title"
       className={cn(
-        isDesktop ? 'desktop:typo-body-1-b' : 'phone:typo-body-3-1-sb',
+        isDesktop ? 'typo-body-1-b' : 'typo-body-3-1-sb',
         'text-black-color text-ellipsis overflow-hidden line-clamp-1 flex-col',
+        className,
       )}
       {...props}
-    />
+    >
+      {isQuestion && (
+        <span className="typo-body-1-b text-main-color-1 mr-2">Q.</span>
+      )}
+      {children}
+    </div>
   )
 }

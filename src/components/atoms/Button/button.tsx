@@ -40,7 +40,7 @@ const buttonVariants = cva(
         ],
       },
       size: {
-        small: 'px-4 py-2 typo-caption-m',
+        small: 'px-4 py-2 typo-caption-1',
         medium: 'px-4 py-3 typo-body-3-b',
         large: 'p-4 typo-body-3-b',
         none: 'p-0 m-0',

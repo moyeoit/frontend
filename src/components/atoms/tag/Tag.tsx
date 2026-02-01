@@ -12,8 +12,7 @@ export type TagSize = 'small' | 'large' | 'none'
 export type TagColor = 'white' | 'lightPurple' | 'purple'
 
 export interface TagProps
-  extends
-    React.HTMLAttributes<HTMLSpanElement>,
+  extends React.HTMLAttributes<HTMLSpanElement>,
     VariantProps<typeof tagVariants> {
   label?: string | null
   kind?: TagKind
@@ -24,8 +23,8 @@ export interface TagProps
 const tagVariants = cva(['inline-flex items-center justify-center'].join(' '), {
   variants: {
     size: {
-      small: 'px-[8px] py-[2px] gap-[10px] rounded-[40px] typo-body-4-m',
-      large: 'px-[12px] py-[4px] gap-[10px] rounded-[40px] typo-body-3-b',
+      small: 'px-2 py-[2px] rounded-[40px] typo-caption-2',
+      large: 'px-3 py-1 rounded-[40px] typo-body-3-b',
       none: 'p-0 m-0',
     },
   },

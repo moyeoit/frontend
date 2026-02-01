@@ -138,7 +138,7 @@ export function CommunityCardMeta({
     <div
       data-slot="community-card-meta"
       className={cn(
-        'flex items-center text-grey-color-3 mt-4',
+        'flex items-center text-grey-color-3',
         isDesktop ? 'desktop:typo-body-3-3-r' : 'phone:typo-smallbody-1-5',
         className,
       )}

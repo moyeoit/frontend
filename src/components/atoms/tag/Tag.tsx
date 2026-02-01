@@ -59,8 +59,8 @@ const PART_STYLE: Record<PartType, string> = {
   'iOS 개발자': 'bg-[#35DDFF]/20 text-[#35BCFF]',
 }
 
-/** 프리미엄 기타 */
-const PREMIUM_ETC = 'bg-light-color-3 text-grey-color-3'
+/** 기타 */
+const ETC = 'bg-light-color-3 text-grey-color-3'
 
 /** 동아리 상세  */
 const CLUB_DETAIL: Record<TagColor, string> = {
@@ -83,14 +83,14 @@ export const Tag: React.FC<TagProps> = ({
     if (display === '기획' || display === '개발' || display === '디자인') {
       colorCls = CATEGORY_STYLE[display as '기획' | '개발' | '디자인']
     } else {
-      colorCls = PREMIUM_ETC
+      colorCls = ETC
     }
   } else if (kind === 'blogReview') {
     // 블로그 리뷰 - 파트별 색상 적용
     if (display in PART_STYLE) {
       colorCls = PART_STYLE[display as PartType]
     } else {
-      colorCls = PREMIUM_ETC
+      colorCls = ETC
     }
   } else {
     colorCls = CLUB_DETAIL[color]

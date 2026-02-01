@@ -113,9 +113,9 @@ export function BlogReviewRoot({
         React.isValidElement(child) &&
         typeof child.type !== 'string' &&
         'displayName' in child.type &&
-        String((child.type as { displayName?: string }).displayName)?.startsWith(
-          'BlogReview.',
-        ),
+        String(
+          (child.type as { displayName?: string }).displayName,
+        )?.startsWith('BlogReview.'),
     )
 
   return (
@@ -150,8 +150,7 @@ function BlogReviewCompoundLayout({
       bookmark?: React.ReactNode
     } = {}
     React.Children.forEach(children, (child) => {
-      if (!React.isValidElement(child) || typeof child.type === 'string')
-        return
+      if (!React.isValidElement(child) || typeof child.type === 'string') return
       const name = (child.type as { displayName?: string }).displayName
       if (name === 'BlogReview.Thumbnail') s.thumbnail = child
       else if (name === 'BlogReview.Tags') s.tags = child
@@ -213,8 +212,13 @@ function BlogReviewCompoundLayout({
 }
 
 function BlogReviewDefaultLayout({ className }: { className?: string }) {
-  const { data, isBookmarked, handleBookmarkClick, handleCardClick, isDesktop } =
-    useBlogReviewContext()
+  const {
+    data,
+    isBookmarked,
+    handleBookmarkClick,
+    handleCardClick,
+    isDesktop,
+  } = useBlogReviewContext()
 
   const thumbnail = (
     <BlogReviewThumbnailImpl
@@ -256,9 +260,7 @@ function BlogReviewDefaultLayout({ className }: { className?: string }) {
       onClick={handleBookmarkClick}
       className={cn(
         'flex items-center justify-center transition-opacity duration-200 hover:opacity-70 focus:outline-none',
-        isDesktop
-          ? 'absolute top-4 right-4 z-10'
-          : 'shrink-0',
+        isDesktop ? 'absolute top-4 right-4 z-10' : 'shrink-0',
       )}
       aria-label={isBookmarked ? '북마크 해제' : '북마크'}
     >
@@ -365,11 +367,7 @@ export function BlogReviewThumbnail({
   const imgSrc = src ?? data?.thumbnailUrl
   const imgAlt = alt ?? data?.title ?? ''
   return (
-    <BlogReviewThumbnailImpl
-      src={imgSrc}
-      alt={imgAlt}
-      isDesktop={isDesktop}
-    />
+    <BlogReviewThumbnailImpl src={imgSrc} alt={imgAlt} isDesktop={isDesktop} />
   )
 }
 BlogReviewThumbnail.displayName = 'BlogReview.Thumbnail'

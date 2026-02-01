@@ -67,6 +67,7 @@ export default function ExamplePage() {
                   views={100}
                   likes={100}
                   comments={100}
+                  className="mt-4"
                 />
               </CommunityCard.Content>
               <CommunityCard.Image

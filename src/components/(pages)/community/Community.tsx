@@ -1,9 +1,12 @@
+//TODO: 무한스크롤 구현 필요
+
 'use client'
 
 import * as React from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/atoms/Button'
 import { Carousel } from '@/components/atoms/Carousel'
+import type useEmblaCarousel from 'embla-carousel-react'
 import { Tag } from '@/components/atoms/tag'
 import { CommunityCard } from '@/components/molecules/communityCard'
 import { PopularCommunityCard } from '@/components/molecules/popularCommunityCard'
@@ -29,17 +32,55 @@ const CATEGORIES = [
 export function Community() {
   const { isDesktop } = useMediaQuery()
   const [selectedCategory, setSelectedCategory] = React.useState<string>('전체')
-  const { data: popularPostsData } = usePopularPosts({ page: 0, size: 3 })
+  const [popularPage, setPopularPage] = React.useState(0)
+  const [carouselApi, setCarouselApi] = React.useState<
+    ReturnType<typeof useEmblaCarousel>[1] | null
+  >(null)
+
+  const { data: popularPostsData } = usePopularPosts({
+    page: popularPage,
+    size: 3,
+  })
   const popularPosts = popularPostsData?.content || []
+  const isFirst = popularPostsData?.first ?? true
+  const isLast = popularPostsData?.last ?? false
 
   const categoryName =
     selectedCategory === '전체' ? undefined : selectedCategory
   const { data: postsData } = usePosts({
     categoryName,
     page: 0,
-    size: 20,
+    size: 8,
   })
   const posts = postsData?.content || []
+
+  const handleNext = React.useCallback(() => {
+    if (!carouselApi) return
+
+    const currentIndex = carouselApi.selectedScrollSnap()
+    const totalSlides = carouselApi.scrollSnapList().length
+    const isLastSlide = currentIndex >= totalSlides - 1
+
+    if (isLastSlide && !isLast) {
+      setPopularPage((prev) => prev + 1)
+    } else {
+      carouselApi.scrollNext()
+    }
+  }, [carouselApi, isLast])
+
+  const handlePrev = React.useCallback(() => {
+    if (!carouselApi) return
+
+    const currentIndex = carouselApi.selectedScrollSnap()
+    const isFirstSlide = currentIndex === 0
+
+    if (isFirstSlide && !isFirst && popularPage > 0) {
+      setPopularPage((prev) => prev - 1)
+    } else {
+      carouselApi.scrollPrev()
+    }
+  }, [carouselApi, isFirst, popularPage])
+
 
   return (
     <div>
@@ -55,28 +96,76 @@ export function Community() {
       </div>
       <div className={cn('flex flex-col max-w-[1100px] mx-auto')}>
         {isDesktop && (
-          <Carousel
-            opts={{
-              align: 'start',
-              loop: false,
-              slidesToScroll: 3,
-            }}
-            className="w-full"
-          >
+          <>
             <div className="flex items-center justify-between mb-4 mt-8">
               <div className="typo-title-2-b text-black-color">
-                🔥 지금 가장 인기있는
+                🔥 오늘 가장 인기있는
               </div>
-              <div className="flex items-center gap-2">
-                <Carousel.Previous />
-                <Carousel.Next />
+              <div className="flex items-center">
+                <button
+                  onClick={handlePrev}
+                  disabled={
+                    carouselApi
+                      ? !carouselApi.canScrollPrev() && isFirst
+                      : isFirst
+                  }
+                  className="inline-flex items-center justify-center w-10 h-10 rounded-tl-[6px] rounded-bl-[6px] bg-white border border-light-color-3 hover:bg-light-color-1 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-4 h-4"
+                  >
+                    <path d="m15 18-6-6 6-6" />
+                  </svg>
+                </button>
+                <button
+                  onClick={handleNext}
+                  disabled={
+                    carouselApi
+                      ? !carouselApi.canScrollNext() && isLast
+                      : isLast
+                  }
+                  className="inline-flex items-center justify-center w-10 h-10 rounded-tr-[6px] rounded-br-[6px] bg-white border border-light-color-3 hover:bg-light-color-1 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-4 h-4"
+                  >
+                    <path d="m9 18 6-6-6-6" />
+                  </svg>
+                </button>
               </div>
             </div>
-            <Carousel.Content className="-ml-4">
+            <Carousel
+              opts={{
+                align: 'start',
+                loop: false,
+                slidesToScroll: 3,
+                duration: 25,
+              }}
+              setApi={setCarouselApi}
+            >
+              <Carousel.Content className="gap-4">
               {popularPosts.map((post) => (
                 <Carousel.Item
                   key={post.postId}
-                  className="pl-4 basis-1/3 shrink-0"
+                  className="basis-1/3 shrink-0"
                 >
                   <PopularCommunityCard
                     postType={post.postType}
@@ -111,8 +200,9 @@ export function Community() {
                   </PopularCommunityCard>
                 </Carousel.Item>
               ))}
-            </Carousel.Content>
-          </Carousel>
+              </Carousel.Content>
+            </Carousel>
+          </>
         )}
 
         <div
@@ -124,7 +214,7 @@ export function Community() {
           {/* 카테고리 및 글 작성 버튼 */}
           <div
             className={cn(
-              'flex items-center gap-2',
+              'flex items-center gap-2 max-w-[800px] mx-auto',
               !isDesktop && 'overflow-x-auto flex-nowrap pl-5',
               !isDesktop &&
                 '[&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]',
@@ -143,7 +233,11 @@ export function Community() {
                 {category}
               </Button>
             ))}
-            <PostButton />
+            {isDesktop && (
+              <div className="ml-[42px]">
+                <PostButton />
+              </div>
+            )}
           </div>
           <div className={cn('mt-4 mb-28', !isDesktop && 'px-5')}>
             {posts.map((post) => (

@@ -37,7 +37,7 @@ export function PopularCommunityCard({
       <div
         data-slot="popular-community-card"
         className={cn(
-          'w-full bg-light-color-1 border border-light-color-2 rounded-[16px] p-6 cursor-pointer',
+          'w-[342px] bg-light-color-1 border border-light-color-2 rounded-[16px] p-6 cursor-pointer',
           className,
         )}
         onClick={handleClick}

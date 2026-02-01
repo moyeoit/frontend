@@ -125,8 +125,7 @@ const CarouselContent = React.forwardRef<HTMLDivElement, CarouselContentProps>(
       <div
         ref={ref}
         className={cn(
-          'flex',
-          orientation === 'horizontal' ? '-ml-4' : '-mt-4 flex-col',
+          'flex transition-transform duration-300 ease-in-out',
           className,
         )}
         {...props}
@@ -147,8 +146,6 @@ const CarouselItem = React.forwardRef<HTMLDivElement, CarouselItemProps>(
         role="group"
         aria-roledescription="slide"
         className={cn(
-          'min-w-0 shrink-0 grow-0 basis-full',
-          orientation === 'horizontal' ? 'pl-4' : 'pt-4',
           className,
         )}
         {...props}
@@ -178,9 +175,8 @@ const CarouselPrevious = React.forwardRef<
       onClick={handleClick}
       disabled={!canScrollPrev}
       className={cn(
-        'absolute top-1/2 -translate-y-1/2 left-4 z-10',
         'inline-flex items-center justify-center',
-        'w-10 h-10 rounded-full',
+        'w-10 h-10 rounded-tl-[6px] rounded-bl-[6px]',
         'bg-white border border-light-color-3',
         'hover:bg-light-color-1',
         'disabled:opacity-50 disabled:cursor-not-allowed',
@@ -228,7 +224,7 @@ const CarouselNext = React.forwardRef<HTMLButtonElement, CarouselNextProps>(
         disabled={!canScrollNext}
         className={cn(
           'inline-flex items-center justify-center',
-          'w-10 h-10 rounded-full',
+          'w-10 h-10 rounded-tr-[6px] rounded-br-[6px]',
           'bg-white border border-light-color-3',
           'hover:bg-light-color-1',
           'disabled:opacity-50 disabled:cursor-not-allowed',

@@ -4,7 +4,7 @@ import {
   PopularReviewCardProfile,
   PopularReviewCardContent,
   PopularReviewCardLink,
-} from './popularReviewCard'
+} from './PopularReviewCard'
 
 export type PopularReviewCardCompound = typeof PopularReviewCardRoot & {
   Tag: typeof PopularReviewCardTag
@@ -34,4 +34,4 @@ export type {
   PopularReviewCardProfileProps,
   PopularReviewCardContentProps,
   PopularReviewCardLinkProps,
-} from './popularReviewCard'
+} from './PopularReviewCard'

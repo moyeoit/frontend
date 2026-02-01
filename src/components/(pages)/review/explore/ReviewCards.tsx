@@ -22,6 +22,7 @@ export type ReviewListItemData = {
   likeCount: number
   commentCount: number
   category?: string
+  result?: string
 }
 
 export type BlogReviewCardData = {
@@ -40,20 +41,28 @@ function DocumentTypeIcon({
   type: 'DOCUMENT' | 'INTERVIEW' | string
 }) {
   const isDocument = type === 'DOCUMENT'
+  const isActivity = type === 'ACTIVITY'
+  const isInterview = type === 'INTERVIEW'
+  const bgClass = isActivity
+    ? 'bg-[#d8dfff]'
+    : isDocument
+      ? 'bg-[#eaffe9]'
+      : 'bg-[#fff5ad]'
+  const textClass = isActivity
+    ? 'text-[#3d5eff]'
+    : isDocument
+      ? 'text-[#2da715]'
+      : 'text-[#ff9500]'
+  const label = isActivity ? '활' : isInterview ? '면' : '서'
   return (
     <div
       className={cn(
         'flex items-center justify-center rounded-full size-10 shrink-0',
-        isDocument ? 'bg-[#eaffe9]' : 'bg-[#fff5ad]',
+        bgClass,
       )}
     >
-      <span
-        className={cn(
-          'typo-body-1 font-semibold',
-          isDocument ? 'text-[#2da715]' : 'text-[#ff9500]',
-        )}
-      >
-        {isDocument ? '서' : '면'}
+      <span className={cn('typo-body-1 font-semibold', textClass)}>
+        {label}
       </span>
     </div>
   )
@@ -66,48 +75,63 @@ export function ReviewListItem({
   review: ReviewListItemData
   isDesktop?: boolean
 }) {
+  const summaryValue = (keywords: string[], fallback: string) =>
+    review.answerSummaries?.find((s) =>
+      keywords.some((keyword) =>
+        s.questionTitleSummary?.includes(keyword),
+      ),
+    )?.answerSummary || fallback
+
   const href = review.reviewId ? `/review/${review.reviewId}` : '#'
-  const meta = [review.clubName, `${review.generation}기`, review.jobName]
+  const resultLabel =
+    review.result === 'PASS'
+      ? '합격'
+      : review.result === 'FAILURE'
+        ? '불합격'
+        : review.result === 'WAITING'
+          ? '대기'
+          : review.result === 'NOT_PARTICIPATE_AFTER_PASS'
+            ? '합격 후 불참'
+            : review.result === 'ACTIVITY'
+              ? '활동'
+              : review.result === 'END_ACTIVITY'
+                ? '활동 종료'
+                : review.result
+
+  const meta = [
+    review.clubName,
+    `${review.generation}기`,
+    review.jobName,
+    resultLabel,
+  ]
     .filter(Boolean)
     .join(' · ')
 
   // 답변 요약에서 메타 정보 추출
   const keyAppeal =
-    review.answerSummaries?.find(
-      (s) =>
-        s.questionTitleSummary?.includes('핵심') ||
-        s.questionTitleSummary?.includes('어필'),
-    )?.answerSummary || '지원동기 외2'
+    summaryValue(['핵심', '어필'], '지원동기 외2')
 
   const referenceInfo =
-    review.answerSummaries?.find(
-      (s) =>
-        s.questionTitleSummary?.includes('참고') ||
-        s.questionTitleSummary?.includes('정보'),
-    )?.answerSummary || '공식 공고'
+    summaryValue(['참고', '정보'], '공식 공고')
 
   const writingStyle =
-    review.answerSummaries?.find(
-      (s) =>
-        s.questionTitleSummary?.includes('서술') ||
-        s.questionTitleSummary?.includes('방식'),
-    )?.answerSummary || '데이터 성과 수치 서술'
+    summaryValue(['서술', '방식'], '데이터 성과 수치 서술')
 
   // 면접인 경우 출제 질문, 분위기 표시
   const isInterview = review.category === 'INTERVIEW'
+  const isActivity = review.category === 'ACTIVITY'
   const questionInfo =
-    review.answerSummaries?.find(
-      (s) =>
-        s.questionTitleSummary?.includes('질문') ||
-        s.questionTitleSummary?.includes('출제'),
-    )?.answerSummary || '지원동기 외2'
+    summaryValue(['질문', '출제'], '지원동기 외2')
 
   const atmosphereInfo =
-    review.answerSummaries?.find(
-      (s) =>
-        s.questionTitleSummary?.includes('분위기') ||
-        s.questionTitleSummary?.includes('느낌'),
-    )?.answerSummary || '차가움/무서움'
+    summaryValue(['분위기', '느낌'], '차가움/무서움')
+
+  const timeInfo = summaryValue(['투자', '시간'], '주 5시간 미만')
+  const activityLevel = summaryValue(['활동', '수준'], '개인 흥미 수준')
+  const satisfactionInfo = summaryValue(
+    ['만족', '영역'],
+    '직무 기술/ 실력 성장 외4',
+  )
 
   return (
     <Link href={href} className="block">
@@ -130,7 +154,9 @@ export function ReviewListItem({
                   disabled
                   className="[&>button]:p-0 [&_svg]:w-[15px] [&_svg]:h-[15px]"
                 />
-                <span className="typo-body-4-m text-grey-color-4">난이도</span>
+                <span className="typo-body-4-m text-grey-color-4">
+                  {isActivity ? '만족도' : '난이도'}
+                </span>
               </div>
             </div>
           </div>
@@ -142,7 +168,22 @@ export function ReviewListItem({
               isDesktop ? 'typo-body-4-m' : 'typo-caption-3',
             )}
           >
-            {isInterview ? (
+            {isActivity ? (
+              <>
+                <span>
+                  <span className="text-grey-color-3">투자 시간 ｜</span>
+                  {timeInfo}
+                </span>
+                <span>
+                  <span className="text-grey-color-3">활동 수준｜</span>
+                  {activityLevel}
+                </span>
+                <span>
+                  <span className="text-grey-color-3">만족 영역｜</span>
+                  {satisfactionInfo}
+                </span>
+              </>
+            ) : isInterview ? (
               <>
                 <span>
                   <span className="text-grey-color-3">출제 질문 ｜</span>

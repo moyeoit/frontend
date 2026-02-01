@@ -433,6 +433,7 @@ export interface ReviewData {
     clubName: string
   }
   clubName?: string
+  category?: string
   job?: {
     name: string
   }
@@ -444,6 +445,10 @@ export interface ReviewData {
   commentCount?: number
   result?: string
   title?: string
+  answerSummaries?: Array<{
+    questionTitleSummary: string
+    answerSummary: string
+  }>
   answers?: Array<{
     question: {
       title: string

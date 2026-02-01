@@ -2,10 +2,11 @@
 
 import * as React from 'react'
 import { useEffect, useState } from 'react'
-import { DummyProfileIcon, SearchMainIcon } from '@/assets/icons'
+import { useQuery } from '@tanstack/react-query'
+import { DummyProfileIcon, SearchMainIcon, XIcon } from '@/assets/icons'
 import { Button } from '@/components/atoms/Button'
 import { Input } from '@/components/atoms/Input'
-import { useClubsSearch } from '@/features/clubs/queries'
+import { clubQueries } from '@/features/clubs/queries.factory'
 import useDebouncedValue from '@/shared/hooks/useDebouncedValue'
 import { cn } from '@/shared/utils/cn'
 
@@ -23,7 +24,7 @@ export interface SearchCoreProps {
   renderItem?: (item: {
     clubId: number
     clubName: string
-    description: string
+    imgUrl?: string | null
   }) => React.ReactNode
   /**
    * Optional empty state node to show when there are no results.
@@ -34,6 +35,43 @@ export interface SearchCoreProps {
    */
   keyword?: string
   onKeywordChange?: (value: string) => void
+  /**
+   * Callback when the search input is submitted (Enter).
+   */
+  onSubmit?: (keyword: string) => void
+  /**
+   * Callback when the close button is clicked.
+   */
+  onClose?: () => void
+  /**
+   * Whether to show the close button next to the search input.
+   */
+  showCloseButton?: boolean
+}
+
+function SearchResultAvatar({
+  src,
+  alt,
+}: {
+  src?: string | null
+  alt?: string
+}) {
+  const [failed, setFailed] = useState(false)
+
+  if (!src || failed) {
+    return (
+      <DummyProfileIcon width={32} height={32} role="img" aria-label={alt} />
+    )
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt || ''}
+      className="size-8 rounded-[8px] border border-light-color-3 object-cover"
+      onError={() => setFailed(true)}
+    />
+  )
 }
 
 export function SearchCore(props: SearchCoreProps) {
@@ -46,6 +84,9 @@ export function SearchCore(props: SearchCoreProps) {
     emptyState,
     keyword: controlledKeyword,
     onKeywordChange,
+    onSubmit,
+    onClose,
+    showCloseButton = true,
   } = props
   const [inputValue, setInputValue] = useState(controlledKeyword ?? '')
 
@@ -64,11 +105,24 @@ export function SearchCore(props: SearchCoreProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedInput])
 
-  const { data, isLoading } = useClubsSearch(
-    debouncedInput ? { keyword: debouncedInput } : undefined,
-  )
+  const trimmedInput = debouncedInput.trim()
+  const { data, isLoading } = useQuery({
+    ...clubQueries.list({
+      page: 0,
+      size: 8,
+      search: trimmedInput,
+    }),
+    enabled: trimmedInput.length > 0,
+  })
 
-  const items = data ?? []
+  const items = data?.content ?? []
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const trimmed = inputValue.trim()
+    if (!trimmed) return
+    onSubmit?.(trimmed)
+  }
 
   return (
     <div
@@ -77,16 +131,40 @@ export function SearchCore(props: SearchCoreProps) {
         className,
       )}
     >
-      <div className="h-12 rounded-full bg-white-color flex items-center justify-between border border-main-color-1 px-4 py-3">
-        <Input
-          autoFocus={autoFocus}
-          placeholder={placeholder}
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
+      <div className="flex items-center gap-4 w-full">
+        <form
+          className="flex-1"
+          onSubmit={handleSubmit}
+          role="search"
           aria-label="search"
-          className="bg-transparent border-none"
-        />
-        <SearchMainIcon width={24} height={24} role="img" aria-label="search" />
+        >
+          <div className="h-12 rounded-full bg-white-color flex items-center justify-between border border-main-color-1 px-4 py-3">
+            <Input
+              autoFocus={autoFocus}
+              placeholder={placeholder}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              aria-label="search"
+              className="bg-transparent border-none"
+            />
+            <SearchMainIcon
+              width={24}
+              height={24}
+              role="img"
+              aria-label="search"
+            />
+          </div>
+        </form>
+        {showCloseButton && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex items-center justify-center size-[34px] text-grey-color-4 hover:text-black-color transition-colors"
+            aria-label="close"
+          >
+            <XIcon width={24} height={24} role="img" aria-label="close" />
+          </button>
+        )}
       </div>
 
       <div className="desktop:min-h-[340px] max-desktop:max-h-[calc(100vh-200px)] overflow-auto">
@@ -119,30 +197,28 @@ export function SearchCore(props: SearchCoreProps) {
             </div>
           ))
         ) : (
-          <ul className="flex flex-col divide-light-color-4">
-            {items.map((it) => (
+          <ul className="flex flex-col gap-1">
+            {items?.map((it) => (
               <li key={it.clubId}>
                 <Button
                   variant="none"
-                  className="w-full text-left p-4 justify-start hover:bg-light-color-2 focus:bg-light-color-2 transition-colors hover:ring-0 focus:ring-0 focus:outline-none focus:ring-offset-0 [&:hover_.typo-body-3-2-b]:text-black-color [&:focus_.typo-body-3-2-b]:text-black-color"
+                  className="w-full text-left px-3 py-3 justify-start rounded-[8px] hover:bg-light-color-2 focus:bg-light-color-2 transition-colors hover:ring-0 focus:ring-0 focus:outline-none focus:ring-offset-0 [&:hover_.typo-body-3-2-m]:text-black-color [&:focus_.typo-body-3-2-m]:text-black-color"
                   onClick={() => onSelect?.(it.clubId)}
                 >
                   {renderItem ? (
                     renderItem({
                       clubId: it.clubId,
-                      clubName: it.name,
-                      description: it.imgUrl || '',
+                      clubName: it.clubName,
+                      imgUrl: it.logoUrl,
                     })
                   ) : (
                     <div className="flex flex-row items-center gap-2">
-                      <DummyProfileIcon
-                        width={32}
-                        height={32}
-                        role="img"
-                        aria-label={it.name}
+                      <SearchResultAvatar
+                        src={it.logoUrl}
+                        alt={it.clubName}
                       />
-                      <span className="typo-body-3-2-b text-grey-color-4">
-                        {it.name}
+                      <span className="typo-body-3-2-m text-grey-color-4">
+                        {it.clubName}
                       </span>
                     </div>
                   )}

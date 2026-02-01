@@ -29,11 +29,16 @@ export function DesktopSearchModal({
     router.push(AppPath.clubDetail(clubId.toString()))
   }
 
+  const handleSubmit = (value: string) => {
+    onOpenChange(false)
+    router.push(`${AppPath.search()}?q=${encodeURIComponent(value)}`)
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        showCloseButton={true}
-        className="w-full rounded-2xl border border-light-color-4 bg-white-color py-14 shadow-lg top-24 translate-y-0"
+        showCloseButton={false}
+        className="w-full rounded-2xl border border-light-color-4 bg-white-color p-0 px-5 py-14 shadow-lg top-24 translate-y-0"
       >
         <VisuallyHidden>
           <DialogTitle>검색</DialogTitle>
@@ -44,6 +49,9 @@ export function DesktopSearchModal({
           keyword={keyword}
           onKeywordChange={setKeyword}
           onSelect={handleSelect}
+          onSubmit={handleSubmit}
+          onClose={() => onOpenChange(false)}
+          showCloseButton
         />
       </DialogContent>
     </Dialog>

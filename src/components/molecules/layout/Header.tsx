@@ -60,6 +60,12 @@ export default function Header() {
               >
                 후기
               </Link>
+              <Link
+                href={AppPath.community()}
+                className="hover:text-main-color-1 focus:text-main-color-1 transition-colors"
+              >
+                커뮤니티
+              </Link>
             </nav>
           </div>
           {/* Right: search, profile, cta */}

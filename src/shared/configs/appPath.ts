@@ -22,6 +22,7 @@ const AppPath = {
     `/review/new${kind ? `/${kind}` : ''}` as const,
   reviewEdit: (reviewId: string) => `/review/${reviewId}/edit` as const,
   reviewSubmitted: () => '/review/submitted' as const,
+  community: () => '/community' as const,
   bookmark: () => '/bookmark' as const,
 } as const
 

@@ -12,8 +12,7 @@ export type TagSize = 'small' | 'large' | 'none'
 export type TagColor = 'white' | 'lightPurple' | 'purple'
 
 export interface TagProps
-  extends
-    React.HTMLAttributes<HTMLSpanElement>,
+  extends React.HTMLAttributes<HTMLSpanElement>,
     VariantProps<typeof tagVariants> {
   label?: string | null
   kind?: TagKind
@@ -24,8 +23,8 @@ export interface TagProps
 const tagVariants = cva(['inline-flex items-center justify-center'].join(' '), {
   variants: {
     size: {
-      small: 'px-[8px] py-[2px] gap-[10px] rounded-[40px] typo-body-4-m',
-      large: 'px-[12px] py-[4px] gap-[10px] rounded-[40px] typo-body-3-b',
+      small: 'px-2 py-[2px] rounded-[40px] typo-caption-2',
+      large: 'px-3 py-1 rounded-[40px] typo-body-3-b',
       none: 'p-0 m-0',
     },
   },
@@ -60,8 +59,8 @@ const PART_STYLE: Record<PartType, string> = {
   'iOS 개발자': 'bg-[#35DDFF]/20 text-[#35BCFF]',
 }
 
-/** 프리미엄 기타 */
-const PREMIUM_ETC = 'bg-light-color-3 text-grey-color-3'
+/** 기타 */
+const ETC = 'bg-light-color-3 text-grey-color-3'
 
 /** 동아리 상세  */
 const CLUB_DETAIL: Record<TagColor, string> = {
@@ -84,14 +83,14 @@ export const Tag: React.FC<TagProps> = ({
     if (display === '기획' || display === '개발' || display === '디자인') {
       colorCls = CATEGORY_STYLE[display as '기획' | '개발' | '디자인']
     } else {
-      colorCls = PREMIUM_ETC
+      colorCls = ETC
     }
   } else if (kind === 'blogReview') {
     // 블로그 리뷰 - 파트별 색상 적용
     if (display in PART_STYLE) {
       colorCls = PART_STYLE[display as PartType]
     } else {
-      colorCls = PREMIUM_ETC
+      colorCls = ETC
     }
   } else {
     colorCls = CLUB_DETAIL[color]

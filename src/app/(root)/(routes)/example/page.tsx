@@ -1,6 +1,7 @@
 'use client'
 
 import { CommunityCard } from '@/components/molecules/communityCard'
+import { PopularReviewCard } from '@/components/molecules/popularReviewCard'
 import BlogReview from '@/components/organisms/blogReview'
 import useMediaQuery from '@/shared/hooks/useMediaQuery'
 
@@ -22,6 +23,61 @@ export default function ExamplePage() {
   return (
     <div className="p-8 space-y-12">
       <h1 className="typo-title-1 text-black-color mb-8">컴포넌트 예시</h1>
+
+      <section className="space-y-4">
+        <h2 className="typo-title-2-1-sb text-black-color">
+          인기 후기 컴포넌트 (홈 피드, 후기 메인 사용)
+        </h2>
+        <div className="flex justify-center items-start w-full px-4">
+          <div className="grid w-full items-start max-w-[1100px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <PopularReviewCard>
+              {/* <PopularReviewCard.Tag /> */}
+              <PopularReviewCard.Profile
+                category="DOCUMENT"
+                clubName="동아리명"
+                generation={12}
+                jobName="프론트엔드 개발자"
+                ratingValue={4}
+              />
+              <PopularReviewCard.Content>
+                직무 경험이 없으면 힘들게 느껴 질 수도 있는 압박질문이 있었고
+                어쩌구저쩌구가나다라마바사
+              </PopularReviewCard.Content>
+              <PopularReviewCard.Link reviewId="1" />
+            </PopularReviewCard>
+            <PopularReviewCard>
+              <PopularReviewCard.Tag />
+              <PopularReviewCard.Profile
+                category="INTERVIEW"
+                clubName="동아리명"
+                generation={12}
+                jobName="프론트엔드 개발자"
+                ratingValue={4}
+              />
+              <PopularReviewCard.Content>
+                직무 경험이 없으면 힘들게 느껴 질 수도 있는 압박질문이 있었고
+                어쩌구저쩌구가나다라마바사
+              </PopularReviewCard.Content>
+              <PopularReviewCard.Link reviewId="25" />
+            </PopularReviewCard>
+            <PopularReviewCard>
+              <PopularReviewCard.Tag />
+              <PopularReviewCard.Profile
+                category="ACTIVITY"
+                clubName="동아리명"
+                generation={12}
+                jobName="프론트엔드 개발자"
+                ratingValue={4}
+              />
+              <PopularReviewCard.Content>
+                직무 경험이 없으면 힘들게 느껴 질 수도 있는 압박질문이 있었고
+                어쩌구저쩌구가나다라마바사
+              </PopularReviewCard.Content>
+              <PopularReviewCard.Link reviewId="26" />
+            </PopularReviewCard>
+          </div>
+        </div>
+      </section>
 
       {/* BlogReview 예시 - data, children 혼합 사용 가능 */}
       <section className="space-y-4">

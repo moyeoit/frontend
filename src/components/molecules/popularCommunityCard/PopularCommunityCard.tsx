@@ -10,8 +10,7 @@ export const PopularCommunityCardCtx = React.createContext<{
   postType: undefined,
 })
 
-export interface PopularCommunityCardProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+export interface PopularCommunityCardProps extends React.HTMLAttributes<HTMLDivElement> {
   postType?: string
   postId?: number
 }
@@ -67,7 +66,9 @@ export function PopularCommunityCardTitle({
       )}
       {...props}
     >
-      {isQuestion && <span className="typo-body-1-b text-main-color-1 mr-2">Q.</span>}
+      {isQuestion && (
+        <span className="typo-body-1-b text-main-color-1 mr-2">Q.</span>
+      )}
       {children}
     </div>
   )

@@ -287,8 +287,7 @@ export function CardTitle({
   )
 }
 
-export interface CardBookmarkProps
-  extends React.HTMLAttributes<HTMLButtonElement> {
+export interface CardBookmarkProps extends React.HTMLAttributes<HTMLButtonElement> {
   isSubscribed?: boolean
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void
   className?: string

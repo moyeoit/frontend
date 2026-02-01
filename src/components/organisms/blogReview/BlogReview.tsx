@@ -113,9 +113,9 @@ export function BlogReviewRoot({
         React.isValidElement(child) &&
         typeof child.type !== 'string' &&
         'displayName' in child.type &&
-        String((child.type as { displayName?: string }).displayName)?.startsWith(
-          'BlogReview.',
-        ),
+        String(
+          (child.type as { displayName?: string }).displayName,
+        )?.startsWith('BlogReview.'),
     )
 
   return (
@@ -150,8 +150,7 @@ function BlogReviewCompoundLayout({
       bookmark?: React.ReactNode
     } = {}
     React.Children.forEach(children, (child) => {
-      if (!React.isValidElement(child) || typeof child.type === 'string')
-        return
+      if (!React.isValidElement(child) || typeof child.type === 'string') return
       const name = (child.type as { displayName?: string }).displayName
       if (name === 'BlogReview.Thumbnail') s.thumbnail = child
       else if (name === 'BlogReview.Tags') s.tags = child
@@ -163,12 +162,22 @@ function BlogReviewCompoundLayout({
     return s
   }, [children])
 
-  const contentArea = (
-    <div className="flex-1 flex flex-col gap-2 min-w-0">
-      {slots.tags}
-      {slots.title}
-      {slots.description}
-      {slots.blogName}
+  const tagsRow = (
+    <div
+      className={cn(
+        'flex items-center gap-3',
+        isDesktop ? 'justify-between' : 'justify-start',
+      )}
+    >
+      <div
+        className={cn(
+          'flex flex-wrap items-center',
+          isDesktop ? 'gap-2' : 'gap-1',
+        )}
+      >
+        {slots.tags}
+      </div>
+      {isDesktop ? slots.bookmark : null}
     </div>
   )
 
@@ -176,33 +185,33 @@ function BlogReviewCompoundLayout({
     return (
       <div
         className={cn(
-          'group relative flex gap-4 p-4 bg-white rounded-lg hover:border-main-color-1 transition-all cursor-pointer',
+          'border-b border-light-color-3 py-8 flex gap-5 items-start cursor-pointer',
           className,
         )}
         onClick={handleCardClick}
       >
         {slots.thumbnail}
-        {contentArea}
-        {slots.bookmark}
+        <div className="flex-1 flex flex-col gap-2 min-w-0">
+          {tagsRow}
+          <div className="flex flex-col gap-1 min-w-0">
+            {slots.title}
+            {slots.description}
+            {slots.blogName}
+          </div>
+        </div>
       </div>
     )
   }
 
   return (
     <div
-      className={cn(
-        'group relative flex flex-col gap-3 p-4 bg-white rounded-lg hover:border-main-color-1 transition-all cursor-pointer',
-        className,
-      )}
+      className={cn('border-b border-light-color-3 py-4', className)}
       onClick={handleCardClick}
     >
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex gap-2 flex-wrap items-center">{slots.tags}</div>
-        {slots.bookmark}
-      </div>
-      <div className="flex gap-3">
+      {tagsRow}
+      <div className="mt-3 flex gap-3">
         {slots.thumbnail}
-        <div className="flex-1 flex flex-col gap-1.5 min-w-0">
+        <div className="flex-1 min-w-0 flex flex-col gap-1">
           {slots.title}
           {slots.description}
           {slots.blogName}
@@ -213,25 +222,51 @@ function BlogReviewCompoundLayout({
 }
 
 function BlogReviewDefaultLayout({ className }: { className?: string }) {
-  const { data, isBookmarked, handleBookmarkClick, handleCardClick, isDesktop } =
-    useBlogReviewContext()
+  const {
+    data,
+    isBookmarked,
+    handleBookmarkClick,
+    handleCardClick,
+    isDesktop,
+  } = useBlogReviewContext()
 
   const thumbnail = (
     <BlogReviewThumbnailImpl
       src={data.thumbnailUrl}
       alt={data.title}
       isDesktop={isDesktop}
-    />
+    >
+      {!isDesktop && (
+        <button
+          onClick={handleBookmarkClick}
+          className="absolute right-2 top-2 flex items-center justify-center rounded-full bg-black/20 p-1"
+          aria-label={isBookmarked ? '북마크 해제' : '북마크'}
+        >
+          {isBookmarked ? (
+            <MobileBookmarkFilledIcon className="w-4 h-4 text-white" />
+          ) : (
+            <MobileBookmarkEmptyIcon className="w-4 h-4 text-white" />
+          )}
+        </button>
+      )}
+    </BlogReviewThumbnailImpl>
   )
   const tags = (
-    <div className="flex gap-2 flex-wrap">
+    <>
       <Tag label={data.clubName} kind="blogReview" size="small" />
-      <Tag label={`${data.generation}기`} kind="blogReview" size="small" />
+      {isDesktop && (
+        <Tag label={`${data.generation}기`} kind="blogReview" size="small" />
+      )}
       <Tag label={data.part} kind="blogReview" size="small" />
-    </div>
+    </>
   )
   const title = (
-    <h3 className="typo-body-1-2-sb text-black-color line-clamp-1">
+    <h3
+      className={cn(
+        'text-black-color line-clamp-1',
+        isDesktop ? 'typo-body-1-2-sb' : 'typo-body-3-1-sb',
+      )}
+    >
       {data.title}
     </h3>
   )
@@ -239,73 +274,91 @@ function BlogReviewDefaultLayout({ className }: { className?: string }) {
     data.description || data.content ? (
       <p
         className={cn(
-          'typo-body-3-3-r text-grey-color-5 line-clamp-2',
-          isDesktop && 'flex-1',
+          'text-grey-color-5 line-clamp-2',
+          isDesktop ? 'typo-body-3-3-r' : 'typo-sm-body-1-5',
         )}
       >
         {data.description || data.content}
       </p>
     ) : null
   const blogName = data.blogName ? (
-    <span className="typo-button-m text-grey-color-3 line-clamp-1">
+    <span
+      className={cn(
+        'text-grey-color-3 line-clamp-1',
+        isDesktop ? 'typo-button-m' : 'typo-caption-2',
+      )}
+    >
       {data.blogName}
     </span>
   ) : null
   const bookmark = (
     <button
       onClick={handleBookmarkClick}
-      className={cn(
-        'flex items-center justify-center transition-opacity duration-200 hover:opacity-70 focus:outline-none',
-        isDesktop
-          ? 'absolute top-4 right-4 z-10'
-          : 'shrink-0',
-      )}
+      className="flex items-center justify-center transition-opacity duration-200 hover:opacity-70 focus:outline-none"
       aria-label={isBookmarked ? '북마크 해제' : '북마크'}
     >
       {isBookmarked ? (
-        <MobileBookmarkFilledIcon className="w-6 h-6" />
+        <MobileBookmarkFilledIcon
+          className={cn(isDesktop ? 'w-6 h-6' : 'w-5 h-5')}
+        />
       ) : (
-        <MobileBookmarkEmptyIcon className="w-6 h-6" />
+        <MobileBookmarkEmptyIcon
+          className={cn(isDesktop ? 'w-6 h-6' : 'w-5 h-5')}
+        />
       )}
     </button>
+  )
+
+  const tagsRow = (
+    <div
+      className={cn(
+        'flex items-center gap-3',
+        isDesktop ? 'justify-between' : 'justify-start',
+      )}
+    >
+      <div
+        className={cn(
+          'flex flex-wrap items-center',
+          isDesktop ? 'gap-2' : 'gap-1',
+        )}
+      >
+        {tags}
+      </div>
+      {isDesktop ? bookmark : null}
+    </div>
   )
 
   if (isDesktop) {
     return (
       <div
         className={cn(
-          'group relative flex gap-4 p-4 bg-white rounded-lg hover:border-main-color-1 transition-all cursor-pointer',
+          'border-b border-light-color-3 py-8 flex gap-5 items-start cursor-pointer',
           className,
         )}
         onClick={handleCardClick}
       >
         {thumbnail}
         <div className="flex-1 flex flex-col gap-2 min-w-0">
-          {tags}
-          {title}
-          {description}
-          {blogName}
+          {tagsRow}
+          <div className="flex flex-col gap-1 min-w-0">
+            {title}
+            {description}
+            {blogName}
+          </div>
         </div>
-        {bookmark}
       </div>
     )
   }
 
   return (
     <div
-      className={cn(
-        'group relative flex flex-col gap-3 p-4 bg-white rounded-lg hover:border-main-color-1 transition-all cursor-pointer',
-        className,
-      )}
+      className={cn('border-b border-light-color-3 py-4', className)}
       onClick={handleCardClick}
     >
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex gap-2 flex-wrap items-center">{tags}</div>
-        {bookmark}
-      </div>
-      <div className="flex gap-3">
+      {tagsRow}
+      <div className="mt-3 flex gap-3">
         {thumbnail}
-        <div className="flex-1 flex flex-col gap-1.5 min-w-0">
+        <div className="flex-1 min-w-0 flex flex-col gap-1">
           {title}
           {description}
           {blogName}
@@ -319,28 +372,49 @@ function BlogReviewThumbnailImpl({
   src,
   alt,
   isDesktop,
+  children,
 }: {
   src?: string
   alt: string
   isDesktop: boolean
+  children?: React.ReactNode
 }) {
+  const resolvedSrc = src || '/images/default.svg'
+  const isRemote = /^https?:\/\//i.test(resolvedSrc)
   return (
     <div
       className={cn(
-        'relative shrink-0 rounded-lg border border-light-color-3 overflow-hidden bg-grey-color-1',
-        isDesktop ? 'w-40 h-30' : 'w-20 h-20',
+        'relative shrink-0 border border-light-color-3 overflow-hidden bg-grey-color-1',
+        isDesktop
+          ? 'rounded-[12px] w-[224px] h-[152px]'
+          : 'rounded-[6px] w-[118px] h-[80px]',
       )}
     >
-      <Image
-        src={src || '/images/default.svg'}
-        alt={alt}
-        fill
-        className="object-cover"
-        onError={(e) => {
-          const target = e.target as HTMLImageElement
-          target.src = '/images/default.svg'
-        }}
-      />
+      {isRemote ? (
+        <img
+          src={resolvedSrc}
+          alt={alt}
+          className="absolute inset-0 h-full w-full object-cover"
+          loading="lazy"
+          onError={(e) => {
+            const target = e.currentTarget
+            if (target.src.includes('/images/default.svg')) return
+            target.src = '/images/default.svg'
+          }}
+        />
+      ) : (
+        <Image
+          src={resolvedSrc}
+          alt={alt}
+          fill
+          className="object-cover"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement
+            target.src = '/images/default.svg'
+          }}
+        />
+      )}
+      {children}
     </div>
   )
 }
@@ -356,8 +430,10 @@ export function BlogReviewThumbnail({
 }) {
   const { data, isDesktop } = useBlogReviewContext()
   const wrapperClass = cn(
-    'relative shrink-0 rounded-lg border border-light-color-3 overflow-hidden bg-grey-color-1',
-    isDesktop ? 'w-40 h-30' : 'w-20 h-20',
+    'relative shrink-0 border border-light-color-3 overflow-hidden bg-grey-color-1',
+    isDesktop
+      ? 'rounded-[12px] w-[224px] h-[152px]'
+      : 'rounded-[6px] w-[118px] h-[80px]',
   )
   if (children) {
     return <div className={wrapperClass}>{children}</div>
@@ -365,23 +441,21 @@ export function BlogReviewThumbnail({
   const imgSrc = src ?? data?.thumbnailUrl
   const imgAlt = alt ?? data?.title ?? ''
   return (
-    <BlogReviewThumbnailImpl
-      src={imgSrc}
-      alt={imgAlt}
-      isDesktop={isDesktop}
-    />
+    <BlogReviewThumbnailImpl src={imgSrc} alt={imgAlt} isDesktop={isDesktop} />
   )
 }
 BlogReviewThumbnail.displayName = 'BlogReview.Thumbnail'
 
 export function BlogReviewTags({ children }: { children?: React.ReactNode }) {
-  const { data } = useBlogReviewContext()
+  const { data, isDesktop } = useBlogReviewContext()
   const content =
     children ??
     (data && (
       <>
         <Tag label={data.clubName} kind="blogReview" size="small" />
-        <Tag label={`${data.generation}기`} kind="blogReview" size="small" />
+        {isDesktop && (
+          <Tag label={`${data.generation}기`} kind="blogReview" size="small" />
+        )}
         <Tag label={data.part} kind="blogReview" size="small" />
       </>
     ))
@@ -390,10 +464,15 @@ export function BlogReviewTags({ children }: { children?: React.ReactNode }) {
 BlogReviewTags.displayName = 'BlogReview.Tags'
 
 export function BlogReviewTitle({ children }: { children?: React.ReactNode }) {
-  const { data } = useBlogReviewContext()
+  const { data, isDesktop } = useBlogReviewContext()
   const content = children ?? data?.title
   return (
-    <h3 className="typo-body-1-2-sb text-black-color line-clamp-1">
+    <h3
+      className={cn(
+        'text-black-color line-clamp-1',
+        isDesktop ? 'typo-body-1-2-sb' : 'typo-body-3-1-sb',
+      )}
+    >
       {content}
     </h3>
   )
@@ -411,8 +490,8 @@ export function BlogReviewDescription({
   return (
     <p
       className={cn(
-        'typo-body-3-3-r text-grey-color-5 line-clamp-2',
-        isDesktop && 'flex-1',
+        'text-grey-color-5 line-clamp-2',
+        isDesktop ? 'typo-body-3-3-r' : 'typo-sm-body-1-5',
       )}
     >
       {content}
@@ -426,11 +505,16 @@ export function BlogReviewBlogName({
 }: {
   children?: React.ReactNode
 }) {
-  const { data } = useBlogReviewContext()
+  const { data, isDesktop } = useBlogReviewContext()
   const content = children ?? data?.blogName
   if (content == null) return null
   return (
-    <span className="typo-button-m text-grey-color-3 line-clamp-1">
+    <span
+      className={cn(
+        'text-grey-color-3 line-clamp-1',
+        isDesktop ? 'typo-button-m' : 'typo-caption-2',
+      )}
+    >
       {content}
     </span>
   )
@@ -443,16 +527,17 @@ export function BlogReviewBookmarkButton() {
   return (
     <button
       onClick={handleBookmarkClick}
-      className={cn(
-        'flex items-center justify-center transition-opacity duration-200 hover:opacity-70 focus:outline-none',
-        isDesktop && 'absolute top-4 right-4 z-10',
-      )}
+      className="flex items-center justify-center transition-opacity duration-200 hover:opacity-70 focus:outline-none"
       aria-label={isBookmarked ? '북마크 해제' : '북마크'}
     >
       {isBookmarked ? (
-        <MobileBookmarkFilledIcon className="w-6 h-6" />
+        <MobileBookmarkFilledIcon
+          className={cn(isDesktop ? 'w-6 h-6' : 'w-5 h-5')}
+        />
       ) : (
-        <MobileBookmarkEmptyIcon className="w-6 h-6" />
+        <MobileBookmarkEmptyIcon
+          className={cn(isDesktop ? 'w-6 h-6' : 'w-5 h-5')}
+        />
       )}
     </button>
   )

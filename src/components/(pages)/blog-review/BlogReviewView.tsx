@@ -1,8 +1,8 @@
 'use client'
 
 import React from 'react'
-import { BlogReviewList } from './BlogReviewList'
 import { BlogReviewSearchRequest, SortType } from '@/features/blog-review/types'
+import { BlogReviewList } from './BlogReviewList'
 
 export const BlogReviewView: React.FC = () => {
   const [filters, setFilters] = React.useState<BlogReviewSearchRequest>({

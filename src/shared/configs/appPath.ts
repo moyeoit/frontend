@@ -24,6 +24,7 @@ const AppPath = {
   reviewSubmitted: () => '/review/submitted' as const,
   community: () => '/community' as const,
   bookmark: () => '/bookmark' as const,
+  search: () => '/search' as const,
 } as const
 
 type AppPathReturnType = {

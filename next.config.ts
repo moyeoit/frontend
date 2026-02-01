@@ -37,6 +37,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/images/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'i.namu.wiki',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
   turbopack: {

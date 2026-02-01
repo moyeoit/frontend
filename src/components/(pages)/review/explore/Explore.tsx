@@ -1,10 +1,10 @@
 'use client'
 
 import * as React from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { StarRating } from '@/components/atoms/StarRating/StarRating'
 import { SideBar } from '@/components/atoms/sideBar/Sidebar'
 import MobileFilterBar from '@/components/molecules/filterBar/MobileFilterBar'
@@ -15,13 +15,13 @@ import { BlogReview } from '@/components/organisms/blogReview'
 import Review from '@/components/organisms/review/Review'
 import { useBlogReviewSearch } from '@/features/blog-review/queries'
 import { useSearchReviews } from '@/features/review/queries'
+import AppPath from '@/shared/configs/appPath'
 import { HERO_IMAGES } from '@/shared/constants/category'
 import {
   RESULT_FILTER_OPTIONS,
   REVIEW_CATEGORY_OPTIONS,
   REVIEW_SORT_OPTIONS,
 } from '@/shared/constants/reviewFilters'
-import AppPath from '@/shared/configs/appPath'
 import useMediaQuery from '@/shared/hooks/useMediaQuery'
 import useQueryState from '@/shared/hooks/useQueryState'
 import { cn } from '@/shared/utils/cn'
@@ -114,7 +114,13 @@ export function Explore() {
     setGenerationFilter([])
     setPartFilter([])
     setDocumentType(null)
-  }, [router, setDocumentType, setClubFilter, setGenerationFilter, setPartFilter])
+  }, [
+    router,
+    setDocumentType,
+    setClubFilter,
+    setGenerationFilter,
+    setPartFilter,
+  ])
 
   const listParams = {
     page: currentPage,
@@ -193,20 +199,19 @@ export function Explore() {
     const content = reviewsData?.content ?? []
     if (!isDocumentCategory || !currentDocumentType) return content
     return content.filter(
-      (review) =>
-        (review.category || '').toUpperCase() === currentDocumentType,
+      (review) => (review.category || '').toUpperCase() === currentDocumentType,
     )
   }, [reviewsData, isDocumentCategory, currentDocumentType])
 
   const listContent = useBlogLayout
-    ? blogReviewsData?.content ?? []
+    ? (blogReviewsData?.content ?? [])
     : filteredReviews
 
   const listIsLoading = useBlogLayout ? isBlogLoading : isListLoading
   const listIsFetching = useBlogLayout ? isBlogFetching : isListFetching
   const totalPages = useBlogLayout
-    ? blogReviewsData?.totalPages ?? 0
-    : reviewsData?.totalPages ?? 0
+    ? (blogReviewsData?.totalPages ?? 0)
+    : (reviewsData?.totalPages ?? 0)
 
   // BEST 후기는 전체 카테고리에서만 표시
   const showBestReviews = isAllCategory
@@ -218,8 +223,7 @@ export function Explore() {
       if (!list) return
       const card = list.querySelector<HTMLElement>('[data-best-card]')
       const styles = window.getComputedStyle(list)
-      const gapValue =
-        parseFloat(styles.columnGap || styles.gap || '0') || 0
+      const gapValue = parseFloat(styles.columnGap || styles.gap || '0') || 0
       const cardWidth = card?.offsetWidth || (isDesktop ? 342 : 230)
       const delta = cardWidth + gapValue
       list.scrollBy({
@@ -300,7 +304,9 @@ export function Explore() {
         <div
           className={`${isDesktop ? 'px-5 mt-8 pt-6 pb-12' : 'pt-4 w-full'}`}
         >
-          <div className={cn('mx-auto', isDesktop ? 'max-w-[802px]' : 'w-full')}>
+          <div
+            className={cn('mx-auto', isDesktop ? 'max-w-[802px]' : 'w-full')}
+          >
             <div
               className={`flex flex-row items-center justify-between gap-2 ${isDesktop ? 'mb-12' : 'pl-5 mb-6'}`}
             >
@@ -336,9 +342,7 @@ export function Explore() {
                     {showTypeFilter && (
                       <MultiDropDown
                         groups={TYPE_FILTER_OPTIONS}
-                        value={
-                          currentDocumentType ? [currentDocumentType] : []
-                        }
+                        value={currentDocumentType ? [currentDocumentType] : []}
                         onChange={(value) =>
                           handleTypeChange(value as string[])
                         }
@@ -403,8 +407,7 @@ export function Explore() {
                       options: CLUB_FILTER_OPTIONS,
                       value: clubFilter,
                       defaultValue: [],
-                      onChange: (value) =>
-                        setClubFilter(value as string[]),
+                      onChange: (value) => setClubFilter(value as string[]),
                       onReset: () => setClubFilter([]),
                     },
                     {
@@ -425,8 +428,7 @@ export function Explore() {
                       options: PART_FILTER_OPTIONS,
                       value: partFilter,
                       defaultValue: [],
-                      onChange: (value) =>
-                        setPartFilter(value as string[]),
+                      onChange: (value) => setPartFilter(value as string[]),
                       onReset: () => setPartFilter([]),
                     },
                     ...(showTypeFilter
@@ -703,7 +705,8 @@ function BestReviewCard({
   }
 }) {
   const { isDesktop } = useMediaQuery()
-  const snippet = review.title || review.answerSummaries?.[0]?.answerSummary || ''
+  const snippet =
+    review.title || review.answerSummaries?.[0]?.answerSummary || ''
   const meta = [
     review.clubName,
     review.generation ? `${review.generation}기` : null,

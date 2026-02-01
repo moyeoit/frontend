@@ -213,10 +213,7 @@ export function SearchCore(props: SearchCoreProps) {
                     })
                   ) : (
                     <div className="flex flex-row items-center gap-2">
-                      <SearchResultAvatar
-                        src={it.logoUrl}
-                        alt={it.clubName}
-                      />
+                      <SearchResultAvatar src={it.logoUrl} alt={it.clubName} />
                       <span className="typo-body-3-2-m text-grey-color-4">
                         {it.clubName}
                       </span>

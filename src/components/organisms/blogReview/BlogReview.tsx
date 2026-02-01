@@ -113,9 +113,9 @@ export function BlogReviewRoot({
         React.isValidElement(child) &&
         typeof child.type !== 'string' &&
         'displayName' in child.type &&
-        String((child.type as { displayName?: string }).displayName)?.startsWith(
-          'BlogReview.',
-        ),
+        String(
+          (child.type as { displayName?: string }).displayName,
+        )?.startsWith('BlogReview.'),
     )
 
   return (
@@ -150,8 +150,7 @@ function BlogReviewCompoundLayout({
       bookmark?: React.ReactNode
     } = {}
     React.Children.forEach(children, (child) => {
-      if (!React.isValidElement(child) || typeof child.type === 'string')
-        return
+      if (!React.isValidElement(child) || typeof child.type === 'string') return
       const name = (child.type as { displayName?: string }).displayName
       if (name === 'BlogReview.Thumbnail') s.thumbnail = child
       else if (name === 'BlogReview.Tags') s.tags = child
@@ -223,8 +222,13 @@ function BlogReviewCompoundLayout({
 }
 
 function BlogReviewDefaultLayout({ className }: { className?: string }) {
-  const { data, isBookmarked, handleBookmarkClick, handleCardClick, isDesktop } =
-    useBlogReviewContext()
+  const {
+    data,
+    isBookmarked,
+    handleBookmarkClick,
+    handleCardClick,
+    isDesktop,
+  } = useBlogReviewContext()
 
   const thumbnail = (
     <BlogReviewThumbnailImpl
@@ -427,7 +431,9 @@ export function BlogReviewThumbnail({
   const { data, isDesktop } = useBlogReviewContext()
   const wrapperClass = cn(
     'relative shrink-0 border border-light-color-3 overflow-hidden bg-grey-color-1',
-    isDesktop ? 'rounded-[12px] w-[224px] h-[152px]' : 'rounded-[6px] w-[118px] h-[80px]',
+    isDesktop
+      ? 'rounded-[12px] w-[224px] h-[152px]'
+      : 'rounded-[6px] w-[118px] h-[80px]',
   )
   if (children) {
     return <div className={wrapperClass}>{children}</div>
@@ -435,11 +441,7 @@ export function BlogReviewThumbnail({
   const imgSrc = src ?? data?.thumbnailUrl
   const imgAlt = alt ?? data?.title ?? ''
   return (
-    <BlogReviewThumbnailImpl
-      src={imgSrc}
-      alt={imgAlt}
-      isDesktop={isDesktop}
-    />
+    <BlogReviewThumbnailImpl src={imgSrc} alt={imgAlt} isDesktop={isDesktop} />
   )
 }
 BlogReviewThumbnail.displayName = 'BlogReview.Thumbnail'

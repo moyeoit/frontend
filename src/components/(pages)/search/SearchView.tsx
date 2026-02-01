@@ -3,15 +3,15 @@
 import * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { BookmarkEmptyIcon, SearchMainIcon, XIcon } from '@/assets/icons'
+import { ReviewListItem } from '@/components/(pages)/review/explore/ReviewCards'
 import { Button } from '@/components/atoms/Button'
 import { Input } from '@/components/atoms/Input'
 import { UnderLineTab } from '@/components/atoms/UnderLineTab'
-import { ReviewListItem } from '@/components/(pages)/review/explore/ReviewCards'
-import { CommunityCard } from '@/components/molecules/communityCard'
 import CardOverlay from '@/components/molecules/card/CardOverlay'
-import { useBookmarkedClubs, useToggleBookmark } from '@/features/bookmark'
+import { CommunityCard } from '@/components/molecules/communityCard'
 import { useBlogReviewSearch } from '@/features/blog-review/queries'
 import type { BlogReviewItem } from '@/features/blog-review/types'
+import { useBookmarkedClubs, useToggleBookmark } from '@/features/bookmark'
 import { clubQueries } from '@/features/clubs/queries.factory'
 import { reviewQueries } from '@/features/review/queries.factory'
 import type { ReviewSearchItem } from '@/features/review/types'
@@ -182,9 +182,7 @@ function SearchBlogReviewItem({
             <p className="typo-body-3-3-r text-grey-color-5 line-clamp-2">
               {review.description || review.content || ''}
             </p>
-            <p className="typo-button-m text-grey-color-3">
-              {review.blogName}
-            </p>
+            <p className="typo-button-m text-grey-color-3">{review.blogName}</p>
           </div>
         </div>
       </div>
@@ -196,7 +194,10 @@ function SearchBlogReviewItem({
       <div className="flex items-center justify-between gap-2">
         <div className="flex flex-wrap items-center gap-1">
           <SearchTag label={review.clubName} className="px-2 py-[2px]" />
-          <SearchTag label={`${review.generation}기`} className="px-2 py-[2px]" />
+          <SearchTag
+            label={`${review.generation}기`}
+            className="px-2 py-[2px]"
+          />
           <SearchTag
             label={review.jobName}
             variant="accent"
@@ -236,9 +237,7 @@ function SearchBlogReviewItem({
           <p className="typo-sm-body-1-5 text-grey-color-5 line-clamp-2">
             {review.description || review.content || ''}
           </p>
-          <p className="typo-caption-2 text-grey-color-3">
-            {review.blogName}
-          </p>
+          <p className="typo-caption-2 text-grey-color-3">{review.blogName}</p>
         </div>
       </div>
     </div>
@@ -268,9 +267,7 @@ export function SearchView() {
   const activeTab =
     tab === 'review' || tab === 'community' ? tab : ('club' as const)
   const activeReviewType: ReviewTabKey =
-    reviewType === 'activity' || reviewType === 'blog'
-      ? reviewType
-      : 'document'
+    reviewType === 'activity' || reviewType === 'blog' ? reviewType : 'document'
 
   const hasKeyword = debouncedKeyword.trim().length > 0
 
@@ -340,14 +337,14 @@ export function SearchView() {
   )
   const blogReviews = blogReviewsData?.content ?? []
 
-  const totalReviews = hasKeyword ? allReviewsData?.totalElements ?? 0 : 0
+  const totalReviews = hasKeyword ? (allReviewsData?.totalElements ?? 0) : 0
   const activityCount = hasKeyword
-    ? activityReviewsData?.totalElements ?? 0
+    ? (activityReviewsData?.totalElements ?? 0)
     : 0
   const documentCount = Math.max(0, totalReviews - activityCount)
-  const blogCount = hasKeyword ? blogReviewsData?.totalElements ?? 0 : 0
+  const blogCount = hasKeyword ? (blogReviewsData?.totalElements ?? 0) : 0
 
-  const clubCount = hasKeyword ? clubsData?.totalElements ?? clubs.length : 0
+  const clubCount = hasKeyword ? (clubsData?.totalElements ?? clubs.length) : 0
   const reviewCount = documentCount + activityCount + blogCount
 
   const filteredCommunity = React.useMemo(() => {

@@ -19,8 +19,4 @@ export const PopularCommunityCard = Object.assign(PopularCommunityCardRoot, {
 
 export type { PopularCommunityCardProps } from './PopularCommunityCard'
 
-export {
-  PopularCommunityCardTitle,
-  PopularCommunityCardDescription,
-}
-
+export { PopularCommunityCardTitle, PopularCommunityCardDescription }

@@ -34,9 +34,7 @@ function DocumentTypeIcon({ type }: { type: string }) {
         'size-10',
       )}
     >
-      <span
-        className={cn('font-semibold typo-body-1', textClass)}
-      >
+      <span className={cn('font-semibold typo-body-1', textClass)}>
         {label}
       </span>
     </div>
@@ -140,9 +138,7 @@ export default function Review({
       if (qaMatch?.answerValue) return qaMatch.answerValue
 
       const answerMatch = answers?.find((answer) =>
-        keywords.some((keyword) =>
-          answer.question.title?.includes(keyword),
-        ),
+        keywords.some((keyword) => answer.question.title?.includes(keyword)),
       )
       if (answerMatch && typeof answerMatch.value === 'string') {
         return answerMatch.value

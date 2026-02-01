@@ -77,9 +77,7 @@ export function ReviewListItem({
 }) {
   const summaryValue = (keywords: string[], fallback: string) =>
     review.answerSummaries?.find((s) =>
-      keywords.some((keyword) =>
-        s.questionTitleSummary?.includes(keyword),
-      ),
+      keywords.some((keyword) => s.questionTitleSummary?.includes(keyword)),
     )?.answerSummary || fallback
 
   const href = review.reviewId ? `/review/${review.reviewId}` : '#'
@@ -108,23 +106,18 @@ export function ReviewListItem({
     .join(' · ')
 
   // 답변 요약에서 메타 정보 추출
-  const keyAppeal =
-    summaryValue(['핵심', '어필'], '지원동기 외2')
+  const keyAppeal = summaryValue(['핵심', '어필'], '지원동기 외2')
 
-  const referenceInfo =
-    summaryValue(['참고', '정보'], '공식 공고')
+  const referenceInfo = summaryValue(['참고', '정보'], '공식 공고')
 
-  const writingStyle =
-    summaryValue(['서술', '방식'], '데이터 성과 수치 서술')
+  const writingStyle = summaryValue(['서술', '방식'], '데이터 성과 수치 서술')
 
   // 면접인 경우 출제 질문, 분위기 표시
   const isInterview = review.category === 'INTERVIEW'
   const isActivity = review.category === 'ACTIVITY'
-  const questionInfo =
-    summaryValue(['질문', '출제'], '지원동기 외2')
+  const questionInfo = summaryValue(['질문', '출제'], '지원동기 외2')
 
-  const atmosphereInfo =
-    summaryValue(['분위기', '느낌'], '차가움/무서움')
+  const atmosphereInfo = summaryValue(['분위기', '느낌'], '차가움/무서움')
 
   const timeInfo = summaryValue(['투자', '시간'], '주 5시간 미만')
   const activityLevel = summaryValue(['활동', '수준'], '개인 흥미 수준')

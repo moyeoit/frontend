@@ -1,5 +1,3 @@
-//TODO: 무한스크롤 구현 필요
-
 'use client'
 
 import * as React from 'react'
@@ -11,6 +9,7 @@ import { Tag } from '@/components/atoms/tag'
 import { CommunityCard } from '@/components/molecules/communityCard'
 import { PopularCommunityCard } from '@/components/molecules/popularCommunityCard'
 import { PostButton } from '@/components/molecules/postButton'
+import { PaginationWithHook } from '@/components/molecules/pagination'
 import { usePopularPosts, usePosts } from '@/features/community/queries'
 import { HERO_IMAGES } from '@/shared/constants/category'
 import useMediaQuery from '@/shared/hooks/useMediaQuery'
@@ -33,6 +32,7 @@ export function Community() {
   const { isDesktop } = useMediaQuery()
   const [selectedCategory, setSelectedCategory] = React.useState<string>('전체')
   const [popularPage, setPopularPage] = React.useState(0)
+  const [currentPage, setCurrentPage] = React.useState(0)
   const [carouselApi, setCarouselApi] = React.useState<
     ReturnType<typeof useEmblaCarousel>[1] | null
   >(null)
@@ -49,10 +49,23 @@ export function Community() {
     selectedCategory === '전체' ? undefined : selectedCategory
   const { data: postsData } = usePosts({
     categoryName,
-    page: 0,
+    page: currentPage,
     size: 8,
   })
   const posts = postsData?.content || []
+  const totalPages = postsData?.totalPages ?? 0
+
+  const handlePageChange = React.useCallback(
+    (newPage: number) => {
+      setCurrentPage(newPage - 1)
+    },
+    [],
+  )
+
+  const handleCategoryChange = React.useCallback((category: string) => {
+    setSelectedCategory(category)
+    setCurrentPage(0)
+  }, [])
 
   const handleNext = React.useCallback(() => {
     if (!carouselApi) return
@@ -227,7 +240,7 @@ export function Community() {
                   selectedCategory === category ? 'solid' : 'outlined-primary'
                 }
                 size="small"
-                onClick={() => setSelectedCategory(category)}
+                onClick={() => handleCategoryChange(category)}
                 className="shrink-0 cursor-pointer"
               >
                 {category}
@@ -278,6 +291,16 @@ export function Community() {
                 />
               </CommunityCard>
             ))}
+            {totalPages > 1 && (
+              <div className="mt-8">
+                <PaginationWithHook
+                  totalPages={totalPages}
+                  maxVisiblePages={5}
+                  initialPage={currentPage + 1}
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>

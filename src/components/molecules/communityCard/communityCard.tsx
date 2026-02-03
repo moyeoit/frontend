@@ -16,7 +16,8 @@ export const CommunityCardCtx = React.createContext<{
   postType: undefined,
 })
 
-export interface CommunityCardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface CommunityCardProps
+  extends React.HTMLAttributes<HTMLDivElement> {
   type?: CommunityCardType
   postType?: string
 }
@@ -34,7 +35,7 @@ export function CommunityCard({
         data-slot="community-card"
         className={cn(
           'w-full border-b border-light-color-3 py-4',
-          type === 'vertical' ? 'flex flex-col' : 'flex flex-row items-start',
+          type === 'vertical' ? 'flex flex-col' : 'flex flex-row',
           className,
         )}
         {...props}
@@ -78,7 +79,8 @@ export function CommunityCardDescription({
   ) : null
 }
 
-export interface CommunityCardImageProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface CommunityCardImageProps
+  extends React.HTMLAttributes<HTMLDivElement> {
   logoUrl?: string | null
   alt?: string
 }
@@ -100,7 +102,7 @@ export function CommunityCardImage({
     <div
       data-slot="community-card-image"
       className={cn(
-        'relative object-cover overflow-hidden border border-light-color-3 rounded-[12px]',
+        'relative object-cover overflow-hidden border border-light-color-3 rounded-[12px] shrink-0 ml-auto',
         isDesktop ? 'w-30 h-30' : 'w-16 h-16',
         className,
       )}
@@ -111,7 +113,7 @@ export function CommunityCardImage({
         alt={alt || ''}
         fill
         sizes={isDesktop ? '120px' : '64px'}
-        className="object-cover transition-transform duration-300 ease-out will-change-transform transform-gpu group-hover:scale-105"
+        className="object-cover transition-transform duration-300 ease-out will-change-transform transform-gpu group-hover:scale-105 "
         onError={() => setFailed(true)}
       />
     </div>

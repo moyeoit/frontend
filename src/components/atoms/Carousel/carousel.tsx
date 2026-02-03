@@ -145,9 +145,7 @@ const CarouselItem = React.forwardRef<HTMLDivElement, CarouselItemProps>(
         ref={ref}
         role="group"
         aria-roledescription="slide"
-        className={cn(
-          className,
-        )}
+        className={cn(className)}
         {...props}
       />
     )

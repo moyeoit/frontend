@@ -1,15 +1,15 @@
 'use client'
 
 import * as React from 'react'
+import type useEmblaCarousel from 'embla-carousel-react'
 import Image from 'next/image'
 import { Button } from '@/components/atoms/Button'
 import { Carousel } from '@/components/atoms/Carousel'
-import type useEmblaCarousel from 'embla-carousel-react'
 import { Tag } from '@/components/atoms/tag'
 import { CommunityCard } from '@/components/molecules/communityCard'
+import { PaginationWithHook } from '@/components/molecules/pagination'
 import { PopularCommunityCard } from '@/components/molecules/popularCommunityCard'
 import { PostButton } from '@/components/molecules/postButton'
-import { PaginationWithHook } from '@/components/molecules/pagination'
 import { usePopularPosts, usePosts } from '@/features/community/queries'
 import { HERO_IMAGES } from '@/shared/constants/category'
 import useMediaQuery from '@/shared/hooks/useMediaQuery'
@@ -55,12 +55,9 @@ export function Community() {
   const posts = postsData?.content || []
   const totalPages = postsData?.totalPages ?? 0
 
-  const handlePageChange = React.useCallback(
-    (newPage: number) => {
-      setCurrentPage(newPage - 1)
-    },
-    [],
-  )
+  const handlePageChange = React.useCallback((newPage: number) => {
+    setCurrentPage(newPage - 1)
+  }, [])
 
   const handleCategoryChange = React.useCallback((category: string) => {
     setSelectedCategory(category)
@@ -93,7 +90,6 @@ export function Community() {
       carouselApi.scrollPrev()
     }
   }, [carouselApi, isFirst, popularPage])
-
 
   return (
     <div>
@@ -175,44 +171,44 @@ export function Community() {
               setApi={setCarouselApi}
             >
               <Carousel.Content className="gap-4">
-              {popularPosts.map((post) => (
-                <Carousel.Item
-                  key={post.postId}
-                  className="basis-1/3 shrink-0"
-                >
-                  <PopularCommunityCard
-                    postType={post.postType}
-                    postId={post.postId}
+                {popularPosts.map((post) => (
+                  <Carousel.Item
+                    key={post.postId}
+                    className="basis-1/3 shrink-0"
                   >
-                    <div className="flex flex-row gap-[5px] mb-2">
-                      <Tag
-                        label={post.categoryName}
-                        kind="blogReview"
-                        size="large"
-                        className="shrink-0"
+                    <PopularCommunityCard
+                      postType={post.postType}
+                      postId={post.postId}
+                    >
+                      <div className="flex flex-row gap-[5px] mb-2">
+                        <Tag
+                          label={post.categoryName}
+                          kind="blogReview"
+                          size="large"
+                          className="shrink-0"
+                        />
+                        <Tag
+                          label="인기"
+                          kind="clubDetail"
+                          size="large"
+                          color="lightPurple"
+                          className="shrink-0"
+                        />
+                      </div>
+                      <PopularCommunityCard.Title>
+                        {post.title}
+                      </PopularCommunityCard.Title>
+                      <PopularCommunityCard.Description>
+                        {post.excerpt}
+                      </PopularCommunityCard.Description>
+                      <PopularCommunityCard.Meta
+                        likes={post.likeCount}
+                        comments={post.commentCount}
+                        className="mt-3"
                       />
-                      <Tag
-                        label="인기"
-                        kind="clubDetail"
-                        size="large"
-                        color="lightPurple"
-                        className="shrink-0"
-                      />
-                    </div>
-                    <PopularCommunityCard.Title>
-                      {post.title}
-                    </PopularCommunityCard.Title>
-                    <PopularCommunityCard.Description>
-                      {post.excerpt}
-                    </PopularCommunityCard.Description>
-                    <PopularCommunityCard.Meta
-                      likes={post.likeCount}
-                      comments={post.commentCount}
-                      className="mt-3"
-                    />
-                  </PopularCommunityCard>
-                </Carousel.Item>
-              ))}
+                    </PopularCommunityCard>
+                  </Carousel.Item>
+                ))}
               </Carousel.Content>
             </Carousel>
           </>
@@ -258,6 +254,7 @@ export function Community() {
                 key={post.postId}
                 type="horizontal"
                 postType={post.postType}
+                postId={post.postId}
                 className={cn(
                   'gap-6 pt-8 group cursor-pointer relative',
                   isDesktop ? 'gap-6' : 'gap-4',

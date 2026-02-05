@@ -2,6 +2,7 @@
 
 import * as React from 'react'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { ThumbsUpEmptyIcon, MessageIcon } from '@/assets/icons'
 import useMediaQuery from '@/shared/hooks/useMediaQuery'
 import { cn } from '@/shared/utils/cn'
@@ -19,22 +20,48 @@ export const CommunityCardCtx = React.createContext<{
 export interface CommunityCardProps extends React.HTMLAttributes<HTMLDivElement> {
   type?: CommunityCardType
   postType?: string
+  postId?: number
 }
 
 export function CommunityCard({
   type = 'horizontal',
   postType,
+  postId,
   className,
   children,
+  onClick,
   ...props
 }: CommunityCardProps) {
+  const router = useRouter()
+
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (postId) {
+      router.push(`community/post/detail/${postId}`)
+    }
+    onClick?.(e)
+  }
+
   return (
     <CommunityCardCtx.Provider value={{ type, postType }}>
       <div
         data-slot="community-card"
+        role={postId ? 'button' : undefined}
+        tabIndex={postId ? 0 : undefined}
+        onClick={postId ? handleClick : onClick}
+        onKeyDown={
+          postId
+            ? (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  router.push(`community/post/detail/${postId}`)
+                }
+              }
+            : undefined
+        }
         className={cn(
           'w-full border-b border-light-color-3 py-4',
           type === 'vertical' ? 'flex flex-col' : 'flex flex-row items-start',
+          postId && 'cursor-pointer',
           className,
         )}
         {...props}

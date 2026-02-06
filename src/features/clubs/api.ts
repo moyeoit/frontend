@@ -8,7 +8,6 @@ import {
   UserSubscriptionCheckData,
   UserSubscriptionCheckResponse,
   SubscriptionResponse,
-  ClubSubscriptionResponse,
   ClubSearchRequest,
   ClubSearchResponse,
 } from './types'

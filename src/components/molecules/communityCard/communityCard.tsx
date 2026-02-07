@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { ThumbsUpEmptyIcon, MessageIcon } from '@/assets/icons'
 import useMediaQuery from '@/shared/hooks/useMediaQuery'
 import { cn } from '@/shared/utils/cn'
+import { resolveImageSrc } from '@/shared/utils'
 
 type CommunityCardType = 'vertical' | 'horizontal'
 
@@ -115,10 +116,11 @@ export function CommunityCardImage({
   className,
   ...props
 }: CommunityCardImageProps) {
-  const [failed, setFailed] = React.useState(false)
   const { isDesktop } = useMediaQuery()
 
-  if (!logoUrl) {
+  const src = resolveImageSrc(logoUrl, null)
+
+  if (!src) {
     return null
   }
 
@@ -133,12 +135,11 @@ export function CommunityCardImage({
       {...props}
     >
       <Image
-        src={logoUrl}
+        src={src}
         alt={alt || ''}
         fill
         sizes={isDesktop ? '120px' : '64px'}
         className="object-cover transition-transform duration-300 ease-out will-change-transform transform-gpu group-hover:scale-105 "
-        onError={() => setFailed(true)}
       />
     </div>
   )

@@ -8,6 +8,7 @@ import {
   BookmarkMobileEmptyIcon,
 } from '@/assets/icons'
 import { cn } from '@/shared/utils/cn'
+import { resolveImageSrc } from '@/shared/utils'
 
 export interface MobileCardProps extends React.HTMLAttributes<HTMLDivElement> {
   logoUrl?: string | null
@@ -33,7 +34,7 @@ export function MobileCard({
   onClick,
   ...props
 }: MobileCardProps) {
-  const src = !logoUrl ? fallbackSrc! : logoUrl!
+  const src = resolveImageSrc(logoUrl, fallbackSrc)
 
   const handleBookmarkClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation()

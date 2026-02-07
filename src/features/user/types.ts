@@ -126,3 +126,15 @@ export interface UserInterests {
   like_count: number
   club_subscribe_count: number
 }
+
+export interface UpdateUserInfoRequest {
+  name: string
+  subscriptionEmail: string
+  emailAgree: boolean
+}
+
+export interface UpdateUserInfoResponse {
+  status: 'SUCCESS' | 'ERROR'
+  message: string
+  data: boolean
+}

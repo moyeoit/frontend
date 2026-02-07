@@ -4,4 +4,5 @@ export const userKeys = {
   profile: () => [...userKeys.all, 'profile'] as const,
   updateProfileImage: () => [...userKeys.all, 'updateProfileImage'] as const,
   interests: () => [...userKeys.all, 'interests'] as const,
+  updateUserInfo: () => [...userKeys.all, 'updateUserInfo'] as const,
 }

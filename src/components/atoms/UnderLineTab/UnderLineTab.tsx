@@ -102,9 +102,12 @@ export function UnderLineTab({
       onValueChange={handleValueChange}
       className={cn('w-full', className)}
     >
-      <div className="relative w-full">
+      <div className="relative w-full overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         <TabsList
-          className="flex w-full justify-start bg-transparent p-0"
+          className={cn(
+            'flex justify-start bg-transparent p-0 flex-nowrap min-w-max',
+            className,
+          )}
           style={{ gap: '4px' }}
         >
           {tabs.map((tab) => (
@@ -123,7 +126,7 @@ export function UnderLineTab({
             </TabsTrigger>
           ))}
         </TabsList>
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-grey-color-1" />
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-grey-color-1 " />
         {activeTabRef && (
           <div
             className="absolute h-0.5 bg-black-color transition-all duration-200"
@@ -136,7 +139,7 @@ export function UnderLineTab({
         )}
       </div>
       {tabs.map((tab) => (
-        <TabsContent key={tab.value} value={tab.value} className="mt-4">
+        <TabsContent key={tab.value} value={tab.value} className={cn('mt-4')}>
           {tab.content}
         </TabsContent>
       ))}

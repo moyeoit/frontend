@@ -19,4 +19,8 @@ export { userKeys } from './keys'
 export { useUserProfile, useUserInterests } from './queries'
 
 // Mutations
-export { useUserActivate, useUpdateUserProfileImage } from './mutations'
+export {
+  useUserActivate,
+  useUpdateUserProfileImage,
+  useUpdateUserInfo,
+} from './mutations'

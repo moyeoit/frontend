@@ -131,12 +131,18 @@ export function Explore() {
   }, [result])
   const mappedResult = isDocumentCategory ? resultArray[0] : undefined
 
-  const clubFilterValue = React.useMemo(() => toSingleValueArray(clubId), [clubId])
+  const clubFilterValue = React.useMemo(
+    () => toSingleValueArray(clubId),
+    [clubId],
+  )
   const generationFilterValue = React.useMemo(
     () => toSingleValueArray(generation),
     [generation],
   )
-  const partFilterValue = React.useMemo(() => toSingleValueArray(jobId), [jobId])
+  const partFilterValue = React.useMemo(
+    () => toSingleValueArray(jobId),
+    [jobId],
+  )
 
   const clubFilterOptions = React.useMemo(() => {
     const options = (clubsData?.content ?? []).map((club) => ({
@@ -202,7 +208,8 @@ export function Explore() {
 
   const mappedCategory = React.useMemo(() => {
     if (isDocumentCategory) return currentDocumentType ?? 'DOCUMENT'
-    if (currentCategory === 'all' || currentCategory === 'BLOG') return undefined
+    if (currentCategory === 'all' || currentCategory === 'BLOG')
+      return undefined
     return currentCategory
   }, [isDocumentCategory, currentDocumentType, currentCategory])
 
@@ -320,7 +327,8 @@ export function Explore() {
     let content = reviewsData?.content ?? []
     if (selectedJobName) {
       content = content.filter(
-        (review) => normalizeText(review.jobName) === normalizeText(selectedJobName),
+        (review) =>
+          normalizeText(review.jobName) === normalizeText(selectedJobName),
       )
     }
     return content
@@ -719,7 +727,8 @@ export function Explore() {
                       reviewItem.reviewCategory ||
                       (isDocumentCategory
                         ? currentDocumentType || 'DOCUMENT'
-                        : currentCategory !== 'all' && currentCategory !== 'BLOG'
+                        : currentCategory !== 'all' &&
+                            currentCategory !== 'BLOG'
                           ? currentCategory
                           : undefined)
                     return (

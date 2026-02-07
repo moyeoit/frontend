@@ -28,6 +28,11 @@ export interface LikeData {
   liked: boolean
 }
 
+export interface ToggleReviewLikeResult {
+  likeCount?: number
+  liked?: boolean
+}
+
 // Internal Types
 export interface LikeParams {
   reviewId: string

@@ -16,6 +16,43 @@ import {
   ReviewCommentUpdateRequest,
 } from './types'
 
+type ReviewDetailStateFields = {
+  liked?: boolean
+  isLiked?: boolean
+  is_liked?: boolean
+  isBookmarked?: boolean
+  bookmarked?: boolean
+  is_bookmarked?: boolean
+}
+
+const normalizeReviewDetail = (
+  review: ReviewView & ReviewDetailStateFields,
+): ReviewView => {
+  const liked =
+    typeof review.liked === 'boolean'
+      ? review.liked
+      : typeof review.isLiked === 'boolean'
+        ? review.isLiked
+        : typeof review.is_liked === 'boolean'
+          ? review.is_liked
+          : undefined
+
+  const isBookmarked =
+    typeof review.isBookmarked === 'boolean'
+      ? review.isBookmarked
+      : typeof review.bookmarked === 'boolean'
+        ? review.bookmarked
+        : typeof review.is_bookmarked === 'boolean'
+          ? review.is_bookmarked
+          : undefined
+
+  return {
+    ...review,
+    liked,
+    isBookmarked,
+  }
+}
+
 // 프리미엄 후기 목록 조회
 export async function getPremiumReviews(
   params?: ReviewsQueryParams,
@@ -89,10 +126,15 @@ export async function getPremiumReviewDetail(
 
 // 후기 상세 조회
 export async function getReviewDetail(reviewId: number): Promise<ReviewView> {
-  const res = await apiClient.get<ApiResponse<ReviewView>>(
+  const res = await apiClient.get<ApiResponse<ReviewView & ReviewDetailStateFields>>(
     `/api/v1/review/${reviewId}`,
   )
-  return res.data.data
+  return normalizeReviewDetail(res.data.data)
+}
+
+// 후기 삭제
+export async function deleteReview(reviewId: number): Promise<void> {
+  await apiClient.delete(`/api/v1/review/${reviewId}`)
 }
 
 // 후기 댓글 목록 조회
@@ -141,9 +183,7 @@ export async function searchReviews(
   params?: ReviewSearchParams,
 ): Promise<ReviewSearchPage> {
   const normalizedParams =
-    params?.sort === 'RECENT'
-      ? { ...params, sort: 'LATEST' }
-      : params
+    params?.sort === 'RECENT' ? { ...params, sort: 'LATEST' } : params
 
   const res = await apiClient.get<ApiResponse<ReviewSearchPage>>(
     '/api/v1/review/search',

@@ -20,7 +20,13 @@ apiClient.interceptors.request.use(
   (config) => {
     // 쿠키에서 토큰을 가져와서 Authorization 헤더에 추가
     const token = tokenCookies.getAccessToken()
-    if (token && tokenCookies.isTokenValid()) {
+    const isTokenValid = Boolean(token) && tokenCookies.isTokenValid()
+    const trackedConfig = config as typeof config & {
+      _hadAccessToken?: boolean
+    }
+    trackedConfig._hadAccessToken = isTokenValid
+
+    if (token && isTokenValid) {
       config.headers.Authorization = `Bearer ${token}`
     } else if (token) {
       tokenCookies.clearAll()
@@ -34,6 +40,13 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response?.status === 401) {
+      const requestConfig = error.config as
+        | { headers?: { Authorization?: string }; _hadAccessToken?: boolean }
+        | undefined
+      const hasAuthContext =
+        Boolean(requestConfig?.headers?.Authorization) ||
+        Boolean(requestConfig?._hadAccessToken)
+
       tokenCookies.clearAll()
 
       if (typeof window !== 'undefined') {
@@ -45,7 +58,7 @@ apiClient.interceptors.response.use(
           currentPath === AppPath.signup() ||
           currentPath.startsWith('/oauth-callback/')
 
-        if (!isAuthPage && !isAuthRedirecting) {
+        if (hasAuthContext && !isAuthPage && !isAuthRedirecting) {
           isAuthRedirecting = true
           const nextPath = `${window.location.pathname}${window.location.search}`
           const loginPath = `${AppPath.login()}?expired=1&next=${encodeURIComponent(nextPath)}`

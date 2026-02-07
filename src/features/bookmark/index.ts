@@ -1,5 +1,6 @@
 export {
   toggleBookmark,
+  checkReviewBookmarkedFromLists,
   getBookmarkedClubs,
   getBookmarkedInterviewReviews,
   getBookmarkedActivityReviews,

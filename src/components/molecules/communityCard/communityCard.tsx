@@ -17,8 +17,7 @@ export const CommunityCardCtx = React.createContext<{
   postType: undefined,
 })
 
-export interface CommunityCardProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+export interface CommunityCardProps extends React.HTMLAttributes<HTMLDivElement> {
   type?: CommunityCardType
   postType?: string
   postId?: number
@@ -105,8 +104,7 @@ export function CommunityCardDescription({
   ) : null
 }
 
-export interface CommunityCardImageProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+export interface CommunityCardImageProps extends React.HTMLAttributes<HTMLDivElement> {
   logoUrl?: string | null
   alt?: string
 }

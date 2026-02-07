@@ -1,13 +1,14 @@
 // API 요청 타입
-export interface Request {
+export interface ExploreRequest {
+  // 필터 파라미터
   field?: string
   part?: string
   way?: string
   target?: string
-  sort?: string
+  sort?: '인기순' | '이름순' | '최신순'
+  // 페이지네이션 파라미터
   page?: number
   size?: number
-  [property: string]: string | number | undefined
 }
 
 // API 응답 타입
@@ -58,3 +59,6 @@ export interface ApiResponse<T> {
 }
 
 export type ExploreApiResponse = ApiResponse<ClubListResponse>
+
+// 타입 별칭 (하위 호환성)
+export type Request = ExploreRequest

@@ -242,11 +242,9 @@ export function Community() {
                 {category}
               </Button>
             ))}
-            {isDesktop && (
-              <div className="ml-[42px]">
-                <PostButton />
-              </div>
-            )}
+            <div className="ml-[42px]">
+              <PostButton />
+            </div>
           </div>
           <div className={cn('mt-4 mb-28', !isDesktop && 'px-5')}>
             {posts.map((post) => (
@@ -254,6 +252,7 @@ export function Community() {
                 key={post.postId}
                 type="horizontal"
                 postType={post.postType}
+                postId={post.postId}
                 className={cn(
                   'gap-6 pt-8 group cursor-pointer relative',
                   isDesktop ? 'gap-6' : 'gap-4',

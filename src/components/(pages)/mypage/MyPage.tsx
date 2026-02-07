@@ -225,7 +225,7 @@ export default function MyPage() {
   const filteredReviews = useMemo<ReviewListItemData[]>(
     () =>
       filteredReviewSource.map((review, index) => ({
-        reviewId: review.reviewId ?? review.id ?? index,
+        reviewId: review.reviewId ?? index,
         clubName: review.clubName,
         jobName: review.jobName,
         generation: review.generation,

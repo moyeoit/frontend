@@ -95,7 +95,6 @@ export default function Page({
   const [commentInput, setCommentInput] = useState('')
   const [replyTargetId, setReplyTargetId] = useState<number | null>(null)
   const [replyInput, setReplyInput] = useState('')
-  const bookmarkType: BookmarkType = 'INTERVIEW_REVIEW'
   const { mutate: postComment, isPending: isPostingComment } =
     usePostReviewComment(numericReviewId, {
       onSuccess: () => setCommentInput(''),
@@ -112,7 +111,7 @@ export default function Page({
     targetId: number
   }>({
     isBookmarked: false,
-    type: bookmarkType,
+    type: 'INTERVIEW_REVIEW', // 초기값, useEffect에서 업데이트됨
     targetId: numericReviewId,
   })
   const queryClient = useQueryClient()
@@ -165,6 +164,33 @@ export default function Page({
 
   useEffect(() => {
     if (!reviewDetail) return
+
+    // reviewCategory에 따라 북마크 타입 결정
+    let bookmarkType: BookmarkType
+    if (reviewDetail.reviewCategory) {
+      switch (reviewDetail.reviewCategory) {
+        case 'ACTIVITY':
+          bookmarkType = 'ACTIVITY_REVIEW'
+          break
+        case 'DOCUMENT':
+        case 'INTERVIEW':
+          bookmarkType = 'INTERVIEW_REVIEW'
+          break
+        default:
+          bookmarkType = 'INTERVIEW_REVIEW'
+      }
+    } else {
+      // reviewCategory가 없으면 result로 추론
+      if (
+        reviewDetail.result === ResultType.Activity ||
+        reviewDetail.result === ResultType.EndActivity
+      ) {
+        bookmarkType = 'ACTIVITY_REVIEW'
+      } else {
+        bookmarkType = 'INTERVIEW_REVIEW'
+      }
+    }
+
     setLikeState({
       liked: reviewDetail.liked ?? false,
       likeCount: reviewDetail.likeCount ?? 0,
@@ -174,7 +200,7 @@ export default function Page({
       type: bookmarkType,
       targetId: numericReviewId,
     })
-  }, [bookmarkType, numericReviewId, reviewDetail])
+  }, [numericReviewId, reviewDetail])
 
   if (isLoading) {
     return (
@@ -238,7 +264,7 @@ export default function Page({
     if (isTogglingBookmark) return
     toggleBookmark({
       targetId: numericReviewId,
-      type: bookmarkType,
+      type: bookmarkState.type,
     })
   }
 

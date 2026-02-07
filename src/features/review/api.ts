@@ -140,10 +140,15 @@ export async function postPremiumReview(
 export async function searchReviews(
   params?: ReviewSearchParams,
 ): Promise<ReviewSearchPage> {
+  const normalizedParams =
+    params?.sort === 'RECENT'
+      ? { ...params, sort: 'LATEST' }
+      : params
+
   const res = await apiClient.get<ApiResponse<ReviewSearchPage>>(
     '/api/v1/review/search',
     {
-      params,
+      params: normalizedParams,
     },
   )
   return res.data.data

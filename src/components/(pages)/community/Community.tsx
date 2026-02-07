@@ -242,11 +242,9 @@ export function Community() {
                 {category}
               </Button>
             ))}
-            {isDesktop && (
-              <div className="ml-[42px]">
-                <PostButton />
-              </div>
-            )}
+            <div className="ml-[42px]">
+              <PostButton />
+            </div>
           </div>
           <div className={cn('mt-4 mb-28', !isDesktop && 'px-5')}>
             {posts.map((post) => (

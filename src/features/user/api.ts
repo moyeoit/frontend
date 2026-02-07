@@ -7,6 +7,8 @@ import {
   UpdateUserProfileRequest,
   UpdateUserProfileImageRequest,
   UserInterests,
+  UpdateUserInfoRequest,
+  UpdateUserInfoResponse,
   UserManageInfo,
   UpdateUserManageRequest,
   UserPostsPage,

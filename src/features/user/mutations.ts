@@ -2,10 +2,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { userApi } from './api'
 import { userKeys } from './keys'
 import {
+  UpdateUserInfoRequest,
+  UpdateUserManageRequest,
   UpdateUserProfileImageRequest,
   UserActivateRequest,
-  UpdateUserProfileRequest,
-  UpdateUserManageRequest,
 } from './types'
 
 export const useUserActivate = () => {
@@ -32,18 +32,6 @@ export const useUpdateUserProfileImage = () => {
       userApi.updateProfileImage(body),
     onSuccess: () => {
       // 프로필 데이터 갱신
-      queryClient.invalidateQueries({ queryKey: userKeys.profile() })
-    },
-  })
-}
-
-export const useUpdateUserProfile = () => {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationKey: userKeys.profile(),
-    mutationFn: (body: UpdateUserProfileRequest) => userApi.updateProfile(body),
-    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.profile() })
     },
   })

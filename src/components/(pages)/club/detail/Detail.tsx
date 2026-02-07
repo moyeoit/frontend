@@ -203,42 +203,28 @@ export default function Detail({ clubId }: DetailProps) {
               {
                 value: '상세 내용',
                 label: '상세 내용',
-                content: (
-                  <div className={isDesktop ? '' : 'px-5'}>
-                    <ClubDetailContent clubDetails={clubDetails} />
-                  </div>
-                ),
+                content: <ClubDetailContent clubDetails={clubDetails} />,
               },
               {
                 value: '활동 후기',
                 label: '활동 후기',
                 content: (
-                  <div className={isDesktop ? '' : 'px-5'}>
-                    <ClubDetailActivityReviewContent
-                      clubId={clubId}
-                      clubDetails={clubDetails}
-                      recruitsData={recruitsData || null}
-                    />
-                  </div>
+                  <ClubDetailActivityReviewContent
+                    clubId={clubId}
+                    clubDetails={clubDetails}
+                    recruitsData={recruitsData || null}
+                  />
                 ),
               },
               {
                 value: '서류/면접 후기',
                 label: '서류/면접 후기',
-                content: (
-                  <div className={isDesktop ? '' : 'px-5'}>
-                    <ClubDetailDocumentInterviewContent clubId={clubId} />
-                  </div>
-                ),
+                content: <ClubDetailDocumentInterviewContent clubId={clubId} />,
               },
               {
                 value: '블로그 후기',
                 label: '블로그 후기',
-                content: (
-                  <div className={isDesktop ? '' : 'px-5'}>
-                    <ClubDetailBlogReviewContent clubId={clubId} />
-                  </div>
-                ),
+                content: <ClubDetailBlogReviewContent clubId={clubId} />,
               },
             ]}
           />

@@ -16,7 +16,7 @@ export default function ClubDetailContent({
   const { isDesktop } = useMediaQuery()
 
   return (
-    <div className={`w-full ${isDesktop ? 'pt-10' : 'pt-6'}`}>
+    <div className={`w-full ${isDesktop ? 'pt-10' : 'pt-6 pr-5'}`}>
       {/* 동아리 소개  */}
       {clubDetails?.club.bio && (
         <div className={`${isDesktop ? 'mb-20' : 'mb-12'}`}>
@@ -37,7 +37,9 @@ export default function ClubDetailContent({
           히스토리
         </div>
         {clubDetails?.club.slogan && (
-          <div className={`${isDesktop ? 'typo-body-3-3-r' : 'typo-button-m'}`}>
+          <div
+            className={`mb-4 ${isDesktop ? 'typo-body-3-3-r' : 'typo-button-m'}`}
+          >
             {clubDetails?.club.slogan}
           </div>
         )}
@@ -101,20 +103,22 @@ export default function ClubDetailContent({
           >
             주요 활동 내용
           </div>
-          <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-8 justify-center items-center ">
             {clubDetails.activities.map((activity, index) => (
               <Card
                 key={activity.activityOrder || index}
                 size="col3Desktop"
-                orientation="horizontal"
-                className="h-37"
+                orientation={isDesktop ? 'horizontal' : undefined}
+                className={isDesktop ? 'h-37' : 'w-full max-w-full max-h-full'}
               >
                 <Card.Image
                   logoUrl={activity.imageUrl}
                   alt={`${activity.activityName} 이미지`}
-                  className="w-56 h-37 mr-4"
+                  className={
+                    isDesktop ? 'w-56 h-37 mr-4' : 'w-full h-full mb-4'
+                  }
                 />
-                <Card.Content className="py-2 h-37">
+                <Card.Content className={isDesktop ? 'py-2 h-37' : ''}>
                   <div className="flex flex-wrap gap-2 mb-1">
                     <span className="typo-button-m text-main-color-1">
                       {activity.hashtag}
@@ -143,13 +147,13 @@ export default function ClubDetailContent({
           </div>
           <div>
             {clubDetails.club.offline && (
-              <div className="mb-6 flex items-center">
+              <div className="mb-6 flex items-center ">
                 <Tag
                   kind="clubDetail"
                   size="none"
-                  color="white"
+                  color="light"
                   label="오프라인"
-                  className="w-20 h-8 px-3 py-1 mr-4 rounded-full typo-body-3-b"
+                  className="shrink-0 w-20 h-8 px-3 py-1 mr-4 rounded-full typo-body-3-b"
                 />
                 <div
                   className={`${isDesktop ? 'typo-body-3-3-r' : 'typo-button-m'}`}
@@ -163,9 +167,9 @@ export default function ClubDetailContent({
                 <Tag
                   kind="clubDetail"
                   size="none"
-                  color="white"
+                  color="light"
                   label="온라인"
-                  className="w-20 h-8 px-3 py-1 mr-4 rounded-full typo-body-3-b"
+                  className="shrink-0 w-20 h-8 px-3 py-1 mr-4 rounded-full typo-body-3-b"
                 />
                 <div
                   className={`${isDesktop ? 'typo-body-3-3-r' : 'typo-button-m'}`}
@@ -220,10 +224,10 @@ export default function ClubDetailContent({
           </div>
 
           <div className="flex flex-col">
-            <div className="flex flex-col w-full bg-white rounded-[16px] px-8 py-4 gap-1">
+            <div className="flex flex-col w-full bg-light-color-2 rounded-2xl px-8 py-4 gap-1">
               {clubDetails.club.location && (
                 <div className="flex items-center">
-                  <div className="typo-button-b mr-4">장소</div>
+                  <div className="typo-button-b mr-4 shrink-0">장소</div>
                   <div className="typo-button-m">
                     {clubDetails.club.location}
                   </div>
@@ -231,7 +235,7 @@ export default function ClubDetailContent({
               )}
               {clubDetails.club.address && (
                 <div className="flex items-center">
-                  <div className="typo-button-b mr-4">주소</div>
+                  <div className="typo-button-b mr-4 shrink-0">주소</div>
                   <div className="typo-button-m">
                     {clubDetails.club.address}
                   </div>

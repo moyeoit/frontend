@@ -28,10 +28,7 @@ export default function ActivityForm() {
       </h2>
 
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col"
-        >
+        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col">
           <section className="px-[10px] py-[30px]">
             <ReviewFormHeader
               control={form.control}

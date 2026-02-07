@@ -131,7 +131,8 @@ export const usePaperForm = () => {
   const hasValidQaItems =
     watchedValues.qaItems.length > 0 &&
     watchedValues.qaItems.every(
-      (item) => item.question.trim().length > 0 && item.answer.trim().length > 0,
+      (item) =>
+        item.question.trim().length > 0 && item.answer.trim().length > 0,
     )
   const isStep2Complete = hasOneLineComment && hasValidQaItems
 

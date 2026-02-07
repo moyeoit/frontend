@@ -37,19 +37,6 @@ export const useUpdateUserProfileImage = () => {
   })
 }
 
-// 유저 정보 수정
-export const useUpdateUserInfo = () => {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationKey: userKeys.updateUserInfo(),
-    mutationFn: (body: UpdateUserInfoRequest) => userApi.updateUserInfo(body),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: userKeys.profile() })
-    },
-  })
-}
-
 export const useUpdateUserManage = () => {
   const queryClient = useQueryClient()
 

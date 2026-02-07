@@ -11,7 +11,7 @@ import {
   DialogFooter,
   DialogTitle,
 } from '@/components/molecules/dialog/Dialog'
-import { useUpdateUserInfo } from '@/features/user/mutations'
+import { useUpdateUserManage } from '@/features/user/mutations'
 import { useUserProfile } from '@/features/user/queries'
 
 interface EmailConfirmDialogProps {
@@ -24,7 +24,7 @@ export function EmailConfirmDialog({
   onOpenChange,
 }: EmailConfirmDialogProps) {
   const { data: userProfile } = useUserProfile()
-  const updateUserInfoMutation = useUpdateUserInfo()
+  const updateUserInfoMutation = useUpdateUserManage()
   const [email, setEmail] = React.useState('')
 
   React.useEffect(() => {

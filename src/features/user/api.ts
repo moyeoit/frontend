@@ -97,17 +97,4 @@ export const userApi = {
     )
     return res.data.data
   },
-
-  /**
-   * 유저 정보 수정 (PATCH /v1/user/manage)
-   */
-  updateUserInfo: async (
-    body: UpdateUserInfoRequest,
-  ): Promise<UpdateUserInfoResponse> => {
-    const res = await apiClient.put<ApiResponse<UpdateUserInfoResponse>>(
-      '/api/v1/user/manage',
-      body,
-    )
-    return res.data.data
-  },
 }

@@ -79,9 +79,9 @@ const REVIEW_CATEGORY_STYLES = {
 export type ReviewCategoryType = keyof typeof REVIEW_CATEGORY_STYLES
 
 export interface PopularReviewCardProfileProps extends React.HTMLAttributes<HTMLDivElement> {
-  /** 리뷰 타입 - DOCUMENT: 서, INTERVIEW: 면, ACTIVITY: 활 (API category 연결용) */
-  category?: ReviewCategoryType
-  /** 아바타에 표시할 글자 (category 없을 때 사용) */
+  /** 리뷰 카테고리 - DOCUMENT: 서류(서), INTERVIEW: 면접(면), ACTIVITY: 활동(활) (API reviewCategory 필드 값) */
+  reviewCategory?: ReviewCategoryType
+  /** 아바타에 표시할 글자 (reviewCategory 없을 때 사용) */
   initial?: string
   /** 동아리명 (API 필드 - clubName, generation, jobName 함께 사용 시 label 대신 사용) */
   clubName?: string
@@ -91,14 +91,14 @@ export interface PopularReviewCardProfileProps extends React.HTMLAttributes<HTML
   jobName?: string
   /** 1~5 별점 */
   ratingValue?: number
-  /** 별점 라벨 (category 없을 때 사용) */
+  /** 별점 라벨 (reviewCategory 없을 때 사용) */
   ratingLabel?: string
 }
 
 const STAR_MAX = 5
 
 export function PopularReviewCardProfile({
-  category,
+  reviewCategory,
   initial,
   clubName,
   generation,
@@ -110,7 +110,9 @@ export function PopularReviewCardProfile({
 }: PopularReviewCardProfileProps) {
   const displayValue = Math.min(STAR_MAX, Math.max(0, ratingValue))
 
-  const styleConfig = category ? REVIEW_CATEGORY_STYLES[category] : null
+  const styleConfig = reviewCategory
+    ? REVIEW_CATEGORY_STYLES[reviewCategory]
+    : null
   const displayInitial = styleConfig?.initial ?? initial?.charAt(0) ?? '?'
   const avatarClassName =
     styleConfig?.avatarClassName ?? 'bg-[#EAFFE9] text-[#2DA715]'

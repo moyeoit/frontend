@@ -3,12 +3,9 @@ import { userApi } from './api'
 import { userKeys } from './keys'
 import {
   UpdateUserInfoRequest,
-  UpdateUserProfileImageRequest,
-  UserActivateRequest,
-  UpdateUserProfileImageRequest,
-  UserActivateRequest,
-  UpdateUserProfileRequest,
   UpdateUserManageRequest,
+  UpdateUserProfileImageRequest,
+  UserActivateRequest,
 } from './types'
 
 export const useUserActivate = () => {
@@ -47,12 +44,6 @@ export const useUpdateUserInfo = () => {
   return useMutation({
     mutationKey: userKeys.updateUserInfo(),
     mutationFn: (body: UpdateUserInfoRequest) => userApi.updateUserInfo(body),
-export const useUpdateUserProfile = () => {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationKey: userKeys.profile(),
-    mutationFn: (body: UpdateUserProfileRequest) => userApi.updateProfile(body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.profile() })
     },

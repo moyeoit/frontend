@@ -6,10 +6,9 @@ import z from 'zod'
 import { usePostBasicReview } from '@/features/review/mutations'
 import {
   ReviewCategory,
-  ReviewType,
   QuestionType,
   type BasicReviewCreateRequest,
-  type AnswerRequest,
+  type ReviewAnswerRequest,
   ResultType,
 } from '@/features/review/types'
 import AppPath from '@/shared/configs/appPath'
@@ -17,8 +16,8 @@ import { appValidation } from '@/shared/configs/appValidation'
 
 // 활동 여부 옵션
 export const ACTIVITY_STATUS_OPTIONS = [
-  { id: 'ACTIVE', label: '활동 중' },
-  { id: 'COMPLETED', label: '활동 종료' },
+  { id: ResultType.Activity, label: '활동 중' },
+  { id: ResultType.EndActivity, label: '활동 종료' },
 ] as const
 
 // Q1: 활동 목표를 달성하기 위해 실제로 투입해야했던 주간 평균 시간은 어느정도였나요?
@@ -51,8 +50,8 @@ export const Q3_SATISFACTION_OPTIONS = [
 
 // 동적 QA 항목 스키마
 const qaItemSchema = z.object({
-  question: z.string().min(1, '질문을 입력해주세요'),
-  answer: z.string().min(1, '답변을 입력해주세요'),
+  question: z.string().trim().min(1, '질문을 입력해주세요'),
+  answer: z.string().trim().min(1, '답변을 입력해주세요'),
 })
 
 const ActivityFormSchema = z.object({
@@ -72,10 +71,18 @@ const ActivityFormSchema = z.object({
     .max(4, '최대 4개까지 선택 가능합니다'),
 
   // Step 2
-  oneLineComment: appValidation.oneLineText(20, '한줄평을 입력해주세요'),
+  oneLineComment: z
+    .string()
+    .trim()
+    .min(1, '한줄평을 입력해주세요')
+    .max(20, '20자 이내로 입력해주세요'),
   qaItems: z.array(qaItemSchema).min(1, '최소 1개의 항목을 입력해주세요'),
-  tip: z.string().max(300, '300자 이내로 입력해주세요').optional(),
-  freeReview: z.string().max(300, '300자 이내로 입력해주세요').optional(),
+  tip: z.string().trim().max(300, '300자 이내로 입력해주세요').optional(),
+  freeReview: z
+    .string()
+    .trim()
+    .max(300, '300자 이내로 입력해주세요')
+    .optional(),
 })
 
 export type ActivityFormType = z.infer<typeof ActivityFormSchema>
@@ -103,6 +110,28 @@ export const useActivityForm = () => {
     },
     mode: 'onBlur',
   })
+
+  const watchedValues = form.watch()
+  const isStep1Complete =
+    typeof watchedValues.clubId === 'number' &&
+    typeof watchedValues.generation === 'number' &&
+    typeof watchedValues.jobId === 'number' &&
+    Boolean(watchedValues.activityStatus) &&
+    typeof watchedValues.rate === 'number' &&
+    watchedValues.rate >= 1 &&
+    typeof watchedValues.q1WeeklyHours === 'number' &&
+    typeof watchedValues.q2Difficulty === 'number' &&
+    watchedValues.q3Satisfaction.length > 0 &&
+    watchedValues.q3Satisfaction.length <= 4
+
+  const hasOneLineComment = watchedValues.oneLineComment.trim().length > 0
+  const hasValidQaItems =
+    watchedValues.qaItems.length > 0 &&
+    watchedValues.qaItems.every(
+      (item) =>
+        item.question.trim().length > 0 && item.answer.trim().length > 0,
+    )
+  const isStep2Complete = hasOneLineComment && hasValidQaItems
 
   const goToNextStep = async () => {
     const step1Fields = [
@@ -133,64 +162,86 @@ export const useActivityForm = () => {
   const transformToApiRequest = (
     data: ActivityFormType,
   ): BasicReviewCreateRequest => {
-    const questions: AnswerRequest[] = [
+    const oneLineComment = data.oneLineComment.trim()
+    const qaItems = data.qaItems
+      .map((qa) => ({
+        question: qa.question.trim(),
+        answer: qa.answer.trim(),
+      }))
+      .filter((qa) => qa.question && qa.answer)
+    const tip = data.tip?.trim()
+    const freeReview = data.freeReview?.trim()
+
+    const answers: ReviewAnswerRequest[] = [
       {
-        questionId: 8, // Q1: 주간 시간
-        questionType: QuestionType.SingleChoice,
+        sequence: 1,
+        question_id: 2, // Q1: 주간 시간 (SINGLE_CHOICE)
+        question_type: QuestionType.SingleChoice,
         value: data.q1WeeklyHours,
       },
       {
-        questionId: 9, // Q2: 난이도
-        questionType: QuestionType.SingleChoice,
+        sequence: 2,
+        question_id: 3, // Q2: 난이도 (SINGLE_CHOICE)
+        question_type: QuestionType.SingleChoice,
         value: data.q2Difficulty,
       },
       {
-        questionId: 10, // Q3: 만족감
-        questionType: QuestionType.MultipleChoice,
+        sequence: 3,
+        question_id: 1, // Q3: 만족감 (MULTIPLE_CHOICE)
+        question_type: QuestionType.MultipleChoice,
         value: data.q3Satisfaction,
       },
       {
-        questionId: 19, // 한줄평
-        questionType: QuestionType.Subjective,
-        value: data.oneLineComment,
+        sequence: 4,
+        question_id: 6, // 한줄평 (SINGLE_SUBJECTIVE)
+        question_type: QuestionType.SingleSubjective,
+        value: oneLineComment,
       },
     ]
 
-    // 동적 QA 항목 추가
-    data.qaItems.forEach((qa, index) => {
-      questions.push({
-        questionId: 100 + index,
-        questionType: QuestionType.Subjective,
-        value: `Q: ${qa.question}\nA: ${qa.answer}`,
+    // 동적 QA 항목 추가 (MULTIPLE_SUBJECTIVE)
+    qaItems.forEach((qa) => {
+      answers.push({
+        sequence: answers.length + 1,
+        question_id: 4,
+        question_type: QuestionType.MultipleSubjective,
+        value: [`Q: ${qa.question}`, `A: ${qa.answer}`],
       })
     })
 
-    if (data.tip) {
-      questions.push({
-        questionId: 20,
-        questionType: QuestionType.Subjective,
-        value: data.tip,
+    if (tip) {
+      answers.push({
+        sequence: answers.length + 1,
+        question_id: 5, // TIP (SINGLE_SUBJECTIVE)
+        question_type: QuestionType.SingleSubjective,
+        value: tip,
       })
     }
 
-    if (data.freeReview) {
-      questions.push({
-        questionId: 21,
-        questionType: QuestionType.Subjective,
-        value: data.freeReview,
+    if (freeReview) {
+      answers.push({
+        sequence: answers.length + 1,
+        question_id: 6, // 자유후기 (SINGLE_SUBJECTIVE)
+        question_type: QuestionType.SingleSubjective,
+        value: freeReview,
       })
     }
 
-    // 활동 후기는 resultType이 없으므로 Pass로 설정
+    // activityStatus를 result로 변환
+    const result =
+      data.activityStatus === ResultType.Activity
+        ? ResultType.Activity
+        : ResultType.EndActivity
+
     return {
+      title: oneLineComment,
+      category: ReviewCategory.Activity,
+      rate: data.rate,
+      result,
       clubId: data.clubId,
       generation: data.generation,
       jobId: data.jobId,
-      questions,
-      rate: data.rate,
-      resultType: ResultType.Pass,
-      reviewCategory: ReviewCategory.Activity,
-      reviewType: ReviewType.Basic,
+      answers,
     }
   }
 
@@ -211,5 +262,7 @@ export const useActivityForm = () => {
     goToPreviousStep,
     onSubmit,
     isSubmitting: postBasicReviewMutation.isPending,
+    isStep1Complete,
+    isStep2Complete,
   }
 }

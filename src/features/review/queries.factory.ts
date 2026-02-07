@@ -5,6 +5,9 @@ import {
   getClubPremiumReviews,
   getClubBasicReviews,
   getPremiumReviewDetail,
+  getReviewDetail,
+  getReviewComments,
+  searchReviews,
 } from './api'
 import { reviewKeys } from './keys'
 import {
@@ -12,6 +15,10 @@ import {
   PremiumReviewDetail,
   PremiumReviewsPage,
   ReviewsQueryParams,
+  ReviewSearchPage,
+  ReviewSearchParams,
+  ReviewView,
+  ReviewComment,
 } from './types'
 
 export const reviewQueries = {
@@ -42,6 +49,23 @@ export const reviewQueries = {
       staleTime: 60_000,
     }),
 
+  // Review detail
+  detail: (reviewId: number) =>
+    queryOptions<ReviewView>({
+      queryKey: reviewKeys.detail(reviewId),
+      queryFn: () => getReviewDetail(reviewId),
+      staleTime: 60_000,
+    }),
+
+  // Review comments
+  commentList: (reviewId: number) =>
+    queryOptions<ReviewComment[]>({
+      queryKey: reviewKeys.commentList(reviewId),
+      queryFn: () => getReviewComments(reviewId),
+      enabled: Number.isFinite(reviewId),
+      staleTime: 30_000,
+    }),
+
   // Basic reviews
   basicList: (params?: ReviewsQueryParams) =>
     queryOptions<BasicReviewsPage>({
@@ -64,6 +88,14 @@ export const reviewQueries = {
       queryKey: reviewKeys.popularPremium(),
       queryFn: () => getPremiumReviews({ size: 4, sort: '인기순' }),
       staleTime: 60_000,
+    }),
+
+  // Search reviews (탐색)
+  searchList: (params?: ReviewSearchParams) =>
+    queryOptions<ReviewSearchPage>({
+      queryKey: reviewKeys.searchList(params),
+      queryFn: () => searchReviews(params),
+      staleTime: 30_000,
     }),
 } as const
 

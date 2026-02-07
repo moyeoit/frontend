@@ -22,17 +22,17 @@ export function SideBar({
   className,
 }: SideBarProps) {
   return (
-    <div className="typo-body-1-2-sb">
+    <div className="typo-body-1-2-sb w-full">
       <RadioGroup.Root
         value={value}
         defaultValue={defaultValue}
         onValueChange={(v) => onChange?.(v)}
-        className={cn('flex flex-col', className)}
+        className={cn('flex w-full flex-col items-stretch', className)}
       >
         {options.map((o) => {
           const id = `${o.value}`
           return (
-            <div key={o.value} className="relative">
+            <div key={o.value} className="relative w-full">
               <RadioGroup.Item
                 id={id}
                 value={o.value}
@@ -42,7 +42,7 @@ export function SideBar({
               <label
                 htmlFor={id}
                 className={cn(
-                  'block w-full py-3 px-5',
+                  'block w-full py-3 px-5 text-left',
                   'cursor-pointer select-none',
                   'peer-data-[state=checked]:bg-light-color-2 ',
                 )}

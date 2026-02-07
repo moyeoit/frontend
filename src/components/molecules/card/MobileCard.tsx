@@ -1,13 +1,13 @@
-//TODO: 디자인 토큰 추가
-
 'use client'
 
+//TODO: 디자인 토큰 추가
 import * as React from 'react'
 import Image from 'next/image'
 import {
   BookmarkMobileFilledIcon,
   BookmarkMobileEmptyIcon,
 } from '@/assets/icons'
+import { resolveImageSrc } from '@/shared/utils'
 import { cn } from '@/shared/utils/cn'
 
 export interface MobileCardProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -34,7 +34,7 @@ export function MobileCard({
   onClick,
   ...props
 }: MobileCardProps) {
-  const src = !logoUrl ? fallbackSrc! : logoUrl!
+  const src = resolveImageSrc(logoUrl, fallbackSrc)
 
   const handleBookmarkClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation()

@@ -14,12 +14,14 @@ export interface CardOverlayProps {
     e: React.MouseEvent<HTMLButtonElement>,
     clubId: number,
   ) => void
+  size?: 'col3Desktop' | 'col4Desktop'
 }
 
 export default function CardOverlay({
   club,
   isSubscribed,
   onBookmarkClick,
+  size = 'col4Desktop',
 }: CardOverlayProps) {
   const { isDesktop } = useMediaQuery()
   const router = useRouter()
@@ -35,7 +37,7 @@ export default function CardOverlay({
   if (isDesktop) {
     return (
       <Card
-        size="col3Desktop"
+        size={size}
         orientation="vertical"
         border={true}
         gap="12px"

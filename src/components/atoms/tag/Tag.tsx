@@ -3,7 +3,11 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/shared/utils/cn'
 import { Badge } from './badge'
 
-export type TagKind = 'premiumReview' | 'generalReview' | 'clubDetail'
+export type TagKind =
+  | 'premiumReview'
+  | 'generalReview'
+  | 'clubDetail'
+  | 'blogReview'
 export type TagSize = 'small' | 'large' | 'none'
 export type TagColor = 'white' | 'lightPurple' | 'purple'
 
@@ -20,8 +24,8 @@ export interface TagProps
 const tagVariants = cva(['inline-flex items-center justify-center'].join(' '), {
   variants: {
     size: {
-      small: 'px-[8px] py-[2px] gap-[10px] rounded-[40px] typo-body-4-m',
-      large: 'px-[12px] py-[4px] gap-[10px] rounded-[40px] typo-body-3-b',
+      small: 'px-2 py-[2px] rounded-[40px] typo-caption-2',
+      large: 'px-3 py-1 rounded-[40px] typo-body-3-b',
       none: 'p-0 m-0',
     },
   },
@@ -30,16 +34,34 @@ const tagVariants = cva(['inline-flex items-center justify-center'].join(' '), {
   },
 })
 
-/** 프리미엄 리뷰 */
+/** 프리미엄 리뷰 - 카테고리별 색상 */
 type Category = '기획' | '개발' | '디자인'
 const CATEGORY_STYLE: Record<Category, string> = {
   기획: 'bg-[#FE90FF]/20 text-[#FE90FF]',
-  개발: 'bg-[#35BCFF]/20  text-[#35BCFF]',
-  디자인: 'bg-[#F7F6514D]/30  text-[#FFA64E]',
+  개발: 'bg-[#35DDFF]/20 text-[#35BCFF]',
+  디자인: 'bg-[#F7F669]/30 text-[#FFA64E]',
 }
 
-/** 프리미엄 기타 */
-const PREMIUM_ETC = 'bg-light-color-3 text-grey-color-3'
+/** 파트별 색상 스타일 */
+type PartType =
+  | 'PM/PO'
+  | '프로덕트 디자이너'
+  | '백엔드 개발자'
+  | '프론트엔드 개발자'
+  | '안드로이드 개발자'
+  | 'iOS 개발자'
+
+const PART_STYLE: Record<PartType, string> = {
+  'PM/PO': 'bg-[#FE90FF]/20 text-[#FE90FF]',
+  '프로덕트 디자이너': 'bg-[#F7F669]/30 text-[#FFA64E]',
+  '백엔드 개발자': 'bg-[#35DDFF]/20 text-[#35BCFF]',
+  '프론트엔드 개발자': 'bg-[#35DDFF]/20 text-[#35BCFF]',
+  '안드로이드 개발자': 'bg-[#35DDFF]/20 text-[#35BCFF]',
+  'iOS 개발자': 'bg-[#35DDFF]/20 text-[#35BCFF]',
+}
+
+/** 기타 */
+const ETC = 'bg-light-color-3 text-grey-color-3'
 
 /** 동아리 상세  */
 const CLUB_DETAIL: Record<TagColor, string> = {
@@ -62,7 +84,14 @@ export const Tag: React.FC<TagProps> = ({
     if (display === '기획' || display === '개발' || display === '디자인') {
       colorCls = CATEGORY_STYLE[display as '기획' | '개발' | '디자인']
     } else {
-      colorCls = PREMIUM_ETC
+      colorCls = ETC
+    }
+  } else if (kind === 'blogReview') {
+    // 블로그 리뷰 - 파트별 색상 적용
+    if (display in PART_STYLE) {
+      colorCls = PART_STYLE[display as PartType]
+    } else {
+      colorCls = ETC
     }
   } else {
     colorCls = CLUB_DETAIL[color]

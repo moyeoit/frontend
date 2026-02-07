@@ -8,9 +8,8 @@ import CardOverlay from '@/components/molecules/card/CardOverlay'
 import MobileFilterBar from '@/components/molecules/filterBar/MobileFilterBar'
 import { MultiDropDown } from '@/components/molecules/multiDropDown/MultiDropDown'
 import TabOverlay from '@/components/molecules/tab/TabOverlay'
-import { useToggleClubSubscription } from '@/features/clubs/mutations'
+import { useToggleBookmark, useBookmarkedClubs } from '@/features/bookmark'
 import { useExploreClubs } from '@/features/explore/queries'
-import { useUserSubscribes } from '@/features/subscribe/queries'
 import { CATEGORY_OPTIONS, HERO_IMAGES } from '@/shared/constants/category'
 import {
   PART_OPTIONS,
@@ -111,6 +110,15 @@ export function Explore() {
     return category
   }
 
+  const mapSort = (
+    sort: string,
+  ): '인기순' | '이름순' | '최신순' | undefined => {
+    if (sort === '인기순') return '인기순'
+    if (sort === '이름순') return '이름순'
+    if (sort === '마감순') return '최신순' // 마감순을 최신순으로 매핑
+    return undefined
+  }
+
   const queryParams = {
     page: 0,
     size: 14,
@@ -118,24 +126,24 @@ export function Explore() {
     part: part && part !== 'all' ? part : undefined,
     way: way && way !== 'all' ? way : undefined,
     target: target && target !== 'all' ? target : undefined,
-    sort: currentSort,
+    sort: mapSort(currentSort),
   }
 
   const { data: clubsData } = useExploreClubs(queryParams)
 
-  const { data: subscribesData } = useUserSubscribes()
-  const toggleSubscription = useToggleClubSubscription()
+  const { data: bookmarkedClubsData } = useBookmarkedClubs()
+  const toggleBookmark = useToggleBookmark()
 
   const clubs = clubsData?.content || []
-  const subscribes = subscribesData?.data?.content || []
-  const subscribedClubIds = new Set(subscribes.map((s) => s.clubId))
+  const bookmarkedClubs = bookmarkedClubsData?.data?.content || []
+  const bookmarkedClubIds = new Set(bookmarkedClubs.map((club) => club.clubId))
 
   const handleBookmarkClick = React.useCallback(
     (e: React.MouseEvent<HTMLButtonElement>, clubId: number) => {
       e.stopPropagation()
-      toggleSubscription.mutate(clubId)
+      toggleBookmark.mutate({ targetId: clubId, type: 'CLUB' })
     },
-    [toggleSubscription],
+    [toggleBookmark],
   )
 
   const fieldLabel = React.useMemo(() => {
@@ -171,8 +179,14 @@ export function Explore() {
         )}
 
         {/* 동아리 목록 섹션 */}
-        <div className={`${isDesktop ? 'px-5 mt-8 pt-6 pb-12' : 'pt-4'}`}>
-          <div className="mx-auto max-w-[calc(17.625rem*3+1rem*2)]">
+        <div
+          className={
+            isDesktop
+              ? 'flex-1 px-5 mt-8 pt-6 pb-12 max-w-[920px]'
+              : 'pt-4 w-full'
+          }
+        >
+          <div className="mx-auto max-w-[920px] w-full">
             {/* 필터 바 */}
             <div
               className={`flex flex-row items-center justify-between gap-2  ${isDesktop ? 'mb-12' : 'pl-5 mb-6'}`}
@@ -279,13 +293,17 @@ export function Explore() {
 
             {/* 카드 그리드 */}
             <div
-              className={`grid ${isDesktop ? 'grid-cols-3 gap-8 pt-0 pb-12' : 'grid-cols-1 gap-4 px-5'}`}
+              className={`grid ${
+                isDesktop
+                  ? 'grid-cols-3 gap-8 pt-0 pb-12 min-h-[400px]'
+                  : 'grid-cols-1 gap-4 px-5'
+              }`}
             >
               {clubs.map((club) => (
                 <CardOverlay
                   key={club.clubId}
                   club={club}
-                  isSubscribed={subscribedClubIds.has(club.clubId)}
+                  isSubscribed={bookmarkedClubIds.has(club.clubId)}
                   onBookmarkClick={handleBookmarkClick}
                 />
               ))}

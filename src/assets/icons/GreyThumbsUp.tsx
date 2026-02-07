@@ -1,7 +1,20 @@
 /**16*16 미리보기용 아이콘 */
-export const GreyThumbsUp = () => {
+import * as React from 'react'
+
+export function GreyThumbsUp({
+  className,
+  ...props
+}: React.SVGProps<SVGSVGElement>) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      className={className}
+      {...props}
+    >
       {/* <g clip-path="url(#a)"> */}
       <path
         fill="#BCBDBF"

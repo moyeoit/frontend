@@ -1,9 +1,10 @@
 'use client'
 
 import * as React from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { MenuIcon, SearchIcon } from '@/assets/icons'
+import { MenuIcon, SearchIcon, BookmarkMobileEmptyIcon } from '@/assets/icons'
 import { MoyeoitMiniLogo } from '@/assets/images'
 import { Button } from '@/components/atoms/Button'
 import AppPath from '@/shared/configs/appPath'
@@ -11,9 +12,14 @@ import useSearchUrlState from '@/shared/hooks/useSearchUrlState'
 import { useAuth } from '@/shared/providers/auth-provider'
 
 export default function MobileHeader() {
-  useRouter() // keep potential future navigation; avoid unused var warning
+  const router = useRouter()
   const { setOpen } = useSearchUrlState()
   const { user } = useAuth()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   return (
     <div className="w-full text-grey-color-5 min-w-[320px] desktop:hidden">
@@ -33,7 +39,7 @@ export default function MobileHeader() {
           </div>
           {/* Right: search, profile, cta */}
           <div className="flex items-center gap-4">
-            {!user && (
+            {!user && mounted && (
               <Link
                 href={AppPath.login()}
                 className="typo-caption-m text-main-color-1 whitespace-nowrap hover:underline focus:underline"
@@ -44,6 +50,7 @@ export default function MobileHeader() {
             <Button
               variant="none"
               size="none"
+              aria-label="search"
               className="w-full h-full rounded-full grid place-items-center transition-colors hover:opacity-50 focus:opacity-50"
               onClick={() => setOpen(true)}
             >
@@ -54,6 +61,22 @@ export default function MobileHeader() {
                 aria-label="search"
               />
             </Button>
+            {user && mounted && (
+              <Button
+                variant="none"
+                size="none"
+                aria-label="bookmark"
+                className="w-full h-full rounded-full grid place-items-center transition-colors hover:opacity-50 focus:opacity-50"
+                onClick={() => router.push(AppPath.bookmark())}
+              >
+                <BookmarkMobileEmptyIcon
+                  width={24}
+                  height={24}
+                  role="img"
+                  aria-label="bookmark"
+                />
+              </Button>
+            )}
             <Button
               variant="none"
               aria-label="menu"

@@ -6,10 +6,9 @@ import z from 'zod'
 import { usePostBasicReview } from '@/features/review/mutations'
 import {
   ReviewCategory,
-  ReviewType,
   QuestionType,
   type BasicReviewCreateRequest,
-  type AnswerRequest,
+  type ReviewAnswerRequest,
   ResultType,
 } from '@/features/review/types'
 import AppPath from '@/shared/configs/appPath'
@@ -18,9 +17,9 @@ import { appValidation } from '@/shared/configs/appValidation'
 // 서류 결과 옵션
 export const PAPER_RESULT_OPTIONS = [
   { id: ResultType.Pass, label: '합격' },
-  { id: ResultType.Fail, label: '불합격' },
-  { id: 'NOT_PARTICIPATED', label: '합격 후 참여하지않음' },
-  { id: ResultType.Ready, label: '결과 대기중' },
+  { id: ResultType.Failure, label: '불합격' },
+  { id: ResultType.NotParticipateAfterPass, label: '합격 후 참여하지않음' },
+  { id: ResultType.Waiting, label: '결과 대기중' },
 ] as const
 
 // Q1: 지원서 작성에 있어 가장 중요하게 어필한 것은 무엇이었나요?
@@ -53,8 +52,8 @@ export const Q3_TECH_DESCRIPTION_OPTIONS = [
 
 // 동적 QA 항목 스키마
 const qaItemSchema = z.object({
-  question: z.string().min(1, '질문을 입력해주세요'),
-  answer: z.string().min(1, '답변을 입력해주세요'),
+  question: z.string().trim().min(1, '질문을 입력해주세요'),
+  answer: z.string().trim().min(1, '답변을 입력해주세요'),
 })
 
 const PaperFormSchema = z.object({
@@ -76,10 +75,18 @@ const PaperFormSchema = z.object({
   ),
 
   // Step 2
-  oneLineComment: appValidation.oneLineText(20, '한줄평을 입력해주세요'),
+  oneLineComment: z
+    .string()
+    .trim()
+    .min(1, '한줄평을 입력해주세요')
+    .max(20, '20자 이내로 입력해주세요'),
   qaItems: z.array(qaItemSchema).min(1, '최소 1개의 항목을 입력해주세요'),
-  tip: z.string().max(300, '300자 이내로 입력해주세요').optional(),
-  freeReview: z.string().max(300, '300자 이내로 입력해주세요').optional(),
+  tip: z.string().trim().max(300, '300자 이내로 입력해주세요').optional(),
+  freeReview: z
+    .string()
+    .trim()
+    .max(300, '300자 이내로 입력해주세요')
+    .optional(),
 })
 
 export type PaperFormType = z.infer<typeof PaperFormSchema>
@@ -107,6 +114,27 @@ export const usePaperForm = () => {
     },
     mode: 'onBlur',
   })
+
+  const watchedValues = form.watch()
+  const isStep1Complete =
+    typeof watchedValues.clubId === 'number' &&
+    typeof watchedValues.generation === 'number' &&
+    typeof watchedValues.jobId === 'number' &&
+    Boolean(watchedValues.resultType) &&
+    typeof watchedValues.rate === 'number' &&
+    watchedValues.rate >= 1 &&
+    watchedValues.q1ImportantAppeal.length > 0 &&
+    typeof watchedValues.q2ReferenceInfo === 'number' &&
+    typeof watchedValues.q3TechDescription === 'number'
+
+  const hasOneLineComment = watchedValues.oneLineComment.trim().length > 0
+  const hasValidQaItems =
+    watchedValues.qaItems.length > 0 &&
+    watchedValues.qaItems.every(
+      (item) =>
+        item.question.trim().length > 0 && item.answer.trim().length > 0,
+    )
+  const isStep2Complete = hasOneLineComment && hasValidQaItems
 
   const goToNextStep = async () => {
     // Step 1 필드들만 검증
@@ -138,74 +166,90 @@ export const usePaperForm = () => {
   const transformToApiRequest = (
     data: PaperFormType,
   ): BasicReviewCreateRequest => {
-    const questions: AnswerRequest[] = [
+    const oneLineComment = data.oneLineComment.trim()
+    const qaItems = data.qaItems
+      .map((qa) => ({
+        question: qa.question.trim(),
+        answer: qa.answer.trim(),
+      }))
+      .filter((qa) => qa.question && qa.answer)
+    const tip = data.tip?.trim()
+    const freeReview = data.freeReview?.trim()
+
+    const answers: ReviewAnswerRequest[] = [
       {
-        questionId: 1, // Q1: 중요 어필
-        questionType: QuestionType.MultipleChoice,
+        sequence: 1,
+        question_id: 1, // Q1: 중요 어필 (MULTIPLE_CHOICE)
+        question_type: QuestionType.MultipleChoice,
         value: data.q1ImportantAppeal,
       },
       {
-        questionId: 2, // Q2: 참고 정보
-        questionType: QuestionType.SingleChoice,
+        sequence: 2,
+        question_id: 2, // Q2: 참고 정보 (SINGLE_CHOICE)
+        question_type: QuestionType.SingleChoice,
         value: data.q2ReferenceInfo,
       },
       {
-        questionId: 3, // Q3: 기술 역량 서술
-        questionType: QuestionType.SingleChoice,
+        sequence: 3,
+        question_id: 3, // Q3: 기술 역량 서술 (SINGLE_CHOICE)
+        question_type: QuestionType.SingleChoice,
         value: data.q3TechDescription,
       },
       {
-        questionId: 19, // 한줄평
-        questionType: QuestionType.Subjective,
-        value: data.oneLineComment,
+        sequence: 4,
+        question_id: 6, // 한줄평 (SINGLE_SUBJECTIVE)
+        question_type: QuestionType.SingleSubjective,
+        value: oneLineComment,
       },
     ]
 
-    // 동적 QA 항목 추가
-    data.qaItems.forEach((qa, index) => {
-      questions.push({
-        questionId: 100 + index, // 동적 QA용 ID
-        questionType: QuestionType.Subjective,
-        value: `Q: ${qa.question}\nA: ${qa.answer}`,
+    // 동적 QA 항목 추가 (MULTIPLE_SUBJECTIVE)
+    qaItems.forEach((qa) => {
+      answers.push({
+        sequence: answers.length + 1,
+        question_id: 4,
+        question_type: QuestionType.MultipleSubjective,
+        value: [`Q: ${qa.question}`, `A: ${qa.answer}`],
       })
     })
 
-    if (data.tip) {
-      questions.push({
-        questionId: 20,
-        questionType: QuestionType.Subjective,
-        value: data.tip,
+    if (tip) {
+      answers.push({
+        sequence: answers.length + 1,
+        question_id: 5, // TIP (SINGLE_SUBJECTIVE)
+        question_type: QuestionType.SingleSubjective,
+        value: tip,
       })
     }
 
-    if (data.freeReview) {
-      questions.push({
-        questionId: 21,
-        questionType: QuestionType.Subjective,
-        value: data.freeReview,
+    if (freeReview) {
+      answers.push({
+        sequence: answers.length + 1,
+        question_id: 6, // 자유후기 (SINGLE_SUBJECTIVE)
+        question_type: QuestionType.SingleSubjective,
+        value: freeReview,
       })
     }
 
     // resultType 변환
-    let resultType = ResultType.Ready
+    let result: ResultType = ResultType.Waiting
     if (data.resultType === ResultType.Pass) {
-      resultType = ResultType.Pass
-    } else if (
-      data.resultType === ResultType.Fail ||
-      data.resultType === 'NOT_PARTICIPATED'
-    ) {
-      resultType = ResultType.Fail
+      result = ResultType.Pass
+    } else if (data.resultType === ResultType.Failure) {
+      result = ResultType.Failure
+    } else if (data.resultType === ResultType.NotParticipateAfterPass) {
+      result = ResultType.NotParticipateAfterPass
     }
 
     return {
+      title: oneLineComment,
+      category: ReviewCategory.Document,
+      rate: data.rate,
+      result,
       clubId: data.clubId,
       generation: data.generation,
       jobId: data.jobId,
-      questions,
-      rate: data.rate,
-      resultType,
-      reviewCategory: ReviewCategory.Document,
-      reviewType: ReviewType.Basic,
+      answers,
     }
   }
 
@@ -226,5 +270,7 @@ export const usePaperForm = () => {
     goToPreviousStep,
     onSubmit,
     isSubmitting: postBasicReviewMutation.isPending,
+    isStep1Complete,
+    isStep2Complete,
   }
 }

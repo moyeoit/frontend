@@ -1,151 +1,188 @@
 'use client'
 
+import * as React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { QuickButton } from '@/components/atoms/quickButton'
-import { Card } from '@/components/molecules/card'
-import { usePopularClubs } from '@/features/clubs/queries'
-import { usePopularPremiumReviews } from '@/features/review/queries'
+import { CardOverlay } from '@/components/molecules/card'
+import { PopularCommunityCardOverlay } from '@/components/molecules/popularCommunityCard'
+import { PopularReviewCard } from '@/components/molecules/popularReviewCard'
+import { useToggleBookmark, useBookmarkedClubs } from '@/features/bookmark'
+import { useClubsList } from '@/features/clubs/queries'
+import { usePopularPosts } from '@/features/community/queries'
+import { ClubItem } from '@/features/explore/types'
+import { useSearchReviews } from '@/features/review/queries'
+import { HERO_IMAGES } from '@/shared/constants/category'
 import useMediaQuery from '@/shared/hooks/useMediaQuery'
+import { cn } from '@/shared/utils/cn'
 
 export default function HomePage() {
   const { isDesktop } = useMediaQuery()
-  const { data: popularClubs } = usePopularClubs()
-  const { data: popularPremiumReviews } = usePopularPremiumReviews()
+  const { data: popularClubsData } = useClubsList({
+    page: 0,
+    size: 4,
+    sort: '인기순',
+  })
+  const { data: bookmarkedClubsData } = useBookmarkedClubs()
+  const toggleBookmark = useToggleBookmark()
+
+  const { data: popularPostsData } = usePopularPosts({
+    page: 0,
+    size: 3,
+  })
+  const { data: popularReviewsData } = useSearchReviews({
+    page: 0,
+    size: 3,
+    sort: 'POPULAR',
+  })
+  const popularPosts = popularPostsData?.content || []
+  const popularClubs = popularClubsData?.content || []
+  const popularReviews = popularReviewsData?.content || []
+  const bookmarkedClubs = bookmarkedClubsData?.data?.content || []
+  const bookmarkedClubIds = new Set(bookmarkedClubs.map((club) => club.clubId))
+
+  const handleBookmarkClick = React.useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>, clubId: number) => {
+      e.stopPropagation()
+      toggleBookmark.mutate({ targetId: clubId, type: 'CLUB' })
+    },
+    [toggleBookmark],
+  )
 
   return (
     <div>
-      <div className="h-64 lg:h-100 flex items-end justify-center px-5 py-14 lg:py-18 -mt-20 relative">
+      {/* Hero 섹션 */}
+      <div className="relative h-70 flex justify-center overflow-hidden w-full mx-auto">
         <Image
-          src="/images/mainBanner.gif"
-          alt="메인 배너"
-          width={1200}
-          height={400}
-          unoptimized
-          className="absolute inset-0 w-full h-full object-cover"
+          src={HERO_IMAGES.all}
+          alt="히어로 이미지"
+          fill
+          className="object-cover"
+          priority
         />
-        <div className="max-w-7xl w-full relative z-10"></div>
       </div>
 
       {/* 하단 푸터 제외한 컨테이너 내용물 전체 */}
-      <div className=" py-8 max-w-[1100px] w-full mx-auto">
+      <div
+        className={`py-8 max-w-[1100px] w-full mx-auto ${isDesktop ? 'flex flex-col gap-y-14' : 'flex flex-col gap-y-12'}`}
+      >
         {/* 상단 버튼 2개  */}
-        <div className="flex flex-row gap-4 justify-center items-center p-6">
-          <QuickButton
-            icon="/icons/subscribe.svg"
-            title="구독"
-            description="구독한 IT 활동 모아보기"
-            href="/subscribe"
-          />
-          <QuickButton
-            icon="/icons/clubMatching.svg"
-            title="동아리 매칭"
-            description="아직 준비중이에요"
-            href="/"
-            onClick={() => alert('준비중인 기능입니다')}
-          />
-        </div>
 
-        {/* 인기 IT 동아리  */}
-        <div className={`${isDesktop ? 'mt-12' : 'mt-8'} px-5 pb-4`}>
-          <div className="flex flex-row justify-between items-center">
-            <h2 className="typo-title-2">인기 IT 동아리</h2>
-            <Link href="/club/explore">
-              <div className="typo-button-m text-grey-color-3 cursor-pointer">
-                전체보기
-              </div>
-            </Link>
-          </div>
-
-          <div
-            className={`grid ${isDesktop ? 'grid-cols-4 gap-4 gap-y-4' : 'grid-cols-2 gap-3 gap-y-6'} mt-6 ${!isDesktop ? 'justify-items-center' : ''}`}
-          >
-            {popularClubs?.content
-              ? popularClubs.content.map((club) => (
-                  <Link key={club.clubId} href={`/club/${club.clubId}`}>
-                    <Card
-                      size={isDesktop ? 'col4Desktop' : 'col4Phone'}
-                      orientation="vertical"
-                      border={true}
-                      gap="12px"
-                      className="group cursor-pointer relative"
-                    >
-                      <Card.Image
-                        logoUrl={club.logoUrl}
-                        alt={club.clubName}
-                        interactive
-                        className="transition-transform duration-300 ease-out"
-                      />
-                      <Card.Content className="px-[6px]">
-                        <Card.Title>{club.clubName}</Card.Title>
-                        <Card.Description>{club.description}</Card.Description>
-                        <Card.Meta part={club.categories.join(' · ')} />
-                      </Card.Content>
-                      {club.isRecruiting && (
-                        <div className="w-[61px] h-[29px] absolute top-[16px] left-[16px] bg-white text-grey-color-5 typo-caption-sb rounded-[73px] border border-light-color-3 z-10 px-3 py-1.5 text-center flex items-center justify-center leading-none">
-                          모집중
-                        </div>
-                      )}
-                    </Card>
-                  </Link>
-                ))
-              : null}
-          </div>
-        </div>
-        {/* IT 동아리 프리미엄 후기 */}
-        <div className={`${isDesktop ? 'mt-16' : 'mt-12'} px-5`}>
+        <div className={`flex flex-col ${isDesktop ? 'gap-y-16' : 'gap-y-12'}`}>
+          {/* 인기 IT 동아리  */}
           <div>
-            <h2 className="typo-title-2">IT 동아리 프리미엄 후기</h2>
+            <div className="flex flex-row justify-between items-center px-5">
+              <h2 className="typo-title-2 ">인기 IT 동아리</h2>
+              <Link href="/club/explore">
+                <div className="typo-button-m text-grey-color-3 cursor-pointer">
+                  전체보기
+                </div>
+              </Link>
+            </div>
+
+            <div
+              className={`mt-4 px-5 flex gap-4 ${isDesktop ? 'grid grid-cols-4' : 'flex flex-col'}`}
+            >
+              {popularClubs.map((club: ClubItem) => (
+                <CardOverlay
+                  key={club.clubId}
+                  club={club as Parameters<typeof CardOverlay>[0]['club']}
+                  isSubscribed={bookmarkedClubIds.has(club.clubId)}
+                  onBookmarkClick={handleBookmarkClick}
+                />
+              ))}
+            </div>
           </div>
 
-          <div
-            className={`grid ${isDesktop ? 'grid-cols-2 gap-6' : 'grid-cols-1 gap-4'} mt-6 ${isDesktop ? 'mb-16' : 'mb-12'}`}
-          >
-            {popularPremiumReviews?.content
-              ? popularPremiumReviews.content.map((review) => (
-                  <Link
-                    key={review.reviewId}
-                    href={`/review/${review.reviewId}`}
+          {/* 인기 후기 */}
+          <div className="flex flex-col gap-4">
+            <div className="">
+              <div className="flex flex-row justify-between items-center px-5">
+                <h2 className="typo-title-2">인기 후기</h2>
+                <Link href="/review/explore">
+                  <div className="typo-button-m text-grey-color-3 cursor-pointer">
+                    전체보기
+                  </div>
+                </Link>
+              </div>
+            </div>
+            <div
+              className={cn(
+                isDesktop
+                  ? 'px-5 grid grid-cols-3 gap-4 gap-y-4'
+                  : 'pl-5 flex flex-nowrap overflow-x-auto gap-4 [&::-webkit-scrollbar]:hidden',
+              )}
+            >
+              {popularReviews.map((review) => (
+                <div
+                  key={review.reviewId || review.title}
+                  className={cn(!isDesktop && 'shrink-0')}
+                >
+                  <PopularReviewCard
+                    className={cn(
+                      'w-full max-w-[342px]',
+                      !isDesktop && 'min-w-[280px]',
+                    )}
                   >
-                    <Card
-                      size={isDesktop ? 'col3Desktop' : 'homeReviewPhone'}
-                      orientation="horizontal"
-                      border={true}
-                      gap="12px"
-                      className="group cursor-pointer relative"
-                    >
-                      <Card.Image
-                        logoUrl={review.imageUrl}
-                        alt={review.title}
-                        interactive
-                        className="transition-transform duration-300 ease-out"
+                    <PopularReviewCard.Tag />
+                    <PopularReviewCard.Profile
+                      reviewCategory={review.reviewCategory}
+                      clubName={review.clubName}
+                      generation={review.generation}
+                      jobName={review.jobName}
+                      ratingValue={review.rate}
+                    />
+                    <PopularReviewCard.Content>
+                      {review.answerSummaries?.[0]?.answerSummary ||
+                        review.title}
+                    </PopularReviewCard.Content>
+                    {review.reviewId && (
+                      <PopularReviewCard.Link
+                        reviewId={String(review.reviewId)}
                       />
-                      <Card.Content className="px-[6px]">
-                        <Card.Title>{review.title}</Card.Title>
-                        <Card.Description>{review.headLine}</Card.Description>
-                        <Card.Meta part={review.identifier.join(' · ')} />
-                        <Card.Stats
-                          likes={review.likeCount}
-                          comments={review.commentCount}
-                        />
-                      </Card.Content>
-                    </Card>
-                  </Link>
-                ))
-              : null}
+                    )}
+                  </PopularReviewCard>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
+        <div
+          className={cn('flex flex-col', isDesktop ? 'gap-y-14' : 'gap-y-12')}
+        >
+          {/* 인기 커뮤니티 글 */}
+          <div>
+            <div className="flex flex-row justify-between items-center px-5 mb-4">
+              <h2 className="typo-title-2">인기 커뮤니티 글</h2>
+              <Link href="/community">
+                <div className="typo-button-m text-grey-color-3 cursor-pointer">
+                  전체보기
+                </div>
+              </Link>
+            </div>
 
-        {/* 하단 광고 배너 */}
-        <div className="mx-5 mb-12">
-          <div
-            className={`w-full ${isDesktop ? 'h-full' : 'h-44'} rounded-[24px] p-6 flex items-center justify-between`}
-          >
-            <img
-              src="/icons/main.svg"
-              alt="main"
-              className="w-full h-full object-cover rounded-[24px]"
-            />
+            <div
+              className={cn(
+                'flex gap-4 px-5',
+                isDesktop ? 'flex-row' : 'flex-col',
+              )}
+            >
+              {popularPosts.map((post) => (
+                <PopularCommunityCardOverlay key={post.postId} post={post} />
+              ))}
+            </div>
+          </div>
+
+          {/* 하단 광고 배너 */}
+          <div className="px-5 mb-12">
+            <div className={`w-full h-full flex items-center justify-between`}>
+              <Image
+                src="/images/main-footer.svg"
+                alt="main-footer"
+                width={1060}
+                height={264}
+                className={`min-h-44 object-cover ${isDesktop ? 'rounded-[24px]' : 'rounded-[8px]'}`}
+              />
+            </div>
           </div>
         </div>
       </div>

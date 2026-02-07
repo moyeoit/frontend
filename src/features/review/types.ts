@@ -5,12 +5,17 @@ export enum QuestionType {
   MultipleChoice = 'MULTIPLE_CHOICE',
   Subjective = 'SUBJECTIVE',
   SingleChoice = 'SINGLE_CHOICE',
+  SingleSubjective = 'SINGLE_SUBJECTIVE',
+  MultipleSubjective = 'MULTIPLE_SUBJECTIVE',
 }
 
 export enum ResultType {
-  Fail = 'FAIL',
   Pass = 'PASS',
-  Ready = 'READY',
+  Failure = 'FAILURE',
+  NotParticipateAfterPass = 'NOT_PARTICIPATE_AFTER_PASS',
+  Waiting = 'WAITING',
+  Activity = 'ACTIVITY',
+  EndActivity = 'END_ACTIVITY',
 }
 
 export enum ReviewCategory {
@@ -38,6 +43,27 @@ export interface AnswerRequest {
    * 답변 값 (객관식 또는 주관식)
    */
   value: number | string | number[]
+}
+
+export type ReviewAnswerValue = number | string | Array<number | string>
+
+export interface ReviewAnswerRequest {
+  /**
+   * 노출 순서
+   */
+  sequence: number
+  /**
+   * 질문 ID
+   */
+  question_id: number
+  /**
+   * 질문 타입
+   */
+  question_type: QuestionType
+  /**
+   * 답변 값 (객관식 또는 주관식)
+   */
+  value: ReviewAnswerValue
 }
 
 export interface PageableSort {
@@ -154,8 +180,122 @@ export interface ReviewsQueryParams {
   sort?: string
 }
 
+// Review Search (탐색) Types
+export interface ReviewAnswerSummary {
+  questionTitleSummary: string
+  answerSummary: string
+}
+
+export interface ReviewSearchItem {
+  reviewId?: number
+  clubName: string
+  generation: number
+  jobName: string
+  rate: number
+  title: string
+  answerSummaries: ReviewAnswerSummary[]
+  likeCount: number
+  commentCount: number
+  reviewCategory?: 'DOCUMENT' | 'INTERVIEW' | 'ACTIVITY'
+  category?: string
+  result?: string
+  createdAt?: string
+  isBookmarked?: boolean
+}
+
+export interface ReviewSearchPage {
+  content: ReviewSearchItem[]
+  totalElements: number
+  totalPages: number
+  size: number
+  number: number
+  first: boolean
+  last: boolean
+  numberOfElements: number
+  empty: boolean
+  sort: PageableSort
+  pageable: Pageable
+}
+
+export interface ReviewSearchParams {
+  title?: string
+  category?: string
+  clubId?: number
+  generation?: number
+  result?: string
+  sort?: string
+  page?: number
+  size?: number
+}
+
+// Review Detail (v1/review/{reviewId}) Types
+export interface ReviewClubSummary {
+  clubName: string
+  imageUrl: string | null
+}
+
+export interface ReviewAnswer {
+  id: number
+  question: Question
+  value: ReviewAnswerValue
+  answerType: string
+}
+
+export type ReviewAnswerItem = ReviewAnswer | string
+
+export interface ReviewView {
+  title: string
+  rate: number
+  result: ResultType
+  reviewCategory?: ReviewCategory
+  job: Job
+  club: ReviewClubSummary
+  generation: number
+  likeCount: number
+  liked?: boolean
+  isBookmarked?: boolean
+  commentCount: number
+  answers: ReviewAnswerItem[]
+}
+
+export interface ReviewComment {
+  id: number
+  nickname: string
+  profileImageUrl: string | null
+  content: string
+  createDate: string
+  children?: ReviewComment[]
+  deleted: boolean
+}
+
+export interface ReviewCommentCreateRequest {
+  reviewId: number
+  content: string
+  parentCommentId?: number | null
+}
+
+export interface ReviewCommentUpdateRequest {
+  content: string
+}
+
 // Review Creation Types
 export interface BasicReviewCreateRequest {
+  /**
+   * 후기 제목 (한줄평 사용)
+   */
+  title: string
+  /**
+   * 후기 카테고리 (서류/면접/활동)
+   */
+  category: ReviewCategory
+  /**
+   * 평점 (실수)
+   */
+  rate: number
+  /**
+   * 결과
+   */
+  result: ResultType
   /**
    * 동아리 ID
    */
@@ -171,23 +311,7 @@ export interface BasicReviewCreateRequest {
   /**
    * 질문에 대한 답변 목록
    */
-  questions: AnswerRequest[]
-  /**
-   * 평점 (실수)
-   */
-  rate: number
-  /**
-   * 결과
-   */
-  resultType?: ResultType
-  /**
-   * 리뷰 종류 (서류/면접/활동)
-   */
-  reviewCategory: ReviewCategory
-  /**
-   * 리뷰 타입 (일반/프리미엄)
-   */
-  reviewType: ReviewType
+  answers: ReviewAnswerRequest[]
 }
 
 export interface PremiumReviewCreateRequest {
@@ -305,4 +429,56 @@ export interface PremiumReviewCreateResponse {
    * 저장된 리뷰 ID
    */
   savedReviewId: number
+}
+
+export interface ReviewData {
+  club?: {
+    clubName: string
+  }
+  clubName?: string
+  reviewCategory?: 'DOCUMENT' | 'INTERVIEW' | 'ACTIVITY'
+  category?: string
+  job?: {
+    name: string
+  }
+  part?: string
+  generation?: string | number
+  cohort?: string | number
+  rate: number
+  likeCount?: number
+  commentCount?: number
+  result?: string
+  title?: string
+  answerSummaries?: Array<{
+    questionTitleSummary: string
+    answerSummary: string
+  }>
+  answers?: Array<{
+    question: {
+      title: string
+      elements?: Array<{
+        id: number
+        title: string
+      }>
+    }
+    value: string | number | number[]
+    answerType: string
+  }>
+  position?: string
+  nickname?: string
+  oneLineComment?: string
+  qaPreviews?: Array<{
+    questionTitle: string
+    answerValue?: string
+  }>
+}
+
+export interface ReviewProps {
+  data: ReviewData
+  className?: string
+  isBookmarked?: boolean
+  onDetailClick?: () => void
+  onLikeClick?: () => void
+  onCommentClick?: () => void
+  onBookmarkClick?: () => void
 }

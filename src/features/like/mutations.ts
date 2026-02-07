@@ -4,9 +4,8 @@ import {
   UseMutationResult,
   useQueryClient,
 } from '@tanstack/react-query'
-import { toggleLike } from './api'
-import { likeKeys } from './keys'
-import { LikeResponse } from './types'
+import { toggleLike, toggleReviewLike } from './api'
+import { LikeResponse, ToggleReviewLikeResult } from './types'
 
 // 좋아요 토글 뮤테이션
 export function useToggleLike(
@@ -38,6 +37,20 @@ export function useToggleLike(
 
       options?.onSuccess?.(data, variables, onMutateResult, context)
     },
+    ...options,
+  })
+}
+
+export function useToggleReviewLike<TContext = { previous?: unknown }>(
+  options?: UseMutationOptions<
+    ToggleReviewLikeResult | null,
+    Error,
+    number,
+    TContext
+  >,
+): UseMutationResult<ToggleReviewLikeResult | null, Error, number, TContext> {
+  return useMutation<ToggleReviewLikeResult | null, Error, number, TContext>({
+    mutationFn: (reviewId) => toggleReviewLike(reviewId),
     ...options,
   })
 }

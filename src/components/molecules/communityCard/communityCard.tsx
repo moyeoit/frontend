@@ -3,7 +3,8 @@
 import * as React from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { ThumbsUpEmptyIcon, MessageIcon } from '@/assets/icons'
+import { GreyMessage } from '@/assets/icons/GreyMessage'
+import { GreyThumbsUp } from '@/assets/icons/GreyThumbsUp'
 import useMediaQuery from '@/shared/hooks/useMediaQuery'
 import { resolveImageSrc } from '@/shared/utils'
 import { cn } from '@/shared/utils/cn'
@@ -191,13 +192,13 @@ export function CommunityCardMeta({
           <div className="flex items-center gap-1">
             {likes !== undefined && (
               <div className="flex items-center gap-1">
-                <ThumbsUpEmptyIcon className="text-grey-color-3 desktop:w-4 desktop:h-4 phone:w-3 phone:h-3" />
+                <GreyThumbsUp className="text-grey-color-3 desktop:w-4 desktop:h-4 phone:w-3 phone:h-3" />
                 <span>{likes}</span>
               </div>
             )}
             {comments !== undefined && (
               <div className="flex items-center gap-1">
-                <MessageIcon className="text-grey-color-3 desktop:w-4 desktop:h-4 phone:w-3 phone:h-3" />
+                <GreyMessage className="text-grey-color-3 desktop:w-4 desktop:h-4 phone:w-3 phone:h-3" />
                 <span>{comments}</span>
               </div>
             )}

@@ -1,8 +1,9 @@
 import axios from 'axios'
 import AppPath from '@/shared/configs/appPath'
+import { Environment } from '@/shared/configs/environment'
 import { tokenCookies } from './cookies'
 
-const baseURL = 'https://dev-api.moyeoit.com'
+const baseURL = Environment.apiAddress()
 
 const apiClient = axios.create({
   baseURL,

@@ -131,10 +131,14 @@ export const useSignupForm = () => {
         activateUser(activateData, {
           onSuccess: (response) => {
             // OAuth 토큰으로 최종 로그인 처리
-            login(oauthData.accessToken, {
-              id: parseInt(oauthData.userId),
-              active: true, // 회원가입 완료 후 활성화
-            })
+            login(
+              oauthData.accessToken,
+              {
+                id: parseInt(oauthData.userId),
+                active: true, // 회원가입 완료 후 활성화
+              },
+              parseInt(oauthData.expiresIn, 10),
+            )
 
             // OAuth 데이터 정리
             sessionStorage.removeItem('oauth_data')

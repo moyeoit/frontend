@@ -26,7 +26,7 @@ export async function toggleBookmark(
     data,
   )
   console.log('📥 북마크 토글 API 응답:', res.data)
-  return res.data.data || res.data
+  return res.data.data
 }
 
 // 북마크한 동아리 목록 조회 API

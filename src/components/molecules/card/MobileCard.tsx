@@ -7,8 +7,8 @@ import {
   BookmarkMobileFilledIcon,
   BookmarkMobileEmptyIcon,
 } from '@/assets/icons'
-import { cn } from '@/shared/utils/cn'
 import { resolveImageSrc } from '@/shared/utils'
+import { cn } from '@/shared/utils/cn'
 
 export interface MobileCardProps extends React.HTMLAttributes<HTMLDivElement> {
   logoUrl?: string | null

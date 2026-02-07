@@ -5,8 +5,8 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { ThumbsUpEmptyIcon, MessageIcon } from '@/assets/icons'
 import useMediaQuery from '@/shared/hooks/useMediaQuery'
-import { cn } from '@/shared/utils/cn'
 import { resolveImageSrc } from '@/shared/utils'
+import { cn } from '@/shared/utils/cn'
 
 type CommunityCardType = 'vertical' | 'horizontal'
 

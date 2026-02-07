@@ -36,6 +36,7 @@ export const useUpdateUserProfileImage = () => {
   })
 }
 
+// 유저 정보 수정
 export const useUpdateUserInfo = () => {
   const queryClient = useQueryClient()
 

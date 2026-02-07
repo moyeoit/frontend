@@ -13,21 +13,25 @@ import { UnderLineTab } from '@/components/atoms/UnderLineTab'
 import { CheckItem } from '@/components/atoms/checkItem'
 import { Tag } from '@/components/atoms/tag'
 import { CommunityCard } from '@/components/molecules/communityCard'
+import { PaginationWithHook } from '@/components/molecules/pagination'
 import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/molecules/pagination'
+  useBookmarkedActivityReviews,
+  useBookmarkedInterviewReviews,
+} from '@/features/bookmark'
 import { useUploadFile } from '@/features/file'
-import { useUpdateUserProfileImage, useUserProfile } from '@/features/user'
+import {
+  useUpdateUserManage,
+  useUpdateUserProfileImage,
+  useUserManage,
+  useUserPosts,
+  useUserProfile,
+} from '@/features/user'
 import AppPath from '@/shared/configs/appPath'
 import useMediaQuery from '@/shared/hooks/useMediaQuery'
 import useQueryState from '@/shared/hooks/useQueryState'
 import { useAuth } from '@/shared/providers/auth-provider'
 import { cn } from '@/shared/utils/cn'
+import { formatTimeAgo } from '@/shared/utils/dateFormat'
 
 type SectionKey =
   | 'profile-basic'
@@ -38,6 +42,19 @@ type SectionKey =
 
 type ReviewFilter = 'DOCUMENT' | 'INTERVIEW' | 'ACTIVITY'
 type CommunityTab = 'posts' | 'comments'
+
+type CommunityItem = {
+  id: number
+  categoryName: string
+  title: string
+  excerpt: string
+  authorNickname: string
+  timeAgo: string
+  views: number
+  likes: number
+  comments: number
+  thumbnailUrl?: string
+}
 
 const SECTION_KEYS: SectionKey[] = [
   'profile-basic',
@@ -77,116 +94,7 @@ const REVIEW_FILTERS: { value: ReviewFilter; label: string }[] = [
   { value: 'ACTIVITY', label: '활동' },
 ]
 
-const MOCK_REVIEWS: ReviewListItemData[] = [
-  {
-    reviewId: 1,
-    clubName: '동아리명',
-    jobName: '파트명',
-    generation: 12,
-    title: '한줄평 내용이 여기에 들어갑니다.',
-    answerSummaries: [
-      { questionTitleSummary: '핵심 어필', answerSummary: '지원동기 외2' },
-      { questionTitleSummary: '참고 정보', answerSummary: '공식 공고' },
-      {
-        questionTitleSummary: '서술 방식',
-        answerSummary: '데이터 성과 수치 서술',
-      },
-    ],
-    rate: 4,
-    likeCount: 0,
-    commentCount: 0,
-    category: 'DOCUMENT',
-    result: 'PASS',
-  },
-  {
-    reviewId: 2,
-    clubName: '동아리명',
-    jobName: '파트명',
-    generation: 8,
-    title: '직무 경험이 없으면 힘들게 느껴질 수도 있는 압박면접입니다.',
-    answerSummaries: [
-      { questionTitleSummary: '출제 질문', answerSummary: '지원동기 외2' },
-      { questionTitleSummary: '핵심 어필', answerSummary: '성장 의지' },
-      { questionTitleSummary: '분위기', answerSummary: '차가움/무서움' },
-    ],
-    rate: 3,
-    likeCount: 0,
-    commentCount: 0,
-    category: 'INTERVIEW',
-    result: 'WAITING',
-  },
-  {
-    reviewId: 3,
-    clubName: '동아리명',
-    jobName: '파트명',
-    generation: 3,
-    title: '활동 강도는 낮지만 새로운 경험을 얻을 수 있었어요.',
-    answerSummaries: [
-      { questionTitleSummary: '투자 시간', answerSummary: '주 5시간 미만' },
-      { questionTitleSummary: '활동 수준', answerSummary: '개인 흥미 수준' },
-      {
-        questionTitleSummary: '만족 영역',
-        answerSummary: '직무 기술/실력 성장 외4',
-      },
-    ],
-    rate: 5,
-    likeCount: 0,
-    commentCount: 0,
-    category: 'ACTIVITY',
-    result: 'ACTIVITY',
-  },
-  {
-    reviewId: 4,
-    clubName: '동아리명',
-    jobName: '파트명',
-    generation: 5,
-    title: '한줄평 내용이 여기에 들어갑니다.',
-    answerSummaries: [
-      { questionTitleSummary: '핵심 어필', answerSummary: '지원동기 외2' },
-      { questionTitleSummary: '참고 정보', answerSummary: '공식 공고' },
-      {
-        questionTitleSummary: '서술 방식',
-        answerSummary: '데이터 성과 수치 서술',
-      },
-    ],
-    rate: 4,
-    likeCount: 0,
-    commentCount: 0,
-    category: 'DOCUMENT',
-    result: 'PASS',
-  },
-]
-
-const MOCK_COMMUNITY_POSTS = [
-  {
-    id: 1,
-    categoryName: '직장 생활',
-    title: '제목 넣어주세요',
-    excerpt:
-      '내용 미리보기 2줄로 넣어주세요 그런데, 나룻이 긴 농부는 소녀 편을 한 번 훑어보고는 그저 송아지 고삐를 풀어내면서…',
-    authorNickname: '닉네임',
-    timeAgo: '14분 전',
-    views: 200,
-    likes: 200,
-    comments: 200,
-    thumbnailUrl: '/images/default.svg',
-  },
-  {
-    id: 2,
-    categoryName: '직장 생활',
-    title: '제목 넣어주세요',
-    excerpt:
-      '내용 미리보기 2줄로 넣어주세요 그런데, 나룻이 긴 농부는 소녀 편을 한 번 훑어보고는 그저 송아지 고삐를 풀어내면서…',
-    authorNickname: '닉네임',
-    timeAgo: '14분 전',
-    views: 200,
-    likes: 200,
-    comments: 200,
-    thumbnailUrl: '/images/default.svg',
-  },
-]
-
-const MOCK_COMMUNITY_COMMENTS = [
+const MOCK_COMMUNITY_COMMENTS: CommunityItem[] = [
   {
     id: 11,
     categoryName: '직장 생활',
@@ -215,12 +123,26 @@ const MOCK_COMMUNITY_COMMENTS = [
   },
 ]
 
+const REVIEW_PAGE_SIZE = 4
+const COMMUNITY_PAGE_SIZE = 4
+
+const getReviewCategory = (category?: string): ReviewFilter | undefined => {
+  if (!category) return undefined
+  if (category.includes('서류')) return 'DOCUMENT'
+  if (category.includes('면접')) return 'INTERVIEW'
+  if (category.includes('활동')) return 'ACTIVITY'
+  return undefined
+}
+
 export default function MyPage() {
   const router = useRouter()
   const { isDesktop } = useMediaQuery()
   const { logout, user, isLoading: isAuthLoading } = useAuth()
   const { data: profile } = useUserProfile()
   const profileData = profile ?? null
+  const { data: manageInfo } = useUserManage()
+  const { mutate: updateManage, isPending: isUpdatingManage } =
+    useUpdateUserManage()
   const { mutate: uploadFile, isPending: isUploading } = useUploadFile()
   const { mutate: updateProfileImage, isPending: isUpdating } =
     useUpdateUserProfileImage()
@@ -236,13 +158,20 @@ export default function MyPage() {
 
   const [reviewFilter, setReviewFilter] = useState<ReviewFilter>('DOCUMENT')
   const [communityTab, setCommunityTab] = useState<CommunityTab>('posts')
+  const [reviewPage, setReviewPage] = useState(1)
+  const [communityPage, setCommunityPage] = useState(1)
   const [activityOngoing, setActivityOngoing] = useState(false)
-  const [emailNotifications, setEmailNotifications] = useState(true)
+  const [manageForm, setManageForm] = useState({
+    name: '',
+    subscriptionEmail: '',
+    emailNotifyAgree: false,
+  })
   const [tempImageUrl, setTempImageUrl] = useState<string | null>(null)
   const [activityFileName, setActivityFileName] = useState<string>('')
 
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const activityFileRef = useRef<HTMLInputElement | null>(null)
+  const manageSnapshotRef = useRef(manageForm)
 
   useEffect(() => {
     if (!isAuthLoading && !user) {
@@ -250,13 +179,100 @@ export default function MyPage() {
     }
   }, [isAuthLoading, user, router])
 
-  const filteredReviews = useMemo(
-    () => MOCK_REVIEWS.filter((review) => review.category === reviewFilter),
-    [reviewFilter],
+  useEffect(() => {
+    if (manageInfo) {
+      const next = {
+        name: manageInfo.name ?? '',
+        subscriptionEmail: manageInfo.subscriptionEmail ?? '',
+        emailNotifyAgree: manageInfo.emailNotifyAgree ?? false,
+      }
+      setManageForm(next)
+      manageSnapshotRef.current = next
+    }
+  }, [manageInfo])
+
+  useEffect(() => {
+    setReviewPage(1)
+  }, [reviewFilter])
+
+  useEffect(() => {
+    if (communityTab === 'posts') {
+      setCommunityPage(1)
+    }
+  }, [communityTab])
+
+  const reviewQueryParams = useMemo(
+    () => ({ page: reviewPage - 1, size: REVIEW_PAGE_SIZE }),
+    [reviewPage],
+  )
+  const { data: interviewReviewsData } =
+    useBookmarkedInterviewReviews(reviewQueryParams)
+  const { data: activityReviewsData } =
+    useBookmarkedActivityReviews(reviewQueryParams)
+
+  const reviewPageData =
+    reviewFilter === 'ACTIVITY'
+      ? activityReviewsData?.data
+      : interviewReviewsData?.data
+  const reviewSource = reviewPageData?.content ?? []
+  const filteredReviewSource =
+    reviewFilter === 'ACTIVITY'
+      ? reviewSource
+      : reviewSource.filter((review) => {
+          const category = getReviewCategory(review.reviewCategory)
+          return category ? category === reviewFilter : true
+        })
+  const filteredReviews = useMemo<ReviewListItemData[]>(
+    () =>
+      filteredReviewSource.map((review, index) => ({
+        reviewId: review.reviewId ?? review.id ?? index,
+        clubName: review.clubName,
+        jobName: review.jobName,
+        generation: review.generation,
+        title: review.title,
+        answerSummaries: review.answerSummaries ?? [],
+        rate: review.rate ?? 0,
+        likeCount: review.likeCount ?? 0,
+        commentCount: review.commentCount ?? 0,
+        category:
+          reviewFilter === 'ACTIVITY'
+            ? 'ACTIVITY'
+            : (getReviewCategory(review.reviewCategory) ?? reviewFilter),
+      })),
+    [filteredReviewSource, reviewFilter],
+  )
+  const reviewTotalPages = Math.max(reviewPageData?.totalPages ?? 1, 1)
+
+  const communityQueryParams = useMemo(
+    () => ({
+      page: communityPage - 1,
+      size: COMMUNITY_PAGE_SIZE,
+      sort: 'createdAt,desc',
+    }),
+    [communityPage],
+  )
+  const { data: communityPostsData } = useUserPosts(communityQueryParams)
+
+  const communityPosts = useMemo<CommunityItem[]>(
+    () =>
+      (communityPostsData?.content ?? []).map((post) => ({
+        id: post.postId,
+        categoryName: post.categoryName,
+        title: post.title,
+        excerpt: post.excerpt,
+        authorNickname: post.authorNickname,
+        timeAgo: formatTimeAgo(post.createdAt),
+        views: post.viewCount,
+        likes: post.likeCount,
+        comments: post.commentCount,
+        thumbnailUrl: post.thumbnailUrl || '/images/default.svg',
+      })),
+    [communityPostsData],
   )
 
   const communityItems =
-    communityTab === 'posts' ? MOCK_COMMUNITY_POSTS : MOCK_COMMUNITY_COMMENTS
+    communityTab === 'posts' ? communityPosts : MOCK_COMMUNITY_COMMENTS
+  const communityTotalPages = Math.max(communityPostsData?.totalPages ?? 1, 1)
 
   const handleSelectSection = (next: SectionKey) => {
     setSectionParam(next)
@@ -277,6 +293,52 @@ export default function MyPage() {
         )
       },
     })
+  }
+
+  const handleManageChange = (
+    field: 'name' | 'subscriptionEmail' | 'emailNotifyAgree',
+    value: string | boolean,
+  ) => {
+    setManageForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }))
+  }
+
+  const commitManage = (override?: Partial<typeof manageForm>) => {
+    if (isUpdatingManage) return
+    const next = {
+      ...manageForm,
+      ...override,
+    }
+    const normalized = {
+      name: next.name.trim(),
+      subscriptionEmail: next.subscriptionEmail.trim(),
+      emailNotifyAgree: next.emailNotifyAgree,
+    }
+    const snapshot = manageSnapshotRef.current
+
+    if (
+      snapshot.name === normalized.name &&
+      snapshot.subscriptionEmail === normalized.subscriptionEmail &&
+      snapshot.emailNotifyAgree === normalized.emailNotifyAgree
+    ) {
+      return
+    }
+
+    updateManage(
+      {
+        name: normalized.name || undefined,
+        subscriptionEmail: normalized.subscriptionEmail || undefined,
+        emailAgree: normalized.emailNotifyAgree,
+      },
+      {
+        onSuccess: () => {
+          manageSnapshotRef.current = normalized
+          setManageForm(normalized)
+        },
+      },
+    )
   }
 
   return (
@@ -377,6 +439,9 @@ export default function MyPage() {
                   reviewFilter={reviewFilter}
                   onChangeFilter={setReviewFilter}
                   reviews={filteredReviews}
+                  page={reviewPage}
+                  totalPages={reviewTotalPages}
+                  onPageChange={setReviewPage}
                 />
               )}
               {section === 'activity-community' && (
@@ -385,14 +450,26 @@ export default function MyPage() {
                   communityTab={communityTab}
                   onChangeTab={setCommunityTab}
                   items={communityItems}
+                  page={communityPage}
+                  totalPages={communityTotalPages}
+                  onPageChange={setCommunityPage}
                 />
               )}
               {section === 'settings-account' && (
                 <AccountSection
                   isDesktop
-                  profile={profileData}
-                  emailNotifications={emailNotifications}
-                  onToggleNotifications={setEmailNotifications}
+                  name={manageForm.name}
+                  subscriptionEmail={manageForm.subscriptionEmail}
+                  emailNotifications={manageForm.emailNotifyAgree}
+                  isUpdating={isUpdatingManage}
+                  onChangeName={(value) => handleManageChange('name', value)}
+                  onChangeEmail={(value) =>
+                    handleManageChange('subscriptionEmail', value)
+                  }
+                  onCommitManage={commitManage}
+                  onToggleNotifications={(value) =>
+                    handleManageChange('emailNotifyAgree', value)
+                  }
                   onLogout={logout}
                 />
               )}
@@ -409,6 +486,12 @@ export default function MyPage() {
             onChangeCommunityTab={setCommunityTab}
             reviews={filteredReviews}
             communityItems={communityItems}
+            reviewPage={reviewPage}
+            reviewTotalPages={reviewTotalPages}
+            onChangeReviewPage={setReviewPage}
+            communityPage={communityPage}
+            communityTotalPages={communityTotalPages}
+            onChangeCommunityPage={setCommunityPage}
             activityOngoing={activityOngoing}
             onToggleOngoing={setActivityOngoing}
             activityFileName={activityFileName}
@@ -419,8 +502,10 @@ export default function MyPage() {
             isUploading={isUploading}
             isUpdating={isUpdating}
             onProfileImageSelect={handleProfileImageChange}
-            emailNotifications={emailNotifications}
-            onToggleNotifications={setEmailNotifications}
+            manageForm={manageForm}
+            isUpdatingManage={isUpdatingManage}
+            onManageChange={handleManageChange}
+            onCommitManage={commitManage}
             onLogout={logout}
           />
         )}
@@ -576,6 +661,7 @@ function BasicInfoSection({
     name?: string
     nickname?: string
     jobDto?: { name?: string }
+    job?: { name?: string }
     active?: boolean
     profileImageUrl?: string
   } | null
@@ -646,7 +732,7 @@ function BasicInfoSection({
           </FormRow>
           <FormRow label="분야" isDesktop={isDesktop}>
             <Input
-              value={profile?.jobDto?.name ?? ''}
+              value={profile?.jobDto?.name ?? profile?.job?.name ?? ''}
               placeholder="분야"
               readOnly
               className="h-[47px]"
@@ -747,11 +833,17 @@ function ReviewActivitySection({
   reviewFilter,
   onChangeFilter,
   reviews,
+  page,
+  totalPages,
+  onPageChange,
 }: {
   isDesktop: boolean
   reviewFilter: ReviewFilter
   onChangeFilter: (value: ReviewFilter) => void
   reviews: ReviewListItemData[]
+  page: number
+  totalPages: number
+  onPageChange: (page: number) => void
 }) {
   return (
     <SectionShell
@@ -781,23 +873,16 @@ function ReviewActivitySection({
             />
           ))}
         </div>
-        <div className="pt-6">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious isDisabled />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink href="#" isActive>
-                  1
-                </PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationNext isDisabled />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
+        {totalPages > 1 && (
+          <div className="pt-6">
+            <PaginationWithHook
+              key={reviewFilter}
+              totalPages={totalPages}
+              initialPage={page}
+              onPageChange={onPageChange}
+            />
+          </div>
+        )}
       </div>
     </SectionShell>
   )
@@ -808,11 +893,17 @@ function CommunityActivitySection({
   communityTab,
   onChangeTab,
   items,
+  page,
+  totalPages,
+  onPageChange,
 }: {
   isDesktop: boolean
   communityTab: CommunityTab
   onChangeTab: (value: CommunityTab) => void
-  items: typeof MOCK_COMMUNITY_POSTS
+  items: CommunityItem[]
+  page: number
+  totalPages: number
+  onPageChange: (page: number) => void
 }) {
   return (
     <SectionShell
@@ -876,29 +967,21 @@ function CommunityActivitySection({
                 />
               </CommunityCard.Content>
               <CommunityCard.Image
-                logoUrl={post.thumbnailUrl}
+                logoUrl={post.thumbnailUrl ?? '/images/default.svg'}
                 alt={post.title}
               />
             </CommunityCard>
           ))}
         </div>
-        <div className="pt-6">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious isDisabled />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink href="#" isActive>
-                  1
-                </PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationNext isDisabled />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
+        {communityTab === 'posts' && totalPages > 1 && (
+          <div className="pt-6">
+            <PaginationWithHook
+              totalPages={totalPages}
+              initialPage={page}
+              onPageChange={onPageChange}
+            />
+          </div>
+        )}
       </div>
     </SectionShell>
   )
@@ -906,17 +989,28 @@ function CommunityActivitySection({
 
 function AccountSection({
   isDesktop,
-  profile,
+  name,
+  subscriptionEmail,
   emailNotifications,
+  isUpdating,
+  onChangeName,
+  onChangeEmail,
+  onCommitManage,
   onToggleNotifications,
   onLogout,
 }: {
   isDesktop: boolean
-  profile: {
-    name?: string
-    email?: string
-  } | null
+  name: string
+  subscriptionEmail: string
   emailNotifications: boolean
+  isUpdating: boolean
+  onChangeName: (value: string) => void
+  onChangeEmail: (value: string) => void
+  onCommitManage: (override?: {
+    name?: string
+    subscriptionEmail?: string
+    emailNotifyAgree?: boolean
+  }) => void
   onToggleNotifications: (next: boolean) => void
   onLogout: () => void
 }) {
@@ -925,18 +1019,22 @@ function AccountSection({
       <div className="flex flex-col gap-8">
         <FormRow label="이름" isDesktop={isDesktop}>
           <Input
-            value={profile?.name ?? ''}
+            value={name}
             placeholder="이름"
-            readOnly
+            disabled={isUpdating}
+            onChange={(event) => onChangeName(event.target.value)}
+            onBlur={() => onCommitManage()}
             className="h-[47px]"
           />
         </FormRow>
         <FormRow label="소식받을 이메일" isDesktop={isDesktop}>
           <div className="flex flex-col gap-2">
             <Input
-              value={profile?.email ?? ''}
+              value={subscriptionEmail}
               placeholder="000@moyeoit.com"
-              readOnly
+              disabled={isUpdating}
+              onChange={(event) => onChangeEmail(event.target.value)}
+              onBlur={() => onCommitManage()}
               className="h-[47px]"
             />
             <p className="typo-caption-2 text-grey-color-1">
@@ -947,7 +1045,10 @@ function AccountSection({
         <FormRow label="이메일 알림 여부" isDesktop={isDesktop}>
           <ToggleSwitch
             checked={emailNotifications}
-            onChange={onToggleNotifications}
+            onChange={(next) => {
+              onToggleNotifications(next)
+              onCommitManage({ emailNotifyAgree: next })
+            }}
           />
         </FormRow>
         <div className="flex justify-end gap-2">
@@ -980,6 +1081,12 @@ function MobileLayout({
   onChangeCommunityTab,
   reviews,
   communityItems,
+  reviewPage,
+  reviewTotalPages,
+  onChangeReviewPage,
+  communityPage,
+  communityTotalPages,
+  onChangeCommunityPage,
   activityOngoing,
   onToggleOngoing,
   activityFileName,
@@ -990,17 +1097,19 @@ function MobileLayout({
   isUploading,
   isUpdating,
   onProfileImageSelect,
-  emailNotifications,
-  onToggleNotifications,
+  manageForm,
+  isUpdatingManage,
+  onManageChange,
+  onCommitManage,
   onLogout,
 }: {
   profile: {
     name?: string
     nickname?: string
     jobDto?: { name?: string }
+    job?: { name?: string }
     active?: boolean
     profileImageUrl?: string
-    email?: string
   } | null
   section: SectionKey
   onChangeSection: (section: SectionKey) => void
@@ -1009,7 +1118,13 @@ function MobileLayout({
   communityTab: CommunityTab
   onChangeCommunityTab: (value: CommunityTab) => void
   reviews: ReviewListItemData[]
-  communityItems: typeof MOCK_COMMUNITY_POSTS
+  communityItems: CommunityItem[]
+  reviewPage: number
+  reviewTotalPages: number
+  onChangeReviewPage: (page: number) => void
+  communityPage: number
+  communityTotalPages: number
+  onChangeCommunityPage: (page: number) => void
   activityOngoing: boolean
   onToggleOngoing: (next: boolean) => void
   activityFileName: string
@@ -1020,8 +1135,21 @@ function MobileLayout({
   isUploading: boolean
   isUpdating: boolean
   onProfileImageSelect: (file?: File) => void
-  emailNotifications: boolean
-  onToggleNotifications: (next: boolean) => void
+  manageForm: {
+    name: string
+    subscriptionEmail: string
+    emailNotifyAgree: boolean
+  }
+  isUpdatingManage: boolean
+  onManageChange: (
+    field: 'name' | 'subscriptionEmail' | 'emailNotifyAgree',
+    value: string | boolean,
+  ) => void
+  onCommitManage: (override?: {
+    name?: string
+    subscriptionEmail?: string
+    emailNotifyAgree?: boolean
+  }) => void
   onLogout: () => void
 }) {
   const activeGroup = section.split('-')[0]
@@ -1062,12 +1190,18 @@ function MobileLayout({
             reviewFilter={reviewFilter}
             onChangeFilter={onChangeReviewFilter}
             reviews={reviews}
+            page={reviewPage}
+            totalPages={reviewTotalPages}
+            onPageChange={onChangeReviewPage}
           />
           <CommunityActivitySection
             isDesktop={false}
             communityTab={communityTab}
             onChangeTab={onChangeCommunityTab}
             items={communityItems}
+            page={communityPage}
+            totalPages={communityTotalPages}
+            onPageChange={onChangeCommunityPage}
           />
         </div>
       ),
@@ -1078,9 +1212,16 @@ function MobileLayout({
       content: (
         <AccountSection
           isDesktop={false}
-          profile={profile}
-          emailNotifications={emailNotifications}
-          onToggleNotifications={onToggleNotifications}
+          name={manageForm.name}
+          subscriptionEmail={manageForm.subscriptionEmail}
+          emailNotifications={manageForm.emailNotifyAgree}
+          isUpdating={isUpdatingManage}
+          onChangeName={(value) => onManageChange('name', value)}
+          onChangeEmail={(value) => onManageChange('subscriptionEmail', value)}
+          onCommitManage={onCommitManage}
+          onToggleNotifications={(value) =>
+            onManageChange('emailNotifyAgree', value)
+          }
           onLogout={onLogout}
         />
       ),

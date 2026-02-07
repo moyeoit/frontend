@@ -10,8 +10,9 @@ export interface BookmarkRequest {
 }
 
 export interface BookmarkResponse {
-  status: string
-  message?: string
+  isBookmarked: boolean
+  type: BookmarkType
+  targetId: number
 }
 
 // 북마크한 동아리 아이템
@@ -60,6 +61,7 @@ export interface BookmarkedClubsPage {
 // API 응답 래퍼
 export interface BookmarkedClubsResponse {
   status: string
+  message?: string
   data: BookmarkedClubsPage
 }
 
@@ -67,6 +69,8 @@ export interface BookmarkedClubsResponse {
 export interface BookmarkedReview {
   id?: number // 북마크 API에서 id로 내려올 수 있음
   reviewId?: number // 북마크 API에서 reviewId 또는 id로 내려올 수 있음
+  reviewCategory?: string
+  isBookmarked?: boolean
   clubName: string
   generation: number
   jobName: string

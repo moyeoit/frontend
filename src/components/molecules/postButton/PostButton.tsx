@@ -21,8 +21,8 @@ export function PostButton({ className }: PostButtonProps) {
   const { isDesktop } = useMediaQuery()
   const router = useRouter()
 
-  const handleClick = () => {
-    router.push('/post')
+  const handleClick = (postType: 'general' | 'question') => {
+    router.push(`/community/post/${postType}`)
   }
 
   const popoverContent = (
@@ -35,14 +35,14 @@ export function PostButton({ className }: PostButtonProps) {
         <button
           type="button"
           className="w-full text-left pl-4 py-2 typo-body-3-r text-grey-color-5 hover:text-black-color hover:bg-light-color-2 active:text-black-color active:bg-light-color-2"
-          onClick={handleClick}
+          onClick={() => handleClick('general')}
         >
           일반글 작성
         </button>
         <button
           type="button"
           className="w-full text-left pl-4 py-2 typo-body-3-r text-grey-color-5 hover:text-black-color hover:bg-light-color-2 active:text-black-color active:bg-light-color-2"
-          onClick={handleClick}
+          onClick={() => handleClick('question')}
         >
           질문글 작성
         </button>

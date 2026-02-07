@@ -28,7 +28,7 @@ export function PopularCommunityCard({
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (postId) {
-      router.push(`/post/detail/${postId}`)
+      router.push(`community/post/detail/${postId}`)
     }
     onClick?.(e)
   }

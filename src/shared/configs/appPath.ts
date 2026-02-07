@@ -23,6 +23,8 @@ const AppPath = {
   reviewEdit: (reviewId: string) => `/review/${reviewId}/edit` as const,
   reviewSubmitted: () => '/review/submitted' as const,
   community: () => '/community' as const,
+  communityPostEdit: (postId: string) =>
+    `/community/post/edit/${postId}` as const,
   bookmark: () => '/bookmark' as const,
   search: () => '/search' as const,
 } as const

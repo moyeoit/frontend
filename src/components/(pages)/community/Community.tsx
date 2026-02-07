@@ -254,6 +254,7 @@ export function Community() {
                 key={post.postId}
                 type="horizontal"
                 postType={post.postType}
+                postId={post.postId}
                 className={cn(
                   'gap-6 pt-8 group cursor-pointer relative',
                   isDesktop ? 'gap-6' : 'gap-4',

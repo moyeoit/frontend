@@ -41,8 +41,7 @@ function useCarousel() {
 }
 
 export interface CarouselProps
-  extends
-    Omit<React.HTMLAttributes<HTMLDivElement>, 'onSelect'>,
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onSelect'>,
     VariantProps<typeof carouselVariants> {
   opts?: CarouselOptions
   plugins?: CarouselPlugin
@@ -145,9 +144,7 @@ const CarouselItem = React.forwardRef<HTMLDivElement, CarouselItemProps>(
         ref={ref}
         role="group"
         aria-roledescription="slide"
-        className={cn(
-          className,
-        )}
+        className={cn(className)}
         {...props}
       />
     )

@@ -20,3 +20,6 @@ export const PopularCommunityCard = Object.assign(PopularCommunityCardRoot, {
 export type { PopularCommunityCardProps } from './PopularCommunityCard'
 
 export { PopularCommunityCardTitle, PopularCommunityCardDescription }
+
+export { default as PopularCommunityCardOverlay } from './PopularCommunityCardOverlay'
+export type { PopularCommunityCardOverlayProps } from './PopularCommunityCardOverlay'

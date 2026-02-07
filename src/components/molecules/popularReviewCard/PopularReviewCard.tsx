@@ -32,7 +32,8 @@ export function PopularReviewCardRoot({
 
 /* --------------------------------- Tag --------------------------------- */
 
-export interface PopularReviewCardTagProps extends React.HTMLAttributes<HTMLSpanElement> {
+export interface PopularReviewCardTagProps
+  extends React.HTMLAttributes<HTMLSpanElement> {
   children?: React.ReactNode
 }
 
@@ -78,7 +79,8 @@ const REVIEW_CATEGORY_STYLES = {
 
 export type ReviewCategoryType = keyof typeof REVIEW_CATEGORY_STYLES
 
-export interface PopularReviewCardProfileProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface PopularReviewCardProfileProps
+  extends React.HTMLAttributes<HTMLDivElement> {
   /** 리뷰 타입 - DOCUMENT: 서, INTERVIEW: 면, ACTIVITY: 활 (API category 연결용) */
   category?: ReviewCategoryType
   /** 아바타에 표시할 글자 (category 없을 때 사용) */
@@ -182,10 +184,8 @@ export function PopularReviewCardContent({
 
 /* --------------------------------- Link --------------------------------- */
 
-export interface PopularReviewCardLinkProps extends Omit<
-  React.ComponentProps<typeof Link>,
-  'href'
-> {
+export interface PopularReviewCardLinkProps
+  extends Omit<React.ComponentProps<typeof Link>, 'href'> {
   /** 리뷰 상세 페이지로 이동할 ID */
   reviewId: string
   children?: React.ReactNode

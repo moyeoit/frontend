@@ -10,7 +10,8 @@ export const PopularCommunityCardCtx = React.createContext<{
   postType: undefined,
 })
 
-export interface PopularCommunityCardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface PopularCommunityCardProps
+  extends React.HTMLAttributes<HTMLDivElement> {
   postType?: string
   postId?: number
 }

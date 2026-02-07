@@ -40,8 +40,8 @@ export default function Page({ params }: PageProps) {
 
   if (isLoading || !user) {
     return (
-      <main className="">
-        <div className="max-w-[800px] mx-auto pt-20">
+      <main className="w-full bg-white-color">
+        <div className="max-w-[800px] mx-auto w-full px-5 desktop:px-0 py-12">
           <div className="text-center">
             <p className="typo-body-2-r text-grey-color-4">로딩 중...</p>
           </div>
@@ -52,8 +52,8 @@ export default function Page({ params }: PageProps) {
 
   if (!formKind) {
     return (
-      <main className="">
-        <div className="max-w-[800px] mx-auto pt-20">
+      <main className="w-full bg-white-color">
+        <div className="max-w-[800px] mx-auto w-full px-5 desktop:px-0 py-12">
           <div className="text-center">
             <p className="typo-body-2-r text-grey-color-4">로딩 중...</p>
           </div>
@@ -63,9 +63,9 @@ export default function Page({ params }: PageProps) {
   }
 
   return (
-    <main className="">
+    <main className="w-full bg-white-color">
       <Suspense>
-        <div className="max-w-[800px] mx-auto pt-20 pb-20">
+        <div className="max-w-[800px] mx-auto w-full px-5 desktop:px-0 pb-12">
           <FormFactory kind={formKind} />
         </div>
       </Suspense>

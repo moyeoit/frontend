@@ -105,7 +105,9 @@ export default function MobileFilterBar({
                 : 'border-light-color-3 bg-light-color-2 text-black-color',
             )}
           >
-            {buttonLabels[tab.id]}
+            <span className="max-w-[7.5rem] overflow-x-auto whitespace-nowrap text-left [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {buttonLabels[tab.id]}
+            </span>
             <ChevronDown
               className={cn(
                 'typo-button-m',

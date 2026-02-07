@@ -14,7 +14,7 @@ const OptionButton = React.forwardRef<HTMLButtonElement, OptionButtonProps>(
         ref={ref}
         variant={'outlined-primary'}
         className={cn(
-          'rounded-full hover:border-main-color-1 hover:text-main-color-1 hover:bg-main-color-3',
+          'rounded-full border-light-color-3 text-grey-color-3 hover:border-main-color-1 hover:text-main-color-1 hover:bg-main-color-3',
           selected && 'border-main-color-1 text-main-color-1 bg-main-color-3',
           className,
         )}

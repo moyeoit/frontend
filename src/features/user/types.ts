@@ -107,9 +107,93 @@ export interface UserProfile {
   email: string
   nickname: string
   profileImageUrl: string
-  jobDto: UserJobDto
-  provider: string
+  jobDto?: UserJobDto
+  job?: UserJobDto
+  provider?: string
+  authProvider?: string
   active: boolean
+  subscriptionEmail?: string
+  emailNotifyAgree?: boolean
+}
+
+/**
+ * 기본 정보 수정 요청 (PATCH /v1/user)
+ */
+export interface UpdateUserProfileRequest {
+  nickname?: string
+  jobId?: number
+  status?: string
+}
+
+/**
+ * 계정 관리 정보 (GET /v1/user/manage)
+ */
+export interface UserManageInfo {
+  name: string
+  subscriptionEmail: string
+  emailNotifyAgree: boolean
+}
+
+/**
+ * 계정 관리 수정 요청 (PATCH /v1/user/manage)
+ */
+export interface UpdateUserManageRequest {
+  name?: string
+  subscriptionEmail?: string
+  emailAgree?: boolean
+}
+
+/**
+ * 내 작성글 조회 (GET /v1/user/posts)
+ */
+export interface UserPostItem {
+  postId: number
+  title: string
+  excerpt: string
+  thumbnailUrl: string
+  categoryId: number
+  categoryName: string
+  postType: string
+  authorNickname: string
+  viewCount: number
+  likeCount: number
+  commentCount: number
+  createdAt: string
+}
+
+export interface UserPostPageableSort {
+  sorted: boolean
+  unsorted: boolean
+  empty: boolean
+}
+
+export interface UserPostPageable {
+  pageNumber: number
+  pageSize: number
+  sort: UserPostPageableSort
+  offset: number
+  paged: boolean
+  unpaged: boolean
+}
+
+export interface UserPostsPage {
+  content: UserPostItem[]
+  pageable: UserPostPageable
+  last: boolean
+  totalElements: number
+  totalPages: number
+  size: number
+  number: number
+  sort: UserPostPageableSort
+  first: boolean
+  numberOfElements: number
+  empty: boolean
+}
+
+export interface UserPostsParams {
+  page?: number
+  size?: number
+  sort?: string
 }
 
 /**

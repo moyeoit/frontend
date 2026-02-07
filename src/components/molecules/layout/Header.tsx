@@ -45,7 +45,7 @@ export default function Header() {
               />
             </Link>
 
-            <nav className="flex items-center gap-10 typo-body-3-b text-black-color">
+            <nav className="flex items-center gap-6 typo-body-3-b text-black-color">
               <Link
                 href={AppPath.clubExplore()}
                 className="hover:text-main-color-1 focus:text-main-color-1 transition-colors"

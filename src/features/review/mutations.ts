@@ -5,6 +5,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 import {
+  deleteReview,
   deleteReviewComment,
   postBasicReview,
   postPremiumReview,
@@ -63,6 +64,39 @@ export function usePostPremiumReview(
       options?.onSuccess?.(data, variables, onMutateResult, context)
     },
     ...options,
+  })
+}
+
+export function useDeleteReview(
+  options?: UseMutationOptions<void, Error, number>,
+): UseMutationResult<void, Error, number> {
+  const queryClient = useQueryClient()
+  const { onSuccess, onError, onSettled, ...restOptions } = options ?? {}
+
+  return useMutation({
+    mutationFn: deleteReview,
+    onSuccess: (data, reviewId, onMutateResult, context) => {
+      queryClient.invalidateQueries({
+        queryKey: reviewKeys.detail(reviewId),
+      })
+      queryClient.invalidateQueries({
+        queryKey: reviewKeys.searchLists(),
+      })
+      queryClient.invalidateQueries({
+        queryKey: reviewKeys.basicLists(),
+      })
+      queryClient.invalidateQueries({
+        queryKey: reviewKeys.premiumLists(),
+      })
+      onSuccess?.(data, reviewId, onMutateResult, context)
+    },
+    onError: (error, variables, onMutateResult, context) => {
+      onError?.(error, variables, onMutateResult, context)
+    },
+    onSettled: (data, error, variables, onMutateResult, context) => {
+      onSettled?.(data, error, variables, onMutateResult, context)
+    },
+    ...restOptions,
   })
 }
 

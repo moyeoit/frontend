@@ -33,9 +33,18 @@ export default function InterviewStep1({ form }: InterviewStep1Props) {
       form.setValue(
         'q1QuestionType',
         current.filter((id) => id !== optionId),
+        {
+          shouldDirty: true,
+          shouldTouch: true,
+          shouldValidate: true,
+        },
       )
-    } else {
-      form.setValue('q1QuestionType', [...current, optionId])
+    } else if (current.length < 4) {
+      form.setValue('q1QuestionType', [...current, optionId], {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      })
     }
   }
 
@@ -51,13 +60,19 @@ export default function InterviewStep1({ form }: InterviewStep1Props) {
               면접 결과
             </FormLabel>
             <FormControl>
-              <div className="flex flex-col desktop:flex-row gap-3 desktop:flex-wrap">
+              <div className="grid grid-cols-1 desktop:grid-cols-4 gap-2 desktop:gap-4">
                 {INTERVIEW_RESULT_OPTIONS.map((option) => (
                   <OptionButton
                     key={option.id}
                     selected={field.value === option.id}
-                    onClick={() => field.onChange(option.id)}
-                    className="w-full desktop:w-auto"
+                    onClick={() =>
+                      form.setValue('resultType', option.id, {
+                        shouldDirty: true,
+                        shouldTouch: true,
+                        shouldValidate: true,
+                      })
+                    }
+                    className="w-full"
                   >
                     {option.label}
                   </OptionButton>
@@ -86,8 +101,16 @@ export default function InterviewStep1({ form }: InterviewStep1Props) {
             <FormControl>
               <StarRating
                 value={field.value || 0}
-                onChange={field.onChange}
+                onChange={(value) =>
+                  form.setValue('rate', value, {
+                    shouldDirty: true,
+                    shouldTouch: true,
+                    shouldValidate: true,
+                  })
+                }
                 maxStars={5}
+                size={40}
+                showLabel
               />
             </FormControl>
             <FormMessage />
@@ -101,19 +124,19 @@ export default function InterviewStep1({ form }: InterviewStep1Props) {
 
         {/* Q1 */}
         <FormItem>
-          <FormLabel className="typo-body-2-sb text-black-color mb-4">
+          <FormLabel className="typo-body-2-sb text-grey-color-5 mb-4">
             Q1. 면접에서 어떤 유형의 질문을 받으셨나요?
             <span className="typo-caption-m text-grey-color-3 ml-2">
-              (복수 선택)
+              (최대 4개)
             </span>
           </FormLabel>
-          <div className="flex flex-col desktop:flex-row gap-3 desktop:flex-wrap">
+          <div className="grid grid-cols-1 desktop:grid-cols-4 gap-2 desktop:gap-4">
             {Q1_QUESTION_TYPE_OPTIONS.map((option) => (
               <OptionButton
                 key={option.id}
                 selected={watchedQ1.includes(option.id)}
                 onClick={() => handleQ1Change(option.id)}
-                className="w-full desktop:w-auto"
+                className="w-full"
               >
                 {option.label}
               </OptionButton>
@@ -132,17 +155,23 @@ export default function InterviewStep1({ form }: InterviewStep1Props) {
           name="q2InterviewerAttitude"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="typo-body-2-sb text-black-color mb-4">
+              <FormLabel className="typo-body-2-sb text-grey-color-5 mb-4">
                 Q2. 면접관들의 가장 일반적인 태도는 어떻게 보였나요?
               </FormLabel>
               <FormControl>
-                <div className="flex flex-col desktop:flex-row gap-3 desktop:flex-wrap">
+                <div className="grid grid-cols-1 desktop:grid-cols-4 gap-2 desktop:gap-4">
                   {Q2_INTERVIEWER_ATTITUDE_OPTIONS.map((option) => (
                     <OptionButton
                       key={option.id}
                       selected={field.value === option.id}
-                      onClick={() => field.onChange(option.id)}
-                      className="w-full desktop:w-auto"
+                      onClick={() =>
+                        form.setValue('q2InterviewerAttitude', option.id, {
+                          shouldDirty: true,
+                          shouldTouch: true,
+                          shouldValidate: true,
+                        })
+                      }
+                      className="w-full"
                     >
                       {option.label}
                     </OptionButton>
@@ -160,18 +189,24 @@ export default function InterviewStep1({ form }: InterviewStep1Props) {
           name="q3MainTopic"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="typo-body-2-sb text-black-color mb-4">
+              <FormLabel className="typo-body-2-sb text-grey-color-5 mb-4">
                 Q3. 면접에서 가장 큰 시간 비중을 차지한, 논의 주제는
                 무엇이었나요?
               </FormLabel>
               <FormControl>
-                <div className="flex flex-col desktop:flex-row gap-3 desktop:flex-wrap">
+                <div className="grid grid-cols-1 desktop:grid-cols-4 gap-2 desktop:gap-4">
                   {Q3_MAIN_TOPIC_OPTIONS.map((option) => (
                     <OptionButton
                       key={option.id}
                       selected={field.value === option.id}
-                      onClick={() => field.onChange(option.id)}
-                      className="w-full desktop:w-auto"
+                      onClick={() =>
+                        form.setValue('q3MainTopic', option.id, {
+                          shouldDirty: true,
+                          shouldTouch: true,
+                          shouldValidate: true,
+                        })
+                      }
+                      className="w-full"
                     >
                       {option.label}
                     </OptionButton>
@@ -189,17 +224,23 @@ export default function InterviewStep1({ form }: InterviewStep1Props) {
           name="q4EmphasizedSkill"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="typo-body-2-sb text-black-color mb-4">
+              <FormLabel className="typo-body-2-sb text-grey-color-5 mb-4">
                 Q4. 면접시 중점적으로 어필한 역량은 무엇이었나요?
               </FormLabel>
               <FormControl>
-                <div className="flex flex-col desktop:flex-row gap-3 desktop:flex-wrap">
+                <div className="grid grid-cols-1 desktop:grid-cols-4 gap-2 desktop:gap-4">
                   {Q4_EMPHASIZED_SKILL_OPTIONS.map((option) => (
                     <OptionButton
                       key={option.id}
                       selected={field.value === option.id}
-                      onClick={() => field.onChange(option.id)}
-                      className="w-full desktop:w-auto"
+                      onClick={() =>
+                        form.setValue('q4EmphasizedSkill', option.id, {
+                          shouldDirty: true,
+                          shouldTouch: true,
+                          shouldValidate: true,
+                        })
+                      }
+                      className="w-full"
                     >
                       {option.label}
                     </OptionButton>

@@ -34,23 +34,22 @@ export default function ReviewFormHeader<T extends FieldValues>({
   )
 
   return (
-    <div className="flex flex-col desktop:flex-row gap-4">
-      {/* 프로필 아이콘 + IT 동아리명 (모바일에서 가로 배치) */}
-      <div className="flex flex-row items-start gap-4">
+    <div className="flex flex-col desktop:flex-row items-start gap-4 desktop:gap-6">
+      <div className="flex flex-row items-center gap-4 desktop:gap-6 w-full desktop:flex-1">
         {/* 프로필 아이콘 */}
-        <div className="flex items-center">
+        <div className="flex items-center shrink-0">
           {selectedClub?.logoUrl ? (
             <img
               src={selectedClub.logoUrl}
               alt={selectedClub.clubName}
-              className="w-16 h-16 rounded-full object-cover flex-shrink-0"
+              className="w-[70px] h-[70px] rounded-full object-cover"
             />
           ) : (
-            <div className="w-16 h-16 bg-grey-color-1 rounded-full flex-shrink-0" />
+            <div className="w-[70px] h-[70px] bg-light-color-3 rounded-full" />
           )}
         </div>
 
-        {/* IT 동아리명 - 모바일에서 아이콘 옆에 배치 */}
+        {/* IT 동아리명 */}
         <FormField
           control={control}
           name={'clubId' as Path<T>}
@@ -85,6 +84,37 @@ export default function ReviewFormHeader<T extends FieldValues>({
         />
       </div>
 
+      {/* 지원 기수 */}
+      <FormField
+        control={control}
+        name={'generation' as Path<T>}
+        render={({ field }) => (
+          <FormItem className="flex-1 gap-[6px]">
+            <FormLabel className="typo-button-m text-grey-color-4">
+              지원 기수
+            </FormLabel>
+            <FormControl>
+              <Select
+                onValueChange={(value) => field.onChange(Number(value))}
+                value={field.value?.toString() || ''}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="-" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: 30 }, (_, i) => i + 1).map((gen) => (
+                    <SelectItem key={gen} value={gen.toString()}>
+                      {gen}기
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
       {/* 지원 파트 */}
       <FormField
         control={control}
@@ -109,37 +139,6 @@ export default function ReviewFormHeader<T extends FieldValues>({
                   <SelectItem value="4">백엔드 개발자</SelectItem>
                   <SelectItem value="5">iOS 개발자</SelectItem>
                   <SelectItem value="6">안드로이드 개발자</SelectItem>
-                </SelectContent>
-              </Select>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      {/* 지원 기수 */}
-      <FormField
-        control={control}
-        name={'generation' as Path<T>}
-        render={({ field }) => (
-          <FormItem className="flex-1 gap-[6px]">
-            <FormLabel className="typo-button-m text-grey-color-4">
-              지원 기수
-            </FormLabel>
-            <FormControl>
-              <Select
-                onValueChange={(value) => field.onChange(Number(value))}
-                value={field.value?.toString() || ''}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="-" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Array.from({ length: 30 }, (_, i) => i + 1).map((gen) => (
-                    <SelectItem key={gen} value={gen.toString()}>
-                      {gen}기
-                    </SelectItem>
-                  ))}
                 </SelectContent>
               </Select>
             </FormControl>

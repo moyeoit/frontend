@@ -196,9 +196,11 @@ export interface ReviewSearchItem {
   answerSummaries: ReviewAnswerSummary[]
   likeCount: number
   commentCount: number
+  reviewCategory?: 'DOCUMENT' | 'INTERVIEW' | 'ACTIVITY'
   category?: string
   result?: string
   createdAt?: string
+  isBookmarked?: boolean
 }
 
 export interface ReviewSearchPage {
@@ -245,6 +247,7 @@ export interface ReviewView {
   title: string
   rate: number
   result: ResultType
+  reviewCategory?: ReviewCategory
   job: Job
   club: ReviewClubSummary
   generation: number
@@ -433,6 +436,7 @@ export interface ReviewData {
     clubName: string
   }
   clubName?: string
+  reviewCategory?: 'DOCUMENT' | 'INTERVIEW' | 'ACTIVITY'
   category?: string
   job?: {
     name: string

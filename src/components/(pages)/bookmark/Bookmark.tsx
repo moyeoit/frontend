@@ -9,8 +9,10 @@ import Review from '@/components/organisms/review/Review'
 import {
   useBookmarkedClubs,
   useBookmarkedInterviewReviews,
+  useBookmarkedActivityReviews,
   useBookmarkedBlogReviews,
   useToggleBookmark,
+  type BookmarkedBlogReview,
 } from '@/features/bookmark'
 import AppPath from '@/shared/configs/appPath'
 import useMediaQuery from '@/shared/hooks/useMediaQuery'
@@ -27,6 +29,13 @@ export function Bookmark() {
     page: 0,
     size: 10,
   })
+  const {
+    data: bookmarkedActivityReviewsData,
+    isPending: isActivityReviewsLoading,
+  } = useBookmarkedActivityReviews({
+    page: 0,
+    size: 10,
+  })
   const { data: bookmarkedBlogReviewsData, isPending: isBlogReviewsLoading } =
     useBookmarkedBlogReviews({
       page: 0,
@@ -37,6 +46,8 @@ export function Bookmark() {
   const bookmarkedClubs = bookmarkedClubsData?.data?.content || []
   const bookmarkedInterviewReviews =
     bookmarkedInterviewReviewsData?.data?.content || []
+  const bookmarkedActivityReviews =
+    bookmarkedActivityReviewsData?.data?.content || []
   const bookmarkedBlogReviews = bookmarkedBlogReviewsData?.data?.content || []
 
   const handleClubBookmarkClick = React.useCallback(
@@ -145,7 +156,7 @@ export function Bookmark() {
           ) : (
             <div className="space-y-4">
               {bookmarkedInterviewReviews.map((review, index) => {
-                const reviewId = review.reviewId || review.id
+                const reviewId = review.reviewId
                 return (
                   <Review
                     key={reviewId || index}
@@ -155,6 +166,16 @@ export function Bookmark() {
                       part: review.jobName || '',
                       rate: review.rate || 0,
                       title: review.title || '',
+                      reviewCategory: [
+                        'DOCUMENT',
+                        'INTERVIEW',
+                        'ACTIVITY',
+                      ].includes(review.reviewCategory)
+                        ? (review.reviewCategory as
+                            | 'DOCUMENT'
+                            | 'INTERVIEW'
+                            | 'ACTIVITY')
+                        : undefined,
                       likeCount: review.likeCount || 0,
                       commentCount: review.commentCount || 0,
                       qaPreviews:
@@ -185,11 +206,62 @@ export function Bookmark() {
       label: '활동 후기',
       content: (
         <div className="w-full">
-          <div className="text-center py-20">
-            <p className="typo-body-2-r text-grey-color-4">
-              북마크한 활동 후기가 없습니다
-            </p>
-          </div>
+          {isActivityReviewsLoading ? (
+            <div className="text-center py-20">
+              <div className="inline-block w-8 h-8 border-4 border-main-color-1 border-t-transparent rounded-full animate-spin"></div>
+              <p className="typo-body-2-r text-grey-color-4 mt-4">로딩 중...</p>
+            </div>
+          ) : bookmarkedActivityReviews.length === 0 ? (
+            <div className="text-center py-20">
+              <p className="typo-body-2-r text-grey-color-4">
+                북마크한 활동 후기가 없습니다
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {bookmarkedActivityReviews.map((review, index) => {
+                const reviewId = review.reviewId
+                return (
+                  <Review
+                    key={reviewId || index}
+                    data={{
+                      clubName: review.clubName || '',
+                      generation: review.generation || 0,
+                      part: review.jobName || '',
+                      rate: review.rate || 0,
+                      title: review.title || '',
+                      reviewCategory: [
+                        'DOCUMENT',
+                        'INTERVIEW',
+                        'ACTIVITY',
+                      ].includes(review.reviewCategory)
+                        ? (review.reviewCategory as
+                            | 'DOCUMENT'
+                            | 'INTERVIEW'
+                            | 'ACTIVITY')
+                        : undefined,
+                      likeCount: review.likeCount || 0,
+                      commentCount: review.commentCount || 0,
+                      qaPreviews:
+                        review.answerSummaries?.map((summary) => ({
+                          questionTitle: summary.questionTitleSummary || '',
+                          answerValue: summary.answerSummary || '',
+                        })) || [],
+                    }}
+                    isBookmarked={true}
+                    onBookmarkClick={() =>
+                      handleActivityReviewBookmarkClick(reviewId!)
+                    }
+                    onDetailClick={
+                      reviewId
+                        ? () => handleReviewDetailClick(reviewId)
+                        : undefined
+                    }
+                  />
+                )
+              })}
+            </div>
+          )}
         </div>
       ),
     },
@@ -212,7 +284,7 @@ export function Bookmark() {
           ) : (
             <div className="space-y-4">
               {bookmarkedBlogReviews
-                .map((review, index) => {
+                .map((review: BookmarkedBlogReview, index: number) => {
                   // 북마크 API 응답에서 id 또는 reviewId 사용
                   const reviewId = review.id || review.reviewId
 

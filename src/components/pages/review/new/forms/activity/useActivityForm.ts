@@ -50,8 +50,8 @@ export const Q3_SATISFACTION_OPTIONS = [
 
 // 동적 QA 항목 스키마
 const qaItemSchema = z.object({
-  question: z.string().min(1, '질문을 입력해주세요'),
-  answer: z.string().min(1, '답변을 입력해주세요'),
+  question: z.string().trim().min(1, '질문을 입력해주세요'),
+  answer: z.string().trim().min(1, '답변을 입력해주세요'),
 })
 
 const ActivityFormSchema = z.object({
@@ -71,10 +71,18 @@ const ActivityFormSchema = z.object({
     .max(4, '최대 4개까지 선택 가능합니다'),
 
   // Step 2
-  oneLineComment: appValidation.oneLineText(20, '한줄평을 입력해주세요'),
+  oneLineComment: z
+    .string()
+    .trim()
+    .min(1, '한줄평을 입력해주세요')
+    .max(20, '20자 이내로 입력해주세요'),
   qaItems: z.array(qaItemSchema).min(1, '최소 1개의 항목을 입력해주세요'),
-  tip: z.string().max(300, '300자 이내로 입력해주세요').optional(),
-  freeReview: z.string().max(300, '300자 이내로 입력해주세요').optional(),
+  tip: z.string().trim().max(300, '300자 이내로 입력해주세요').optional(),
+  freeReview: z
+    .string()
+    .trim()
+    .max(300, '300자 이내로 입력해주세요')
+    .optional(),
 })
 
 export type ActivityFormType = z.infer<typeof ActivityFormSchema>
@@ -102,6 +110,28 @@ export const useActivityForm = () => {
     },
     mode: 'onBlur',
   })
+
+  const watchedValues = form.watch()
+  const isStep1Complete =
+    typeof watchedValues.clubId === 'number' &&
+    typeof watchedValues.generation === 'number' &&
+    typeof watchedValues.jobId === 'number' &&
+    Boolean(watchedValues.activityStatus) &&
+    typeof watchedValues.rate === 'number' &&
+    watchedValues.rate >= 1 &&
+    typeof watchedValues.q1WeeklyHours === 'number' &&
+    typeof watchedValues.q2Difficulty === 'number' &&
+    watchedValues.q3Satisfaction.length > 0 &&
+    watchedValues.q3Satisfaction.length <= 4
+
+  const hasOneLineComment = watchedValues.oneLineComment.trim().length > 0
+  const hasValidQaItems =
+    watchedValues.qaItems.length > 0 &&
+    watchedValues.qaItems.every(
+      (item) =>
+        item.question.trim().length > 0 && item.answer.trim().length > 0,
+    )
+  const isStep2Complete = hasOneLineComment && hasValidQaItems
 
   const goToNextStep = async () => {
     const step1Fields = [
@@ -132,6 +162,16 @@ export const useActivityForm = () => {
   const transformToApiRequest = (
     data: ActivityFormType,
   ): BasicReviewCreateRequest => {
+    const oneLineComment = data.oneLineComment.trim()
+    const qaItems = data.qaItems
+      .map((qa) => ({
+        question: qa.question.trim(),
+        answer: qa.answer.trim(),
+      }))
+      .filter((qa) => qa.question && qa.answer)
+    const tip = data.tip?.trim()
+    const freeReview = data.freeReview?.trim()
+
     const answers: ReviewAnswerRequest[] = [
       {
         sequence: 1,
@@ -155,12 +195,12 @@ export const useActivityForm = () => {
         sequence: 4,
         question_id: 6, // 한줄평 (SINGLE_SUBJECTIVE)
         question_type: QuestionType.SingleSubjective,
-        value: data.oneLineComment,
+        value: oneLineComment,
       },
     ]
 
     // 동적 QA 항목 추가 (MULTIPLE_SUBJECTIVE)
-    data.qaItems.forEach((qa) => {
+    qaItems.forEach((qa) => {
       answers.push({
         sequence: answers.length + 1,
         question_id: 4,
@@ -169,21 +209,21 @@ export const useActivityForm = () => {
       })
     })
 
-    if (data.tip) {
+    if (tip) {
       answers.push({
         sequence: answers.length + 1,
         question_id: 5, // TIP (SINGLE_SUBJECTIVE)
         question_type: QuestionType.SingleSubjective,
-        value: data.tip,
+        value: tip,
       })
     }
 
-    if (data.freeReview) {
+    if (freeReview) {
       answers.push({
         sequence: answers.length + 1,
         question_id: 6, // 자유후기 (SINGLE_SUBJECTIVE)
         question_type: QuestionType.SingleSubjective,
-        value: data.freeReview,
+        value: freeReview,
       })
     }
 
@@ -194,7 +234,7 @@ export const useActivityForm = () => {
         : ResultType.EndActivity
 
     return {
-      title: data.oneLineComment,
+      title: oneLineComment,
       category: ReviewCategory.Activity,
       rate: data.rate,
       result,
@@ -222,5 +262,7 @@ export const useActivityForm = () => {
     goToPreviousStep,
     onSubmit,
     isSubmitting: postBasicReviewMutation.isPending,
+    isStep1Complete,
+    isStep2Complete,
   }
 }

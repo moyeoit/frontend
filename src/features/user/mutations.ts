@@ -5,6 +5,10 @@ import {
   UpdateUserInfoRequest,
   UpdateUserProfileImageRequest,
   UserActivateRequest,
+  UpdateUserProfileImageRequest,
+  UserActivateRequest,
+  UpdateUserProfileRequest,
+  UpdateUserManageRequest,
 } from './types'
 
 export const useUserActivate = () => {
@@ -42,8 +46,26 @@ export const useUpdateUserInfo = () => {
   return useMutation({
     mutationKey: userKeys.updateUserInfo(),
     mutationFn: (body: UpdateUserInfoRequest) => userApi.updateUserInfo(body),
+export const useUpdateUserProfile = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationKey: userKeys.profile(),
+    mutationFn: (body: UpdateUserProfileRequest) => userApi.updateProfile(body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.profile() })
+    },
+  })
+}
+
+export const useUpdateUserManage = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationKey: userKeys.manage(),
+    mutationFn: (body: UpdateUserManageRequest) => userApi.updateManage(body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: userKeys.manage() })
     },
   })
 }

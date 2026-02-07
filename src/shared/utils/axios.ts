@@ -14,12 +14,22 @@ const apiClient = axios.create({
   timeout: 10_000,
 })
 
+let isAuthRedirecting = false
+
 apiClient.interceptors.request.use(
   (config) => {
     // 쿠키에서 토큰을 가져와서 Authorization 헤더에 추가
     const token = tokenCookies.getAccessToken()
-    if (token && tokenCookies.isTokenValid()) {
+    const isTokenValid = Boolean(token) && tokenCookies.isTokenValid()
+    const trackedConfig = config as typeof config & {
+      _hadAccessToken?: boolean
+    }
+    trackedConfig._hadAccessToken = isTokenValid
+
+    if (token && isTokenValid) {
       config.headers.Authorization = `Bearer ${token}`
+    } else if (token) {
+      tokenCookies.clearAll()
     }
     return config
   },
@@ -29,26 +39,32 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
-    // 401 에러 시 토큰 유효성을 다시 확인
     if (error.response?.status === 401) {
-      // const token = tokenCookies.getAccessToken()
-      // const isTokenValid = tokenCookies.isTokenValid()
-      // console.log('🚨 401 에러 발생:', {
-      //   url: error.config?.url,
-      //   token: token ? '존재' : '없음',
-      //   isTokenValid,
-      //   willRedirect: !token || !isTokenValid,
-      // })
-      // 토큰이 없거나 만료된 경우에만 로그인 페이지로 리다이렉트
-      // if (!token || !isTokenValid) {
-      // console.log('🔄 로그인 페이지로 리다이렉트 중...')
-      // if (typeof window !== 'undefined') {
-      //   window.location.href = AppPath.login()
-      // }
-      // } else {
-      // console.log('⚠️ 토큰이 유효한데 401 에러 발생 - 서버 측 문제일 수 있음')
-      // }
-      // 토큰이 있는데 401이 발생한 경우는 서버 측 문제이므로 토큰을 삭제하지 않음
+      const requestConfig = error.config as
+        | { headers?: { Authorization?: string }; _hadAccessToken?: boolean }
+        | undefined
+      const hasAuthContext =
+        Boolean(requestConfig?.headers?.Authorization) ||
+        Boolean(requestConfig?._hadAccessToken)
+
+      tokenCookies.clearAll()
+
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('oauth_data')
+
+        const currentPath = window.location.pathname
+        const isAuthPage =
+          currentPath === AppPath.login() ||
+          currentPath === AppPath.signup() ||
+          currentPath.startsWith('/oauth-callback/')
+
+        if (hasAuthContext && !isAuthPage && !isAuthRedirecting) {
+          isAuthRedirecting = true
+          const nextPath = `${window.location.pathname}${window.location.search}`
+          const loginPath = `${AppPath.login()}?expired=1&next=${encodeURIComponent(nextPath)}`
+          window.location.replace(loginPath)
+        }
+      }
     }
     return Promise.reject(error)
   },

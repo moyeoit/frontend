@@ -21,70 +21,71 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Page() {
   return (
-    <main className="w-full h-full">
-      <div className="max-w-[530px] h-full mx-auto flex flex-col items-center justify-center">
-        {/* 제목 */}
-        <div className="text-center mb-8">
-          <h2 className="typo-title-1 text-black-color mb-8">후기 작성</h2>
-        </div>
+    <main className="w-full bg-light-color-2 min-h-full">
+      <div className="max-w-[530px] w-full mx-auto px-5 pt-12 desktop:pt-36 pb-12">
+        <h2 className="typo-title-1-3-m text-black-color text-center mb-8">
+          후기 작성
+        </h2>
 
-        {/* 카드 컨테이너 */}
-        <div className="p-6 rounded-2xl bg-white-color flex flex-col gap-8 items-center w-[530px] shadow-sm">
-          <p className="typo-body-2-sb text-grey-color-4">
-            작성하실 후기 종류를 선택해주세요
+        <div className="p-6 rounded-2xl bg-white-color shadow-sm flex flex-col gap-8">
+          <p className="typo-body-2-sb text-grey-color-4 text-center">
+            작성하실 후기 스타일을 선택해주세요
           </p>
+
           <div className="w-full flex flex-col gap-4">
-            {/* 서류 후기 카드 */}
-            <Link href={AppPath.reviewNew('paper')}>
-              <div className="w-full p-6 border border-gray-200 rounded-xl cursor-pointer group hover:border-primary-color transition-colors">
-                <div className="flex items-center space-x-4">
-                  <div className="flex-shrink-0">
-                    <DocumentPencilIcon role="img" aria-label="서류 후기" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="typo-body-3-b text-black-color mb-1">
-                      서류 후기
-                    </h3>
-                    <p className="typo-button-m text-grey-color-3">
-                      서류 전형 경험을 공유해주세요
-                    </p>
-                  </div>
+            <Link
+              href={AppPath.reviewNew('paper')}
+              className="w-full border border-light-color-3 rounded-2xl p-4 transition-colors hover:border-main-color-1"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-14 h-14 shrink-0 flex items-center justify-center">
+                  <DocumentPencilIcon role="img" aria-label="서류 후기" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="typo-body-3-b text-black-color mb-1">
+                    서류 후기
+                  </h3>
+                  <p className="typo-button-m text-grey-color-3">
+                    공고 확인부터 서류 작성까지의 열정적인 경험을 공유해주세요
+                  </p>
                 </div>
               </div>
             </Link>
-            {/* 면접 후기 카드 */}
-            <Link href={AppPath.reviewNew('interview')}>
-              <div className="w-full p-6 border border-gray-200 rounded-xl cursor-pointer group hover:border-primary-color transition-colors">
-                <div className="flex items-center space-x-4">
-                  <div className="flex-shrink-0">
-                    <DocumentDiamondIcon role="img" aria-label="면접 후기" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="typo-body-3-b text-black-color mb-1">
-                      면접 후기
-                    </h3>
-                    <p className="typo-button-m text-grey-color-3">
-                      면접 전형 경험을 공유해주세요
-                    </p>
-                  </div>
+
+            <Link
+              href={AppPath.reviewNew('interview')}
+              className="w-full border border-light-color-3 rounded-2xl p-4 transition-colors hover:border-main-color-1"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-14 h-14 shrink-0 flex items-center justify-center">
+                  <DocumentDiamondIcon role="img" aria-label="면접 후기" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="typo-body-3-b text-black-color mb-1">
+                    면접 후기
+                  </h3>
+                  <p className="typo-button-m text-grey-color-3">
+                    서류 합격부터 면접까지의 생생한 경험을 공유 해주세요
+                  </p>
                 </div>
               </div>
             </Link>
-            {/* 활동 후기 카드 */}
-            <Link href={AppPath.reviewNew('activity')}>
-              <div className="w-full p-6 border border-gray-200 rounded-xl cursor-pointer group hover:border-primary-color transition-colors">
-                <div className="flex items-center space-x-4">
-                  <div className="flex-shrink-0">
-                    <DocumentFileIcon role="img" aria-label="활동 후기" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="typo-body-3-b text-black-color mb-1">
-                      활동 후기
-                    </h3>
-                    <p className="typo-button-m text-grey-color-3">
-                      동아리 활동 경험을 공유해주세요
-                    </p>
-                  </div>
+
+            <Link
+              href={AppPath.reviewNew('activity')}
+              className="w-full border border-light-color-3 rounded-2xl p-4 transition-colors hover:border-main-color-1"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-14 h-14 shrink-0 flex items-center justify-center">
+                  <DocumentFileIcon role="img" aria-label="활동 후기" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="typo-body-3-b text-black-color mb-1">
+                    활동 후기
+                  </h3>
+                  <p className="typo-button-m text-grey-color-3">
+                    면접 합격부터 활동 종료까지의 의미있는 경험을 공유해주세요
+                  </p>
                 </div>
               </div>
             </Link>

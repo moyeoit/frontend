@@ -6,6 +6,7 @@ import { BookmarkFilledIcon, BookmarkEmptyIcon } from '@/assets/icons'
 import { GreyMessage } from '@/assets/icons/GreyMessage'
 import { GreyThumbsUp } from '@/assets/icons/GreyThumbsUp'
 import { cn } from '@/shared/utils/cn'
+import { resolveImageSrc } from '@/shared/utils'
 import { PRESET } from './presets'
 import { CardSizePreset, Orientation } from './types'
 
@@ -163,7 +164,10 @@ export function CardImage({
   const p = PRESET[preset]
 
   const [failed, setFailed] = React.useState(false)
-  const src = failed || !logoUrl ? fallbackSrc! : logoUrl!
+  const baseSrc = resolveImageSrc(logoUrl, fallbackSrc)
+  const src = failed
+    ? resolveImageSrc(fallbackSrc, '/images/default.svg')
+    : baseSrc
 
   const ratio = ratioOverride || p.ratio
 

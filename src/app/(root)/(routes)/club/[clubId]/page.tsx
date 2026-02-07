@@ -1,11 +1,23 @@
-import BasicReview from '@/components/(pages)/club/basicReview/BasicReview'
+import { Suspense } from 'react'
+import { Metadata } from 'next'
 import Detail from '@/components/(pages)/club/detail/Detail'
-import DetailContent from '@/components/(pages)/club/detail/DetailContent'
-import PremiumReview from '@/components/(pages)/club/premiumReview/PremiumReview'
-import Recruit from '@/components/(pages)/club/recruit/Recruit'
-import { UnderLineTab } from '@/components/atoms/UnderLineTab'
-import { getClubRecruits } from '@/features/clubs/api'
-import { ClubRecruitsData } from '@/features/clubs/types'
+
+export const metadata: Metadata = {
+  title: '동아리 상세정보',
+  description:
+    'IT 동아리 상세 정보를 확인하고 후기를 읽어보세요. 동아리 모집 정보, 활동 방식, 후기 등을 통해 동아리에 대해 자세히 알아볼 수 있습니다.',
+  keywords: [
+    'IT 동아리 상세정보',
+    'IT 동아리 활동 후기',
+    'IT 동아리 서류 면접 후기',
+    'IT 동아리 블로그 후기',
+  ],
+  openGraph: {
+    title: '동아리 상세정보 | 모여잇',
+    description:
+      'IT 동아리 상세 정보를 확인하고 후기를 읽어보세요. 동아리 상세 내용, 활동 후기, 서류/면접 후기, 블로그 후기 등을 통해 동아리에 대해 자세히 알아볼 수 있습니다.',
+  },
+}
 
 export default async function Page({
   params,
@@ -14,46 +26,9 @@ export default async function Page({
 }) {
   const { clubId } = await params
 
-  let recruitsData: ClubRecruitsData | null = null
-  try {
-    recruitsData = await getClubRecruits(clubId)
-  } catch (error) {
-    console.error('Failed to fetch recruits data:', error)
-  }
-
   return (
-    <div className="flex justify-center py-15 w-full mx-auto max-w-[1440px]">
-      <div className="w-180 max-w-[720px]">
-        <Detail clubId={clubId} />
-        <UnderLineTab
-          className="px-5"
-          defaultValue="상세 내용"
-          tabs={[
-            {
-              value: '상세 내용',
-              label: '상세 내용',
-              content: <DetailContent clubId={clubId} />,
-            },
-            {
-              value: '일반 후기',
-              label: '일반 후기',
-              content: (
-                <BasicReview recruitsData={recruitsData} clubId={clubId} />
-              ),
-            },
-            {
-              value: '프리미엄 후기',
-              label: '프리미엄 후기',
-              content: (
-                <PremiumReview recruitsData={recruitsData} clubId={clubId} />
-              ),
-            },
-          ]}
-        />
-      </div>
-      <div className="w-80">
-        <Recruit clubId={clubId} />
-      </div>
-    </div>
+    <Suspense fallback={null}>
+      <Detail clubId={clubId} />
+    </Suspense>
   )
 }

@@ -10,43 +10,10 @@ import { useToggleBookmark, useBookmarkedClubs } from '@/features/bookmark'
 import { useClubsList } from '@/features/clubs/queries'
 import { usePopularPosts } from '@/features/community/queries'
 import { ClubItem } from '@/features/explore/types'
+import { useSearchReviews } from '@/features/review/queries'
 import { HERO_IMAGES } from '@/shared/constants/category'
 import useMediaQuery from '@/shared/hooks/useMediaQuery'
 import { cn } from '@/shared/utils/cn'
-
-// 더미 인기 후기 데이터
-const DUMMY_POPULAR_REVIEWS = [
-  {
-    reviewId: '1',
-    category: 'DOCUMENT' as const,
-    clubName: '프론트엔드 개발 동아리',
-    generation: 12,
-    jobName: '프론트엔드 개발자',
-    ratingValue: 4,
-    content:
-      '직무 경험이 없으면 힘들게 느껴 질 수도 있는 압박질문이 있었고, 실제 프로젝트 경험을 바탕으로 답변하는 것이 중요했습니다.',
-  },
-  {
-    reviewId: '2',
-    category: 'INTERVIEW' as const,
-    clubName: '백엔드 개발 동아리',
-    generation: 11,
-    jobName: '백엔드 개발자',
-    ratingValue: 5,
-    content:
-      '면접 준비를 철저히 했고, 동아리에서 진행한 프로젝트 경험이 큰 도움이 되었습니다. 기술 질문보다는 프로젝트 경험을 중심으로 질문이 나왔어요.',
-  },
-  {
-    reviewId: '3',
-    category: 'ACTIVITY' as const,
-    clubName: '풀스택 개발 동아리',
-    generation: 13,
-    jobName: '풀스택 개발자',
-    ratingValue: 4,
-    content:
-      '동아리 활동을 통해 다양한 기술 스택을 경험할 수 있었고, 협업 능력도 크게 향상되었습니다. 실제 서비스를 배포해본 경험이 인상적이었습니다.',
-  },
-] as const
 
 export default function HomePage() {
   const { isDesktop } = useMediaQuery()
@@ -62,8 +29,14 @@ export default function HomePage() {
     page: 0,
     size: 3,
   })
+  const { data: popularReviewsData } = useSearchReviews({
+    page: 0,
+    size: 3,
+    sort: 'POPULAR',
+  })
   const popularPosts = popularPostsData?.content || []
   const popularClubs = popularClubsData?.content || []
+  const popularReviews = popularReviewsData?.content || []
   const bookmarkedClubs = bookmarkedClubsData?.data?.content || []
   const bookmarkedClubIds = new Set(bookmarkedClubs.map((club) => club.clubId))
 
@@ -139,9 +112,9 @@ export default function HomePage() {
                   : 'pl-5 flex flex-nowrap overflow-x-auto gap-4 [&::-webkit-scrollbar]:hidden',
               )}
             >
-              {DUMMY_POPULAR_REVIEWS.map((review) => (
+              {popularReviews.map((review) => (
                 <div
-                  key={review.reviewId}
+                  key={review.reviewId || review.title}
                   className={cn(!isDesktop && 'shrink-0')}
                 >
                   <PopularReviewCard
@@ -152,16 +125,23 @@ export default function HomePage() {
                   >
                     <PopularReviewCard.Tag />
                     <PopularReviewCard.Profile
-                      category={review.category}
+                      category={
+                        review.category as 'DOCUMENT' | 'INTERVIEW' | 'ACTIVITY'
+                      }
                       clubName={review.clubName}
                       generation={review.generation}
                       jobName={review.jobName}
-                      ratingValue={review.ratingValue}
+                      ratingValue={review.rate}
                     />
                     <PopularReviewCard.Content>
-                      {review.content}
+                      {review.answerSummaries?.[0]?.answerSummary ||
+                        review.title}
                     </PopularReviewCard.Content>
-                    <PopularReviewCard.Link reviewId={review.reviewId} />
+                    {review.reviewId && (
+                      <PopularReviewCard.Link
+                        reviewId={String(review.reviewId)}
+                      />
+                    )}
                   </PopularReviewCard>
                 </div>
               ))}

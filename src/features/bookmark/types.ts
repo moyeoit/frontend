@@ -65,21 +65,19 @@ export interface BookmarkedClubsResponse {
 
 // 북마크한 후기 아이템 (공통)
 export interface BookmarkedReview {
-  id?: number // 북마크 API에서 id로 내려올 수 있음
-  reviewId?: number // 북마크 API에서 reviewId 또는 id로 내려올 수 있음
+  reviewId: number
   clubName: string
   generation: number
   jobName: string
   rate: number
   title: string
-  answerSummaries?: {
+  reviewCategory: string
+  answerSummaries: {
     questionTitleSummary: string
     answerSummary: string
   }[]
   likeCount: number
   commentCount: number
-  blogName?: string
-  imageUrl?: string
 }
 
 // 북마크한 후기 페이지 응답 (공통)
@@ -118,18 +116,20 @@ export interface BookmarkedReviewsParams {
 // Type aliases for clarity
 export type BookmarkedInterviewReview = BookmarkedReview
 export type BookmarkedActivityReview = BookmarkedReview
+export type BookmarkedBlogReview = BookmarkedReview & {
+  id?: number
+  imageUrl?: string
+  blogName?: string
+}
 
 export type BookmarkedInterviewReviewsPage = BookmarkedReviewsPage
 export type BookmarkedActivityReviewsPage = BookmarkedReviewsPage
+export type BookmarkedBlogReviewsPage = BookmarkedReviewsPage
 
 export type BookmarkedInterviewReviewsResponse = BookmarkedReviewsResponse
 export type BookmarkedActivityReviewsResponse = BookmarkedReviewsResponse
+export type BookmarkedBlogReviewsResponse = BookmarkedReviewsResponse
 
 export type BookmarkedInterviewReviewsParams = BookmarkedReviewsParams
 export type BookmarkedActivityReviewsParams = BookmarkedReviewsParams
-
-// 북마크한 블로그 후기 (같은 구조 재사용)
-export type BookmarkedBlogReview = BookmarkedReview
-export type BookmarkedBlogReviewsPage = BookmarkedReviewsPage
-export type BookmarkedBlogReviewsResponse = BookmarkedReviewsResponse
 export type BookmarkedBlogReviewsParams = BookmarkedReviewsParams

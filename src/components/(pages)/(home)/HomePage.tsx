@@ -125,9 +125,7 @@ export default function HomePage() {
                   >
                     <PopularReviewCard.Tag />
                     <PopularReviewCard.Profile
-                      category={
-                        review.category as 'DOCUMENT' | 'INTERVIEW' | 'ACTIVITY'
-                      }
+                      reviewCategory={review.reviewCategory}
                       clubName={review.clubName}
                       generation={review.generation}
                       jobName={review.jobName}

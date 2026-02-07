@@ -63,7 +63,10 @@ export default function Review({
   const likeCount = data.likeCount || 0
   const commentCount = data.commentCount || 0
   const category =
-    data.category || (data as { reviewType?: string }).reviewType || 'DOCUMENT'
+    data.reviewCategory ||
+    data.category ||
+    (data as { reviewType?: string }).reviewType ||
+    'DOCUMENT'
   const answers = data.answers
   const answerSummaries = data.answerSummaries
   const qaPreviews = data.qaPreviews

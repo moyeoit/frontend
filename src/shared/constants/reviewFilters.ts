@@ -20,8 +20,8 @@ export const RESULT_FILTER_OPTIONS: Group[] = [
     options: [
       { label: '전체', value: 'all' },
       { label: '합격', value: 'PASS' },
-      { label: '불합격', value: 'FAIL' },
-      { label: '대기', value: 'READY' },
+      { label: '불합격', value: 'FAILURE' },
+      { label: '대기', value: 'WAITING' },
     ],
   },
 ]

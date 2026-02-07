@@ -4,10 +4,15 @@ import {
   UserActivateRequest,
   UserActivateResponse,
   UserProfile,
+  UpdateUserProfileRequest,
   UpdateUserProfileImageRequest,
   UserInterests,
   UpdateUserInfoRequest,
   UpdateUserInfoResponse,
+  UserManageInfo,
+  UpdateUserManageRequest,
+  UserPostsPage,
+  UserPostsParams,
 } from './types'
 
 export const userApi = {
@@ -47,6 +52,39 @@ export const userApi = {
     const res = await apiClient.post<ApiResponse<UserProfile>>(
       '/api/v1/user/profile/image',
       body,
+    )
+    return res.data.data
+  },
+  /**
+   * 기본 정보 수정 (PATCH /v1/user)
+   */
+  updateProfile: async (body: UpdateUserProfileRequest): Promise<void> => {
+    await apiClient.patch('/api/v1/user', body)
+  },
+  /**
+   * 계정 관리 조회 (GET /v1/user/manage)
+   */
+  getManage: async (): Promise<UserManageInfo> => {
+    const res = await apiClient.get<ApiResponse<UserManageInfo>>(
+      '/api/v1/user/manage',
+    )
+    return res.data.data
+  },
+  /**
+   * 계정 관리 수정 (PATCH /v1/user/manage)
+   */
+  updateManage: async (body: UpdateUserManageRequest): Promise<void> => {
+    await apiClient.patch('/api/v1/user/manage', body)
+  },
+  /**
+   * 내 작성글 조회 (GET /v1/user/posts)
+   */
+  getUserPosts: async (params?: UserPostsParams): Promise<UserPostsPage> => {
+    const res = await apiClient.get<ApiResponse<UserPostsPage>>(
+      '/api/v1/user/posts',
+      {
+        params,
+      },
     )
     return res.data.data
   },

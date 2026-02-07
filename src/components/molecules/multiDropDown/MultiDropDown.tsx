@@ -185,7 +185,9 @@ const MultiDropDown: React.FC<Props> = ({
       <Popover open={open} onOpenChange={handleOpenChange}>
         <PopoverTrigger asChild>
           <Button className={triggerClass}>
-            {summary}
+            <span className="max-w-[11rem] overflow-x-auto whitespace-nowrap text-left [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {summary}
+            </span>
             <span
               className={cn(
                 'typo-button-m',
@@ -202,7 +204,7 @@ const MultiDropDown: React.FC<Props> = ({
           align="start"
           sideOffset={4}
           avoidCollisions={false}
-          className="w-fit mt-2 border border-light-color-3 shadow-none bg-white-color typo-button-m whitespace-nowrap p-4 space-y-4 rounded-2xl"
+          className="w-fit mt-2 max-h-[40vh] overflow-y-auto border border-light-color-3 shadow-none bg-white-color typo-button-m whitespace-nowrap p-4 space-y-4 rounded-2xl"
           onOpenAutoFocus={(e) => e.preventDefault()}
           onCloseAutoFocus={(e) => e.preventDefault()}
         >

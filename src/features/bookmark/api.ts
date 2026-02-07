@@ -1,6 +1,7 @@
 import { ApiResponse } from '@/shared/types/api'
 import apiClient from '@/shared/utils/axios'
 import {
+  BookmarkType,
   BookmarkRequest,
   BookmarkResponse,
   BookmarkedClubsResponse,
@@ -26,7 +27,7 @@ export async function toggleBookmark(
     data,
   )
   console.log('📥 북마크 토글 API 응답:', res.data)
-  return res.data.data || res.data
+  return res.data.data
 }
 
 // 북마크한 동아리 목록 조회 API
@@ -86,4 +87,48 @@ export async function getBookmarkedBlogReviews(
     },
   )
   return res.data
+}
+
+type ReviewBookmarkType = Extract<
+  BookmarkType,
+  'INTERVIEW_REVIEW' | 'ACTIVITY_REVIEW'
+>
+
+interface CheckReviewBookmarkOptions {
+  pageSize?: number
+  maxPages?: number
+}
+
+const DEFAULT_PAGE_SIZE = 100
+const DEFAULT_MAX_PAGES = 30
+
+// 북마크 목록 API를 순회해 특정 후기의 북마크 여부를 확인
+export async function checkReviewBookmarkedFromLists(
+  reviewId: number,
+  type: ReviewBookmarkType,
+  options?: CheckReviewBookmarkOptions,
+): Promise<boolean> {
+  const pageSize = Math.max(1, options?.pageSize ?? DEFAULT_PAGE_SIZE)
+  const maxPages = Math.max(1, options?.maxPages ?? DEFAULT_MAX_PAGES)
+
+  for (let page = 0; page < maxPages; page += 1) {
+    const response =
+      type === 'ACTIVITY_REVIEW'
+        ? await getBookmarkedActivityReviews({ page, size: pageSize })
+        : await getBookmarkedInterviewReviews({ page, size: pageSize })
+
+    const pageData = response.data
+    const isBookmarked = pageData.content.some(
+      (item) => item.reviewId === reviewId,
+    )
+    if (isBookmarked) {
+      return true
+    }
+
+    if (pageData.last || page + 1 >= pageData.totalPages) {
+      break
+    }
+  }
+
+  return false
 }

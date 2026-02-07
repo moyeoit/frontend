@@ -22,7 +22,7 @@ export default function StepNavigation({
     <div className="flex flex-col-reverse desktop:flex-row justify-between gap-4 pt-6">
       <Button
         type="button"
-        variant="outlined-secondary"
+        variant="outlined-primary"
         size="large"
         className="flex-1"
         onClick={onPrevious}

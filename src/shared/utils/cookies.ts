@@ -95,12 +95,16 @@ export const deleteCookie = (
 export const tokenCookies = {
   // 액세스 토큰 설정
   setAccessToken: (token: string, expiresIn: number) => {
-    // 일주일(7일) 동안 유지되는 액세스 토큰 쿠키 설정
-    const oneWeekInSeconds = 7 * 24 * 60 * 60
-    const expiresAt = new Date(Date.now() + oneWeekInSeconds * 1000)
+    const ttlSeconds = Math.max(0, Math.floor(expiresIn))
+    if (ttlSeconds <= 0) {
+      deleteCookie('access_token')
+      return
+    }
+
+    const expiresAt = new Date(Date.now() + ttlSeconds * 1000)
     setCookie('access_token', token, {
       expires: expiresAt,
-      maxAge: oneWeekInSeconds,
+      maxAge: ttlSeconds,
     })
   },
 
@@ -133,11 +137,15 @@ export const tokenCookies = {
 
   // 토큰 만료 시간 설정
   setExpiresAt: (expiresAt: number) => {
-    // expires 옵션과 maxAge 옵션 모두 1주일(7일)로 고정
-    const oneWeekInSeconds = 7 * 24 * 60 * 60
+    const maxAge = Math.max(0, Math.floor((expiresAt - Date.now()) / 1000))
+    if (maxAge <= 0) {
+      deleteCookie('expires_at')
+      return
+    }
+
     setCookie('expires_at', expiresAt.toString(), {
-      expires: new Date(Date.now() + oneWeekInSeconds * 1000),
-      maxAge: oneWeekInSeconds,
+      expires: new Date(Date.now() + maxAge * 1000),
+      maxAge,
     })
   },
 
@@ -162,14 +170,22 @@ export const tokenCookies = {
   // 토큰이 유효한지 확인
   isTokenValid: (): boolean => {
     const token = getCookie('access_token')
-    // const expiresAt = getCookie('expires_at')
+    const expiresAt = getCookie('expires_at')
 
     // 토큰이 없으면 유효하지 않음
     if (!token) {
-      // console.log('🔍 isTokenValid: 토큰이 없음')
       return false
     }
 
-    return true
+    if (!expiresAt) {
+      return false
+    }
+
+    const parsedExpiresAt = parseInt(expiresAt, 10)
+    if (Number.isNaN(parsedExpiresAt)) {
+      return false
+    }
+
+    return Date.now() < parsedExpiresAt
   },
 }

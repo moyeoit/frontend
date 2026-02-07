@@ -36,6 +36,9 @@ export default function DynamicQASection<T extends FieldValues>({
     control,
     name,
   })
+  const sectionError = (
+    control._formState.errors as Record<string, { message?: string }>
+  )[name as string]?.message
   const [focusedField, setFocusedField] = useState<{
     index: number
     field: 'question' | 'answer'
@@ -75,7 +78,7 @@ export default function DynamicQASection<T extends FieldValues>({
         return (
           <div
             key={field.id}
-            className="border border-grey-color-1 rounded-lg overflow-hidden"
+            className="border border-light-color-4 rounded-lg overflow-hidden"
           >
             <FormField
               control={control}
@@ -83,7 +86,7 @@ export default function DynamicQASection<T extends FieldValues>({
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <div className="flex items-start gap-2 p-4 border-b border-grey-color-2">
+                    <div className="flex items-start gap-2 p-4 border-b border-light-color-4">
                       <span
                         className={cn(
                           'typo-body-2-sb transition-colors',
@@ -146,10 +149,13 @@ export default function DynamicQASection<T extends FieldValues>({
       <button
         type="button"
         onClick={handleAddQuestion}
-        className="w-full py-3 bg-main-color-3 rounded-lg text-main-color-1 typo-button-m transition-colors"
+        className="w-full h-14 px-4 bg-light-color-2 border border-main-color-3 rounded-[10px] text-main-color-1 typo-body-3-2-m text-left transition-colors"
       >
         + 문항 추가
       </button>
+      {sectionError && (
+        <p className="typo-caption-m text-failure-color">{sectionError}</p>
+      )}
     </div>
   )
 }

@@ -14,6 +14,8 @@ import TabOverlay from '@/components/molecules/tab/TabOverlay'
 import { BlogReview } from '@/components/organisms/blogReview'
 import Review from '@/components/organisms/review/Review'
 import { useBlogReviewSearch } from '@/features/blog-review/queries'
+import { useClubsList } from '@/features/clubs/queries'
+import { useJobs } from '@/features/jobs'
 import { useSearchReviews } from '@/features/review/queries'
 import AppPath from '@/shared/configs/appPath'
 import { HERO_IMAGES } from '@/shared/constants/category'
@@ -34,27 +36,6 @@ const MOBILE_TAB_OPTIONS = [
   { value: 'BLOG', label: '블로그' },
 ]
 
-const CLUB_FILTER_OPTIONS = [
-  {
-    title: '동아리명',
-    options: [{ label: '전체', value: 'all' }],
-  },
-]
-
-const GENERATION_FILTER_OPTIONS = [
-  {
-    title: '기수',
-    options: [{ label: '전체', value: 'all' }],
-  },
-]
-
-const PART_FILTER_OPTIONS = [
-  {
-    title: '파트',
-    options: [{ label: '전체', value: 'all' }],
-  },
-]
-
 const TYPE_FILTER_OPTIONS = [
   {
     title: '종류',
@@ -68,6 +49,22 @@ const TYPE_FILTER_OPTIONS = [
 
 const DEFAULT_SIZE_DESKTOP = 9
 const DEFAULT_SIZE_MOBILE = 6
+const GENERATION_FALLBACK_MAX = 20
+
+function toSingleQueryValue(values: string[]): string | null {
+  if (values.includes('all')) return null
+  const selected = values.filter((value) => value !== 'all')
+  if (selected.length === 0) return null
+  return selected[selected.length - 1]
+}
+
+function toSingleValueArray(value: string | null): string[] {
+  return value ? [value] : []
+}
+
+function normalizeText(value?: string): string {
+  return (value ?? '').trim().toLowerCase()
+}
 
 export function Explore() {
   const { isDesktop } = useMediaQuery()
@@ -78,19 +75,48 @@ export function Explore() {
   const [sort, setSort] = useQueryState('sort')
   const [page, setPage] = useQueryState('page')
   const [documentType, setDocumentType] = useQueryState('type')
-  const [clubFilter, setClubFilter] = React.useState<string[]>([])
-  const [generationFilter, setGenerationFilter] = React.useState<string[]>([])
-  const [partFilter, setPartFilter] = React.useState<string[]>([])
+  const [clubId, setClubId] = useQueryState('clubId')
+  const [generation, setGeneration] = useQueryState('generation')
+  const [jobId, setJobId] = useQueryState('jobId')
+
+  const { data: clubsData } = useClubsList({
+    page: 0,
+    size: 200,
+    sort: '인기순',
+  })
+  const { data: jobsData = [] } = useJobs()
 
   const currentCategory = React.useMemo(() => category || 'all', [category])
   const currentSort = React.useMemo(() => sort || '인기순', [sort])
-  const currentPage = React.useMemo(() => parseInt(page || '0'), [page])
+  const currentPage = React.useMemo(() => {
+    const parsed = Number(page || '0')
+    if (!Number.isFinite(parsed) || parsed < 0) return 0
+    return parsed
+  }, [page])
   const currentDocumentType = React.useMemo(() => {
     if (documentType === 'DOCUMENT' || documentType === 'INTERVIEW') {
       return documentType
     }
     return null
   }, [documentType])
+  const currentClubId = React.useMemo(() => {
+    if (!clubId) return undefined
+    const parsed = Number(clubId)
+    if (!Number.isFinite(parsed)) return undefined
+    return parsed
+  }, [clubId])
+  const currentGeneration = React.useMemo(() => {
+    if (!generation) return undefined
+    const parsed = Number(generation)
+    if (!Number.isFinite(parsed)) return undefined
+    return parsed
+  }, [generation])
+  const currentJobId = React.useMemo(() => {
+    if (!jobId) return undefined
+    const parsed = Number(jobId)
+    if (!Number.isFinite(parsed)) return undefined
+    return parsed
+  }, [jobId])
 
   const isAllCategory = currentCategory === 'all'
   const isBlogCategory = currentCategory === 'BLOG'
@@ -98,34 +124,105 @@ export function Explore() {
   const useBlogLayout = isAllCategory || isBlogCategory
 
   const resultArray = React.useMemo(() => {
-    if (result === 'all') return ['all']
-    if (result == null) return []
-    return result.split(',').filter(Boolean)
+    if (result == null || result === '' || result === 'all') return []
+    const parsed = result.split(',').filter(Boolean)
+    if (parsed.length === 0) return []
+    return [parsed[parsed.length - 1]]
   }, [result])
+  const mappedResult = isDocumentCategory ? resultArray[0] : undefined
 
-  const mappedResult =
-    resultArray.length === 0 || resultArray.includes('all')
-      ? undefined
-      : resultArray[0]
+  const clubFilterValue = React.useMemo(
+    () => toSingleValueArray(clubId),
+    [clubId],
+  )
+  const generationFilterValue = React.useMemo(
+    () => toSingleValueArray(generation),
+    [generation],
+  )
+  const partFilterValue = React.useMemo(
+    () => toSingleValueArray(jobId),
+    [jobId],
+  )
+
+  const clubFilterOptions = React.useMemo(() => {
+    const options = (clubsData?.content ?? []).map((club) => ({
+      label: club.clubName,
+      value: String(club.clubId),
+    }))
+    return [
+      {
+        title: '동아리명',
+        options: [{ label: '전체', value: 'all' }, ...options],
+      },
+    ]
+  }, [clubsData])
+
+  const generationFilterOptions = React.useMemo(() => {
+    const baseNumbers = Array.from(
+      { length: GENERATION_FALLBACK_MAX },
+      (_, index) => index + 1,
+    )
+    if (currentGeneration && !baseNumbers.includes(currentGeneration)) {
+      baseNumbers.push(currentGeneration)
+    }
+    const sorted = baseNumbers.sort((a, b) => b - a)
+
+    return [
+      {
+        title: '기수',
+        options: [
+          { label: '전체', value: 'all' },
+          ...sorted.map((value) => ({
+            label: `${value}기`,
+            value: String(value),
+          })),
+        ],
+      },
+    ]
+  }, [currentGeneration])
+
+  const partFilterOptions = React.useMemo(() => {
+    return [
+      {
+        title: '파트',
+        options: [
+          { label: '전체', value: 'all' },
+          ...jobsData.map((job) => ({
+            label: job.name,
+            value: String(job.id),
+          })),
+        ],
+      },
+    ]
+  }, [jobsData])
+
+  const selectedJobName = React.useMemo(() => {
+    if (!currentJobId) return undefined
+    return jobsData.find((job) => job.id === currentJobId)?.name
+  }, [jobsData, currentJobId])
+
+  const typeArray = React.useMemo(() => {
+    if (!isDocumentCategory) return []
+    return currentDocumentType ? [currentDocumentType] : []
+  }, [isDocumentCategory, currentDocumentType])
+
+  const mappedCategory = React.useMemo(() => {
+    if (isDocumentCategory) return currentDocumentType ?? 'DOCUMENT'
+    if (currentCategory === 'all' || currentCategory === 'BLOG')
+      return undefined
+    return currentCategory
+  }, [isDocumentCategory, currentDocumentType, currentCategory])
 
   const resetFilters = React.useCallback(() => {
     router.replace('/review/explore')
-    setClubFilter([])
-    setGenerationFilter([])
-    setPartFilter([])
-    setDocumentType(null)
-  }, [
-    router,
-    setDocumentType,
-    setClubFilter,
-    setGenerationFilter,
-    setPartFilter,
-  ])
+  }, [router])
 
   const listParams = {
     page: currentPage,
     size: isDesktop ? DEFAULT_SIZE_DESKTOP : DEFAULT_SIZE_MOBILE,
-    category: currentCategory !== 'all' ? currentCategory : undefined,
+    category: mappedCategory,
+    clubId: currentClubId,
+    generation: currentGeneration,
     result: mappedResult,
     sort: currentSort === '최신순' ? 'RECENT' : 'POPULAR',
   }
@@ -144,6 +241,9 @@ export function Explore() {
     {
       page: currentPage,
       size: isDesktop ? DEFAULT_SIZE_DESKTOP : DEFAULT_SIZE_MOBILE,
+      clubId: currentClubId,
+      generation: currentGeneration,
+      jobId: currentJobId,
       sort: currentSort === '최신순' ? 'RECENT' : 'POPULAR',
     },
     { enabled: useBlogLayout },
@@ -157,24 +257,52 @@ export function Explore() {
 
   const handleResultChange = React.useCallback(
     (values: string[]) => {
-      if (values.includes('all')) {
-        setResult('all')
-      } else {
-        setResult(values.length > 0 ? values.join(',') : null)
-      }
+      setResult(toSingleQueryValue(values))
     },
     [setResult],
   )
 
   const handleTypeChange = React.useCallback(
     (values: string[]) => {
-      if (values.includes('all') || values.length === 0) {
-        setDocumentType(null)
-      } else {
-        setDocumentType(values[0])
-      }
+      setDocumentType(toSingleQueryValue(values))
     },
     [setDocumentType],
+  )
+
+  const handleClubChange = React.useCallback(
+    (values: string[]) => {
+      setClubId(toSingleQueryValue(values))
+    },
+    [setClubId],
+  )
+
+  const handleGenerationChange = React.useCallback(
+    (values: string[]) => {
+      setGeneration(toSingleQueryValue(values))
+    },
+    [setGeneration],
+  )
+
+  const handlePartChange = React.useCallback(
+    (values: string[]) => {
+      setJobId(toSingleQueryValue(values))
+    },
+    [setJobId],
+  )
+
+  const handleSortChange = React.useCallback(
+    (value: string) => {
+      setSort(value)
+    },
+    [setSort],
+  )
+
+  const handleCategoryChange = React.useCallback(
+    (value: string) => {
+      const nextCategory = value === 'all' ? null : value
+      setCategory(nextCategory)
+    },
+    [setCategory],
   )
 
   const handlePageChange = React.useCallback(
@@ -196,12 +324,15 @@ export function Explore() {
   const showResultFilter = isDocumentCategory
 
   const filteredReviews = React.useMemo(() => {
-    const content = reviewsData?.content ?? []
-    if (!isDocumentCategory || !currentDocumentType) return content
-    return content.filter(
-      (review) => (review.category || '').toUpperCase() === currentDocumentType,
-    )
-  }, [reviewsData, isDocumentCategory, currentDocumentType])
+    let content = reviewsData?.content ?? []
+    if (selectedJobName) {
+      content = content.filter(
+        (review) =>
+          normalizeText(review.jobName) === normalizeText(selectedJobName),
+      )
+    }
+    return content
+  }, [reviewsData, selectedJobName])
 
   const listContent = useBlogLayout
     ? (blogReviewsData?.content ?? [])
@@ -237,9 +368,9 @@ export function Explore() {
   // 모바일 탭 변경 핸들러
   const handleMobileTabChange = React.useCallback(
     (value: string) => {
-      setCategory(value === 'all' ? null : value)
+      handleCategoryChange(value)
     },
-    [setCategory],
+    [handleCategoryChange],
   )
 
   return (
@@ -293,9 +424,7 @@ export function Explore() {
             <SideBar
               options={REVIEW_CATEGORY_OPTIONS}
               value={currentCategory}
-              onChange={(value) =>
-                setCategory(value === 'all' ? null : (value as string))
-              }
+              onChange={(value) => handleCategoryChange(value as string)}
               className="w-full h-full"
             />
           </div>
@@ -314,27 +443,27 @@ export function Explore() {
                 <>
                   <div className="flex flex-wrap items-center gap-2">
                     <MultiDropDown
-                      groups={CLUB_FILTER_OPTIONS}
-                      value={clubFilter}
-                      onChange={(value) => setClubFilter(value as string[])}
+                      groups={clubFilterOptions}
+                      value={clubFilterValue}
+                      onChange={(value) => handleClubChange(value as string[])}
                       placeholder="동아리명"
                       maxSummary={1}
                       className="w-auto"
                     />
                     <MultiDropDown
-                      groups={GENERATION_FILTER_OPTIONS}
-                      value={generationFilter}
+                      groups={generationFilterOptions}
+                      value={generationFilterValue}
                       onChange={(value) =>
-                        setGenerationFilter(value as string[])
+                        handleGenerationChange(value as string[])
                       }
                       placeholder="기수"
                       maxSummary={1}
                       className="w-auto"
                     />
                     <MultiDropDown
-                      groups={PART_FILTER_OPTIONS}
-                      value={partFilter}
-                      onChange={(value) => setPartFilter(value as string[])}
+                      groups={partFilterOptions}
+                      value={partFilterValue}
+                      onChange={(value) => handlePartChange(value as string[])}
                       placeholder="파트"
                       maxSummary={1}
                       className="w-auto"
@@ -342,7 +471,7 @@ export function Explore() {
                     {showTypeFilter && (
                       <MultiDropDown
                         groups={TYPE_FILTER_OPTIONS}
-                        value={currentDocumentType ? [currentDocumentType] : []}
+                        value={typeArray}
                         onChange={(value) =>
                           handleTypeChange(value as string[])
                         }
@@ -382,8 +511,8 @@ export function Explore() {
                     <TabOverlay
                       options={REVIEW_SORT_OPTIONS}
                       value={currentSort as '인기순' | '최신순'}
-                      onChange={(value) => setSort(value)}
-                      onReset={() => setSort('인기순')}
+                      onChange={(value) => handleSortChange(value)}
+                      onReset={() => handleSortChange('인기순')}
                     />
                   </div>
                 </>
@@ -397,39 +526,39 @@ export function Explore() {
                       options: REVIEW_SORT_OPTIONS,
                       value: currentSort,
                       defaultValue: '인기순',
-                      onChange: (value) => setSort(value as string),
-                      onReset: () => setSort('인기순'),
+                      onChange: (value) => handleSortChange(value as string),
+                      onReset: () => handleSortChange('인기순'),
                     },
                     {
                       id: 'club',
                       label: '동아리명',
                       type: 'multi',
-                      options: CLUB_FILTER_OPTIONS,
-                      value: clubFilter,
+                      options: clubFilterOptions,
+                      value: clubFilterValue,
                       defaultValue: [],
-                      onChange: (value) => setClubFilter(value as string[]),
-                      onReset: () => setClubFilter([]),
+                      onChange: (value) => handleClubChange(value as string[]),
+                      onReset: () => setClubId(null),
                     },
                     {
                       id: 'generation',
                       label: '기수',
                       type: 'multi',
-                      options: GENERATION_FILTER_OPTIONS,
-                      value: generationFilter,
+                      options: generationFilterOptions,
+                      value: generationFilterValue,
                       defaultValue: [],
                       onChange: (value) =>
-                        setGenerationFilter(value as string[]),
-                      onReset: () => setGenerationFilter([]),
+                        handleGenerationChange(value as string[]),
+                      onReset: () => setGeneration(null),
                     },
                     {
                       id: 'part',
                       label: '파트',
                       type: 'multi',
-                      options: PART_FILTER_OPTIONS,
-                      value: partFilter,
+                      options: partFilterOptions,
+                      value: partFilterValue,
                       defaultValue: [],
-                      onChange: (value) => setPartFilter(value as string[]),
-                      onReset: () => setPartFilter([]),
+                      onChange: (value) => handlePartChange(value as string[]),
+                      onReset: () => setJobId(null),
                     },
                     ...(showTypeFilter
                       ? [
@@ -438,9 +567,7 @@ export function Explore() {
                             label: '종류',
                             type: 'multi' as const,
                             options: TYPE_FILTER_OPTIONS,
-                            value: currentDocumentType
-                              ? [currentDocumentType]
-                              : [],
+                            value: typeArray,
                             defaultValue: [],
                             onChange: (value: string[] | string) =>
                               handleTypeChange(value as string[]),
@@ -592,8 +719,18 @@ export function Explore() {
                       likeCount: number
                       commentCount: number
                       category?: string
+                      reviewCategory?: string
                       result?: string
                     }
+                    const derivedCategory =
+                      reviewItem.category ||
+                      reviewItem.reviewCategory ||
+                      (isDocumentCategory
+                        ? currentDocumentType || 'DOCUMENT'
+                        : currentCategory !== 'all' &&
+                            currentCategory !== 'BLOG'
+                          ? currentCategory
+                          : undefined)
                     return (
                       <Review
                         key={`${reviewItem.reviewId}-${reviewItem.title}`}
@@ -604,9 +741,9 @@ export function Explore() {
                           rate: reviewItem.rate,
                           likeCount: reviewItem.likeCount,
                           commentCount: reviewItem.commentCount,
-                          result: reviewItem.result,
+                          result: reviewItem.result || mappedResult,
                           title: reviewItem.title,
-                          category: reviewItem.category,
+                          category: derivedCategory,
                           answerSummaries: reviewItem.answerSummaries,
                         }}
                         onDetailClick={

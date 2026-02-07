@@ -33,7 +33,7 @@ export default function ExamplePage() {
             <PopularReviewCard>
               {/* <PopularReviewCard.Tag /> */}
               <PopularReviewCard.Profile
-                category="DOCUMENT"
+                reviewCategory="DOCUMENT"
                 clubName="동아리명"
                 generation={12}
                 jobName="프론트엔드 개발자"
@@ -48,7 +48,7 @@ export default function ExamplePage() {
             <PopularReviewCard>
               <PopularReviewCard.Tag />
               <PopularReviewCard.Profile
-                category="INTERVIEW"
+                reviewCategory="INTERVIEW"
                 clubName="동아리명"
                 generation={12}
                 jobName="프론트엔드 개발자"
@@ -63,7 +63,7 @@ export default function ExamplePage() {
             <PopularReviewCard>
               <PopularReviewCard.Tag />
               <PopularReviewCard.Profile
-                category="ACTIVITY"
+                reviewCategory="ACTIVITY"
                 clubName="동아리명"
                 generation={12}
                 jobName="프론트엔드 개발자"

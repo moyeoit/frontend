@@ -32,9 +32,18 @@ export default function ActivityStep1({ form }: ActivityStep1Props) {
       form.setValue(
         'q3Satisfaction',
         current.filter((id) => id !== optionId),
+        {
+          shouldDirty: true,
+          shouldTouch: true,
+          shouldValidate: true,
+        },
       )
     } else if (current.length < 4) {
-      form.setValue('q3Satisfaction', [...current, optionId])
+      form.setValue('q3Satisfaction', [...current, optionId], {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      })
     }
   }
 
@@ -50,13 +59,19 @@ export default function ActivityStep1({ form }: ActivityStep1Props) {
               활동 여부
             </FormLabel>
             <FormControl>
-              <div className="flex flex-col desktop:flex-row gap-3 desktop:flex-wrap">
+              <div className="grid grid-cols-1 desktop:grid-cols-2 gap-2 desktop:gap-4 desktop:max-w-[300px]">
                 {ACTIVITY_STATUS_OPTIONS.map((option) => (
                   <OptionButton
                     key={option.id}
                     selected={field.value === option.id}
-                    onClick={() => field.onChange(option.id)}
-                    className="w-full desktop:w-auto"
+                    onClick={() =>
+                      form.setValue('activityStatus', option.id, {
+                        shouldDirty: true,
+                        shouldTouch: true,
+                        shouldValidate: true,
+                      })
+                    }
+                    className="w-full"
                   >
                     {option.label}
                   </OptionButton>
@@ -85,8 +100,16 @@ export default function ActivityStep1({ form }: ActivityStep1Props) {
             <FormControl>
               <StarRating
                 value={field.value || 0}
-                onChange={field.onChange}
+                onChange={(value) =>
+                  form.setValue('rate', value, {
+                    shouldDirty: true,
+                    shouldTouch: true,
+                    shouldValidate: true,
+                  })
+                }
                 maxStars={5}
+                size={40}
+                showLabel
               />
             </FormControl>
             <FormMessage />
@@ -104,18 +127,24 @@ export default function ActivityStep1({ form }: ActivityStep1Props) {
           name="q1WeeklyHours"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="typo-body-2-sb text-black-color mb-4">
+              <FormLabel className="typo-body-2-sb text-grey-color-5 mb-4">
                 Q1. 활동 목표를 달성하기 위해 실제로 투입해야했던 주간 평균
                 시간은 어느정도였나요?
               </FormLabel>
               <FormControl>
-                <div className="flex flex-col desktop:flex-row gap-3 desktop:flex-wrap">
+                <div className="grid grid-cols-1 desktop:grid-cols-4 gap-2 desktop:gap-4">
                   {Q1_WEEKLY_HOURS_OPTIONS.map((option) => (
                     <OptionButton
                       key={option.id}
                       selected={field.value === option.id}
-                      onClick={() => field.onChange(option.id)}
-                      className="w-full desktop:w-auto"
+                      onClick={() =>
+                        form.setValue('q1WeeklyHours', option.id, {
+                          shouldDirty: true,
+                          shouldTouch: true,
+                          shouldValidate: true,
+                        })
+                      }
+                      className="w-full"
                     >
                       {option.label}
                     </OptionButton>
@@ -133,17 +162,23 @@ export default function ActivityStep1({ form }: ActivityStep1Props) {
           name="q2Difficulty"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="typo-body-2-sb text-black-color mb-4">
+              <FormLabel className="typo-body-2-sb text-grey-color-5 mb-4">
                 Q2. 활동 난이도의 수준은 어느정도였나요?
               </FormLabel>
               <FormControl>
-                <div className="flex flex-col desktop:flex-row gap-3 desktop:flex-wrap">
+                <div className="grid grid-cols-1 desktop:grid-cols-4 gap-2 desktop:gap-4">
                   {Q2_DIFFICULTY_OPTIONS.map((option) => (
                     <OptionButton
                       key={option.id}
                       selected={field.value === option.id}
-                      onClick={() => field.onChange(option.id)}
-                      className="w-full desktop:w-auto"
+                      onClick={() =>
+                        form.setValue('q2Difficulty', option.id, {
+                          shouldDirty: true,
+                          shouldTouch: true,
+                          shouldValidate: true,
+                        })
+                      }
+                      className="w-full"
                     >
                       {option.label}
                     </OptionButton>
@@ -157,19 +192,19 @@ export default function ActivityStep1({ form }: ActivityStep1Props) {
 
         {/* Q3 */}
         <FormItem>
-          <FormLabel className="typo-body-2-sb text-black-color mb-4">
+          <FormLabel className="typo-body-2-sb text-grey-color-5 mb-4">
             Q3. 참여하신 활동 중 가장 큰 만족감을 느꼈던 부분은 무엇이었나요?
             <span className="typo-caption-m text-grey-color-3 ml-2">
               (최대 4개)
             </span>
           </FormLabel>
-          <div className="flex flex-col desktop:flex-row gap-3 desktop:flex-wrap">
+          <div className="grid grid-cols-1 desktop:grid-cols-4 gap-2 desktop:gap-4">
             {Q3_SATISFACTION_OPTIONS.map((option) => (
               <OptionButton
                 key={option.id}
                 selected={watchedQ3.includes(option.id)}
                 onClick={() => handleQ3Change(option.id)}
-                className="w-full desktop:w-auto"
+                className="w-full"
               >
                 {option.label}
               </OptionButton>

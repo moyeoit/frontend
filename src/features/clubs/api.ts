@@ -37,7 +37,7 @@ export async function getClubDetails(clubId: number): Promise<ClubDetailsData> {
 }
 
 export async function getClubRecruits(
-  clubId: number | string,
+  clubId: number,
 ): Promise<ClubRecruitsData> {
   const res = await apiClient.get<ClubRecruitsResponse>(
     `/api/v1/clubs/${clubId}/recruits`,

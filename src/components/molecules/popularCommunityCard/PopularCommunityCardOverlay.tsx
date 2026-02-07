@@ -4,13 +4,16 @@ import * as React from 'react'
 import { Tag } from '@/components/atoms/tag'
 import { CommunityCard } from '@/components/molecules/communityCard'
 import { PopularCommunityCard } from '@/components/molecules/popularCommunityCard'
-import type { CommunityPostItem } from '@/features/community/types'
+import type {
+  CommunityPostItem,
+  PopularPostItem,
+} from '@/features/community/types'
 import useMediaQuery from '@/shared/hooks/useMediaQuery'
 import { cn } from '@/shared/utils/cn'
 import { formatTimeAgo } from '@/shared/utils/dateFormat'
 
 export interface PopularCommunityCardOverlayProps {
-  post: CommunityPostItem
+  post: CommunityPostItem | PopularPostItem
 }
 
 export default function PopularCommunityCardOverlay({
@@ -70,15 +73,30 @@ export default function PopularCommunityCardOverlay({
         <CommunityCard.Title>{post.title}</CommunityCard.Title>
         <CommunityCard.Description>{post.excerpt}</CommunityCard.Description>
         <CommunityCard.Meta
-          nickname={post.authorNickname}
-          timeAgo={formatTimeAgo(post.createdAt)}
-          views={post.viewCount}
+          {...('authorNickname' in post && {
+            nickname: (post as CommunityPostItem).authorNickname,
+          })}
+          {...('createdAt' in post && {
+            timeAgo: formatTimeAgo((post as CommunityPostItem).createdAt),
+          })}
+          {...('viewCount' in post && {
+            views: (post as CommunityPostItem).viewCount,
+          })}
+          {...('likeCount' in post && {
+            likes: (post as CommunityPostItem).likeCount,
+          })}
+          {...('commentCount' in post && {
+            comments: (post as CommunityPostItem).commentCount,
+          })}
           likes={post.likeCount}
           comments={post.commentCount}
           className="mt-4"
         />
       </CommunityCard.Content>
-      <CommunityCard.Image logoUrl={post.thumbnailUrl} alt={post.title} />
+      <CommunityCard.Image
+        logoUrl={(post as CommunityPostItem).thumbnailUrl}
+        alt={post.title}
+      />
     </CommunityCard>
   )
 }

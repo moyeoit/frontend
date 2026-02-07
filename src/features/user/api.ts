@@ -7,6 +7,8 @@ import {
   UpdateUserProfileRequest,
   UpdateUserProfileImageRequest,
   UserInterests,
+  UpdateUserInfoRequest,
+  UpdateUserInfoResponse,
   UserManageInfo,
   UpdateUserManageRequest,
   UserPostsPage,
@@ -92,6 +94,19 @@ export const userApi = {
   getInterests: async (): Promise<UserInterests> => {
     const res = await apiClient.get<ApiResponse<UserInterests>>(
       '/api/v1/user/interests',
+    )
+    return res.data.data
+  },
+
+  /**
+   * 유저 정보 수정 (PATCH /v1/user/manage)
+   */
+  updateUserInfo: async (
+    body: UpdateUserInfoRequest,
+  ): Promise<UpdateUserInfoResponse> => {
+    const res = await apiClient.put<ApiResponse<UpdateUserInfoResponse>>(
+      '/api/v1/user/manage',
+      body,
     )
     return res.data.data
   },

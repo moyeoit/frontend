@@ -194,6 +194,12 @@ export function Explore() {
               {isDesktop ? (
                 <>
                   <div className="flex flex-wrap items-center gap-2">
+                    <TabOverlay
+                      options={SORT_OPTIONS}
+                      value={currentSort as '인기순' | '이름순' | '마감순'}
+                      onChange={(value) => setSort(value)}
+                      onReset={() => setSort('인기순')}
+                    />
                     <MultiDropDown
                       groups={PART_OPTIONS}
                       value={partArray}
@@ -232,14 +238,7 @@ export function Explore() {
                     </button>
                   </div>
 
-                  <div className="flex">
-                    <TabOverlay
-                      options={SORT_OPTIONS}
-                      value={currentSort as '인기순' | '이름순' | '마감순'}
-                      onChange={(value) => setSort(value)}
-                      onReset={() => setSort('인기순')}
-                    />
-                  </div>
+                  <div className="flex"></div>
                 </>
               ) : (
                 <MobileFilterBar

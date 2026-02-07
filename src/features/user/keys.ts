@@ -7,4 +7,5 @@ export const userKeys = {
     [...userKeys.all, 'posts', params] as const,
   updateProfileImage: () => [...userKeys.all, 'updateProfileImage'] as const,
   interests: () => [...userKeys.all, 'interests'] as const,
+  updateUserInfo: () => [...userKeys.all, 'updateUserInfo'] as const,
 }

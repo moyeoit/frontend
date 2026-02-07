@@ -163,12 +163,7 @@ function BlogReviewCompoundLayout({
   }, [children])
 
   const tagsRow = (
-    <div
-      className={cn(
-        'flex items-center gap-3',
-        isDesktop ? 'justify-between' : 'justify-start',
-      )}
-    >
+    <div className="flex items-start justify-between gap-3">
       <div
         className={cn(
           'flex flex-wrap items-center',
@@ -177,7 +172,7 @@ function BlogReviewCompoundLayout({
       >
         {slots.tags}
       </div>
-      {isDesktop ? slots.bookmark : null}
+      {slots.bookmark}
     </div>
   )
 
@@ -235,28 +230,12 @@ function BlogReviewDefaultLayout({ className }: { className?: string }) {
       src={data.thumbnailUrl}
       alt={data.title}
       isDesktop={isDesktop}
-    >
-      {!isDesktop && (
-        <button
-          onClick={handleBookmarkClick}
-          className="absolute right-2 top-2 flex items-center justify-center rounded-full bg-black/20 p-1"
-          aria-label={isBookmarked ? '북마크 해제' : '북마크'}
-        >
-          {isBookmarked ? (
-            <MobileBookmarkFilledIcon className="w-4 h-4 text-white" />
-          ) : (
-            <MobileBookmarkEmptyIcon className="w-4 h-4 text-white" />
-          )}
-        </button>
-      )}
-    </BlogReviewThumbnailImpl>
+    />
   )
   const tags = (
     <>
       <Tag label={data.clubName} kind="blogReview" size="small" />
-      {isDesktop && (
-        <Tag label={`${data.generation}기`} kind="blogReview" size="small" />
-      )}
+      <Tag label={`${data.generation}기`} kind="blogReview" size="small" />
       <Tag label={data.part} kind="blogReview" size="small" />
     </>
   )
@@ -294,28 +273,23 @@ function BlogReviewDefaultLayout({ className }: { className?: string }) {
   const bookmark = (
     <button
       onClick={handleBookmarkClick}
-      className="flex items-center justify-center transition-opacity duration-200 hover:opacity-70 focus:outline-none"
+      className="flex items-center justify-center transition-opacity duration-200 hover:opacity-70 focus:outline-none shrink-0"
       aria-label={isBookmarked ? '북마크 해제' : '북마크'}
     >
       {isBookmarked ? (
         <MobileBookmarkFilledIcon
-          className={cn(isDesktop ? 'w-6 h-6' : 'w-5 h-5')}
+          className={cn(isDesktop ? 'w-6 h-6' : 'w-5.5 h-5.5')}
         />
       ) : (
         <MobileBookmarkEmptyIcon
-          className={cn(isDesktop ? 'w-6 h-6' : 'w-5 h-5')}
+          className={cn(isDesktop ? 'w-6 h-6' : 'w-5.5 h-5.5')}
         />
       )}
     </button>
   )
 
   const tagsRow = (
-    <div
-      className={cn(
-        'flex items-center gap-3',
-        isDesktop ? 'justify-between' : 'justify-start',
-      )}
-    >
+    <div className="flex items-start justify-between gap-3">
       <div
         className={cn(
           'flex flex-wrap items-center',
@@ -324,7 +298,7 @@ function BlogReviewDefaultLayout({ className }: { className?: string }) {
       >
         {tags}
       </div>
-      {isDesktop ? bookmark : null}
+      {bookmark}
     </div>
   )
 
@@ -447,15 +421,13 @@ export function BlogReviewThumbnail({
 BlogReviewThumbnail.displayName = 'BlogReview.Thumbnail'
 
 export function BlogReviewTags({ children }: { children?: React.ReactNode }) {
-  const { data, isDesktop } = useBlogReviewContext()
+  const { data } = useBlogReviewContext()
   const content =
     children ??
     (data && (
       <>
         <Tag label={data.clubName} kind="blogReview" size="small" />
-        {isDesktop && (
-          <Tag label={`${data.generation}기`} kind="blogReview" size="small" />
-        )}
+        <Tag label={`${data.generation}기`} kind="blogReview" size="small" />
         <Tag label={data.part} kind="blogReview" size="small" />
       </>
     ))
@@ -527,16 +499,16 @@ export function BlogReviewBookmarkButton() {
   return (
     <button
       onClick={handleBookmarkClick}
-      className="flex items-center justify-center transition-opacity duration-200 hover:opacity-70 focus:outline-none"
+      className="flex items-center justify-center transition-opacity duration-200 hover:opacity-70 focus:outline-none shrink-0"
       aria-label={isBookmarked ? '북마크 해제' : '북마크'}
     >
       {isBookmarked ? (
         <MobileBookmarkFilledIcon
-          className={cn(isDesktop ? 'w-6 h-6' : 'w-5 h-5')}
+          className={cn(isDesktop ? 'w-6 h-6' : 'w-5.5 h-5.5')}
         />
       ) : (
         <MobileBookmarkEmptyIcon
-          className={cn(isDesktop ? 'w-6 h-6' : 'w-5 h-5')}
+          className={cn(isDesktop ? 'w-6 h-6' : 'w-5.5 h-5.5')}
         />
       )}
     </button>

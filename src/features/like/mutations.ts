@@ -42,7 +42,12 @@ export function useToggleLike(
 }
 
 export function useToggleReviewLike<TContext = { previous?: unknown }>(
-  options?: UseMutationOptions<ToggleReviewLikeResult | null, Error, number, TContext>,
+  options?: UseMutationOptions<
+    ToggleReviewLikeResult | null,
+    Error,
+    number,
+    TContext
+  >,
 ): UseMutationResult<ToggleReviewLikeResult | null, Error, number, TContext> {
   return useMutation<ToggleReviewLikeResult | null, Error, number, TContext>({
     mutationFn: (reviewId) => toggleReviewLike(reviewId),

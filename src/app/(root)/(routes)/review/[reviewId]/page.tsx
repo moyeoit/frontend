@@ -26,9 +26,9 @@ import {
   ReviewCategory,
   ReviewComment,
 } from '@/features/review/types'
+import { useUserProfile } from '@/features/user/queries'
 import AppPath from '@/shared/configs/appPath'
 import { useAuth } from '@/shared/providers/auth-provider'
-import { useUserProfile } from '@/features/user/queries'
 import { formatDateToYYMMDD } from '@/shared/utils/dateFormat'
 
 const RESULT_LABELS: Record<ResultType, string> = {
@@ -56,7 +56,9 @@ const normalizeText = (value: string) => value.replace(/\s+/g, '').toLowerCase()
 
 const includesKeyword = (title: string, keywords: string[]) => {
   const normalizedTitle = normalizeText(title)
-  return keywords.some((keyword) => normalizedTitle.includes(normalizeText(keyword)))
+  return keywords.some((keyword) =>
+    normalizedTitle.includes(normalizeText(keyword)),
+  )
 }
 
 const resolveReviewCategory = (
@@ -103,10 +105,15 @@ const satisfactionLabel = (rate: number) => {
   return '매우 불만족'
 }
 
-const mapAnswerElementTitle = (answer: ReviewAnswer, rawValue: number | string) => {
+const mapAnswerElementTitle = (
+  answer: ReviewAnswer,
+  rawValue: number | string,
+) => {
   const parsed = typeof rawValue === 'number' ? rawValue : Number(rawValue)
   if (Number.isFinite(parsed)) {
-    const matched = answer.question?.elements?.find((element) => element.id === parsed)
+    const matched = answer.question?.elements?.find(
+      (element) => element.id === parsed,
+    )
     if (matched?.elementTitle) {
       return matched.elementTitle
     }
@@ -130,14 +137,19 @@ const answerToDisplayValues = (answer?: ReviewAnswer): string[] => {
   return [mapAnswerElementTitle(answer, answer.value)]
 }
 
-const answerToDisplayText = (answer: ReviewAnswer | undefined, fallback: string) => {
+const answerToDisplayText = (
+  answer: ReviewAnswer | undefined,
+  fallback: string,
+) => {
   const values = answerToDisplayValues(answer)
   if (!values.length) return fallback
   return values.join(' / ')
 }
 
 const findAnswerByKeywords = (answers: ReviewAnswer[], keywords: string[]) => {
-  return answers.find((answer) => includesKeyword(answer.question?.title ?? '', keywords))
+  return answers.find((answer) =>
+    includesKeyword(answer.question?.title ?? '', keywords),
+  )
 }
 
 const renderAnswerText = (answer: ReviewAnswer) => {
@@ -225,7 +237,9 @@ export default function Page({
         setLikeState((prev) => ({
           liked: data.liked ?? prev.liked,
           likeCount:
-            typeof data.likeCount === 'number' ? data.likeCount : prev.likeCount,
+            typeof data.likeCount === 'number'
+              ? data.likeCount
+              : prev.likeCount,
         }))
       },
       onSettled: () => {
@@ -354,7 +368,9 @@ export default function Page({
     )
   }
 
-  const structuredAnswers = (reviewDetail.answers || []).filter(isStructuredAnswer)
+  const structuredAnswers = (reviewDetail.answers || []).filter(
+    isStructuredAnswer,
+  )
 
   const reviewCategory = resolveReviewCategory(
     reviewDetail.reviewCategory,
@@ -393,17 +409,17 @@ export default function Page({
   )
 
   const timeInfoAnswer = findAnswerByKeywords(structuredAnswers, ['투자 시간'])
-  const activityLevelAnswer = findAnswerByKeywords(structuredAnswers, ['활동 수준'])
-  const satisfactionAreaAnswer = findAnswerByKeywords(
-    structuredAnswers,
-    ['만족 영역'],
-  )
+  const activityLevelAnswer = findAnswerByKeywords(structuredAnswers, [
+    '활동 수준',
+  ])
+  const satisfactionAreaAnswer = findAnswerByKeywords(structuredAnswers, [
+    '만족 영역',
+  ])
 
   const keyFocusValues = answerToDisplayValues(keyFocusAnswer).slice(0, 4)
-  const satisfactionAreaValues = answerToDisplayValues(satisfactionAreaAnswer).slice(
-    0,
-    4,
-  )
+  const satisfactionAreaValues = answerToDisplayValues(
+    satisfactionAreaAnswer,
+  ).slice(0, 4)
 
   const supportInfoText = answerToDisplayText(
     supportInfoAnswer,
@@ -415,10 +431,15 @@ export default function Page({
   )
 
   const timeInfoText = answerToDisplayText(timeInfoAnswer, '주 5시간 미만')
-  const activityLevelText = answerToDisplayText(activityLevelAnswer, '개인 흥미 수준')
+  const activityLevelText = answerToDisplayText(
+    activityLevelAnswer,
+    '개인 흥미 수준',
+  )
 
   const clubName = reviewDetail.club?.clubName ?? ''
-  const generationLabel = reviewDetail.generation ? `${reviewDetail.generation}기` : ''
+  const generationLabel = reviewDetail.generation
+    ? `${reviewDetail.generation}기`
+    : ''
   const partLabel = reviewDetail.job?.name ?? ''
   const applicationMeta = [clubName, generationLabel, partLabel].filter(Boolean)
 
@@ -435,7 +456,9 @@ export default function Page({
   }
 
   const commentCount =
-    comments != null ? countVisibleComments(comments) : reviewDetail.commentCount
+    comments != null
+      ? countVisibleComments(comments)
+      : reviewDetail.commentCount
 
   const trimmedComment = commentInput.trim()
   const trimmedReply = replyInput.trim()
@@ -519,11 +542,15 @@ export default function Page({
     deleteComment(commentId)
   }
 
-  const renderComments = (items: ReviewComment[], depth = 0): React.ReactNode => {
+  const renderComments = (
+    items: ReviewComment[],
+    depth = 0,
+  ): React.ReactNode => {
     return items.map((comment) => {
       const isNested = depth > 0
       const canReply = !comment.deleted
-      const canDelete = !comment.deleted && userProfile?.nickname === comment.nickname
+      const canDelete =
+        !comment.deleted && userProfile?.nickname === comment.nickname
 
       return (
         <div
@@ -782,7 +809,11 @@ export default function Page({
                         {isInterviewReview ? '핵심 질문' : '핵심 어필'}
                       </span>
                       <div className="text-[12px] font-medium text-main-color-1 flex flex-wrap items-center gap-[6px] md:typo-body-3-1-sb">
-                        {renderPipeValues(keyFocusValues, '지원 동기', 'text-main-color-1')}
+                        {renderPipeValues(
+                          keyFocusValues,
+                          '지원 동기',
+                          'text-main-color-1',
+                        )}
                       </div>
                     </div>
 
@@ -816,7 +847,9 @@ export default function Page({
                 const title = structured
                   ? (answer.question?.title ?? `질문 ${index + 1}`)
                   : `질문 ${index + 1}`
-                const content = structured ? renderAnswerText(answer) : String(answer)
+                const content = structured
+                  ? renderAnswerText(answer)
+                  : String(answer)
                 const noteStyle = structured && isNoteAnswer(title)
 
                 return (
@@ -838,9 +871,13 @@ export default function Page({
                     ) : (
                       <>
                         <div className="flex flex-col gap-5 md:hidden">
-                          <span className="text-[15px] font-bold text-main-color-1">Q.</span>
+                          <span className="text-[15px] font-bold text-main-color-1">
+                            Q.
+                          </span>
                           <div className="border-b border-[#ccc] pb-2">
-                            <p className="text-[15px] font-bold text-[#515151]">{title}</p>
+                            <p className="text-[15px] font-bold text-[#515151]">
+                              {title}
+                            </p>
                           </div>
                           <p className="text-[14px] leading-[25px] text-grey-color-4 whitespace-pre-line">
                             {content}
@@ -848,14 +885,20 @@ export default function Page({
                         </div>
 
                         <div className="hidden md:flex items-start gap-[6px]">
-                          <span className="typo-body-1-b text-main-color-1">Q.</span>
+                          <span className="typo-body-1-b text-main-color-1">
+                            Q.
+                          </span>
                           <div className="flex-1 border-b border-[#ccc] pb-4">
-                            <span className="typo-body-1-b text-[#515151]">{title}</span>
+                            <span className="typo-body-1-b text-[#515151]">
+                              {title}
+                            </span>
                           </div>
                         </div>
 
                         <div className="hidden md:flex items-start gap-3 pt-4">
-                          <span className="typo-body-2-3-m text-grey-color-4">A.</span>
+                          <span className="typo-body-2-3-m text-grey-color-4">
+                            A.
+                          </span>
                           <p className="typo-body-2-3-m text-grey-color-4 leading-[30px] whitespace-pre-line">
                             {content}
                           </p>
@@ -910,7 +953,9 @@ export default function Page({
                   댓글을 불러오는 중...
                 </div>
               ) : commentCount > 0 ? (
-                <div className="flex flex-col">{renderComments(comments ?? [], 0)}</div>
+                <div className="flex flex-col">
+                  {renderComments(comments ?? [], 0)}
+                </div>
               ) : (
                 <div className="py-[88px] text-center typo-body-2-2-sb text-grey-color-1">
                   댓글을 작성해주세요

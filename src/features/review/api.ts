@@ -126,9 +126,9 @@ export async function getPremiumReviewDetail(
 
 // 후기 상세 조회
 export async function getReviewDetail(reviewId: number): Promise<ReviewView> {
-  const res = await apiClient.get<ApiResponse<ReviewView & ReviewDetailStateFields>>(
-    `/api/v1/review/${reviewId}`,
-  )
+  const res = await apiClient.get<
+    ApiResponse<ReviewView & ReviewDetailStateFields>
+  >(`/api/v1/review/${reviewId}`)
   return normalizeReviewDetail(res.data.data)
 }
 

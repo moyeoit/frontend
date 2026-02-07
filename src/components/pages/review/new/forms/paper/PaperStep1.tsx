@@ -32,9 +32,18 @@ export default function PaperStep1({ form }: PaperStep1Props) {
       form.setValue(
         'q1ImportantAppeal',
         current.filter((id) => id !== optionId),
+        {
+          shouldDirty: true,
+          shouldTouch: true,
+          shouldValidate: true,
+        },
       )
     } else if (current.length < 4) {
-      form.setValue('q1ImportantAppeal', [...current, optionId])
+      form.setValue('q1ImportantAppeal', [...current, optionId], {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      })
     }
   }
 
@@ -50,13 +59,19 @@ export default function PaperStep1({ form }: PaperStep1Props) {
               서류 결과
             </FormLabel>
             <FormControl>
-              <div className="flex flex-col desktop:flex-row gap-3 desktop:flex-wrap">
+              <div className="grid grid-cols-1 desktop:grid-cols-4 gap-2 desktop:gap-4">
                 {PAPER_RESULT_OPTIONS.map((option) => (
                   <OptionButton
                     key={option.id}
                     selected={field.value === option.id}
-                    onClick={() => field.onChange(option.id)}
-                    className="w-full desktop:w-auto"
+                    onClick={() =>
+                      form.setValue('resultType', option.id, {
+                        shouldDirty: true,
+                        shouldTouch: true,
+                        shouldValidate: true,
+                      })
+                    }
+                    className="w-full"
                   >
                     {option.label}
                   </OptionButton>
@@ -85,8 +100,16 @@ export default function PaperStep1({ form }: PaperStep1Props) {
             <FormControl>
               <StarRating
                 value={field.value || 0}
-                onChange={field.onChange}
+                onChange={(value) =>
+                  form.setValue('rate', value, {
+                    shouldDirty: true,
+                    shouldTouch: true,
+                    shouldValidate: true,
+                  })
+                }
                 maxStars={5}
+                size={40}
+                showLabel
               />
             </FormControl>
             <FormMessage />
@@ -100,19 +123,19 @@ export default function PaperStep1({ form }: PaperStep1Props) {
 
         {/* Q1 */}
         <FormItem>
-          <FormLabel className="typo-body-2-sb text-black-color mb-4">
+          <FormLabel className="typo-body-2-sb text-grey-color-5 mb-4">
             Q1. 지원서 작성에 있어 가장 중요하게 어필한 것은 무엇이었나요?
             <span className="typo-caption-m text-grey-color-3 ml-2">
               (최대 4개)
             </span>
           </FormLabel>
-          <div className="flex flex-col desktop:flex-row gap-3 desktop:flex-wrap">
+          <div className="grid grid-cols-1 desktop:grid-cols-4 gap-2 desktop:gap-4">
             {Q1_IMPORTANT_APPEAL_OPTIONS.map((option) => (
               <OptionButton
                 key={option.id}
                 selected={watchedQ1.includes(option.id)}
                 onClick={() => handleQ1Change(option.id)}
-                className="w-full desktop:w-auto"
+                className="w-full"
               >
                 {option.label}
               </OptionButton>
@@ -131,17 +154,23 @@ export default function PaperStep1({ form }: PaperStep1Props) {
           name="q2ReferenceInfo"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="typo-body-2-sb text-black-color mb-4">
+              <FormLabel className="typo-body-2-sb text-grey-color-5 mb-4">
                 Q2. 지원서 작성 시 가장 참고한 정보는 무엇이었나요?
               </FormLabel>
               <FormControl>
-                <div className="flex flex-col desktop:flex-row gap-3 desktop:flex-wrap">
+                <div className="grid grid-cols-1 desktop:grid-cols-4 gap-2 desktop:gap-4">
                   {Q2_REFERENCE_INFO_OPTIONS.map((option) => (
                     <OptionButton
                       key={option.id}
                       selected={field.value === option.id}
-                      onClick={() => field.onChange(option.id)}
-                      className="w-full desktop:w-auto"
+                      onClick={() =>
+                        form.setValue('q2ReferenceInfo', option.id, {
+                          shouldDirty: true,
+                          shouldTouch: true,
+                          shouldValidate: true,
+                        })
+                      }
+                      className="w-full"
                     >
                       {option.label}
                     </OptionButton>
@@ -159,18 +188,24 @@ export default function PaperStep1({ form }: PaperStep1Props) {
           name="q3TechDescription"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="typo-body-2-sb text-black-color mb-4">
+              <FormLabel className="typo-body-2-sb text-grey-color-5 mb-4">
                 Q3. 지원서 혹은 포트폴리오 제작 시 기술 역량에 대한 서술은 어떤
                 방식으로 작성하셨나요?
               </FormLabel>
               <FormControl>
-                <div className="flex flex-col desktop:flex-row gap-3 desktop:flex-wrap">
+                <div className="grid grid-cols-1 desktop:grid-cols-4 gap-2 desktop:gap-4">
                   {Q3_TECH_DESCRIPTION_OPTIONS.map((option) => (
                     <OptionButton
                       key={option.id}
                       selected={field.value === option.id}
-                      onClick={() => field.onChange(option.id)}
-                      className="w-full desktop:w-auto"
+                      onClick={() =>
+                        form.setValue('q3TechDescription', option.id, {
+                          shouldDirty: true,
+                          shouldTouch: true,
+                          shouldValidate: true,
+                        })
+                      }
+                      className="w-full"
                     >
                       {option.label}
                     </OptionButton>

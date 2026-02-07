@@ -60,8 +60,8 @@ export const Q4_EMPHASIZED_SKILL_OPTIONS = [
 
 // 동적 QA 항목 스키마
 const qaItemSchema = z.object({
-  question: z.string().min(1, '질문을 입력해주세요'),
-  answer: z.string().min(1, '답변을 입력해주세요'),
+  question: z.string().trim().min(1, '질문을 입력해주세요'),
+  answer: z.string().trim().min(1, '답변을 입력해주세요'),
 })
 
 const InterviewFormSchema = z.object({
@@ -73,17 +73,28 @@ const InterviewFormSchema = z.object({
   // Step 1
   resultType: z.string().min(1, '면접 결과를 선택해주세요'),
   rate: appValidation.rating('면접 총평을 선택해주세요'),
-  q1QuestionType: z.array(z.number()).min(1, '최소 1개 이상 선택해주세요'),
+  q1QuestionType: z
+    .array(z.number())
+    .min(1, '최소 1개 이상 선택해주세요')
+    .max(4, '최대 4개까지 선택 가능합니다'),
   q2InterviewerAttitude:
     appValidation.requiredNumber('면접관 태도를 선택해주세요'),
   q3MainTopic: appValidation.requiredNumber('주요 논의 주제를 선택해주세요'),
   q4EmphasizedSkill: appValidation.requiredNumber('어필한 역량을 선택해주세요'),
 
   // Step 2
-  oneLineComment: appValidation.oneLineText(30, '한줄평을 입력해주세요'),
+  oneLineComment: z
+    .string()
+    .trim()
+    .min(1, '한줄평을 입력해주세요')
+    .max(20, '20자 이내로 입력해주세요'),
   qaItems: z.array(qaItemSchema).min(1, '최소 1개의 항목을 입력해주세요'),
-  tip: z.string().max(300, '300자 이내로 입력해주세요').optional(),
-  freeReview: z.string().max(300, '300자 이내로 입력해주세요').optional(),
+  tip: z.string().trim().max(300, '300자 이내로 입력해주세요').optional(),
+  freeReview: z
+    .string()
+    .trim()
+    .max(300, '300자 이내로 입력해주세요')
+    .optional(),
 })
 
 export type InterviewFormType = z.infer<typeof InterviewFormSchema>
@@ -112,6 +123,28 @@ export const useInterviewForm = () => {
     },
     mode: 'onBlur',
   })
+
+  const watchedValues = form.watch()
+  const isStep1Complete =
+    typeof watchedValues.clubId === 'number' &&
+    typeof watchedValues.generation === 'number' &&
+    typeof watchedValues.jobId === 'number' &&
+    Boolean(watchedValues.resultType) &&
+    typeof watchedValues.rate === 'number' &&
+    watchedValues.rate >= 1 &&
+    watchedValues.q1QuestionType.length > 0 &&
+    watchedValues.q1QuestionType.length <= 4 &&
+    typeof watchedValues.q2InterviewerAttitude === 'number' &&
+    typeof watchedValues.q3MainTopic === 'number' &&
+    typeof watchedValues.q4EmphasizedSkill === 'number'
+
+  const hasOneLineComment = watchedValues.oneLineComment.trim().length > 0
+  const hasValidQaItems =
+    watchedValues.qaItems.length > 0 &&
+    watchedValues.qaItems.every(
+      (item) => item.question.trim().length > 0 && item.answer.trim().length > 0,
+    )
+  const isStep2Complete = hasOneLineComment && hasValidQaItems
 
   const goToNextStep = async () => {
     const step1Fields = [
@@ -143,6 +176,16 @@ export const useInterviewForm = () => {
   const transformToApiRequest = (
     data: InterviewFormType,
   ): BasicReviewCreateRequest => {
+    const oneLineComment = data.oneLineComment.trim()
+    const qaItems = data.qaItems
+      .map((qa) => ({
+        question: qa.question.trim(),
+        answer: qa.answer.trim(),
+      }))
+      .filter((qa) => qa.question && qa.answer)
+    const tip = data.tip?.trim()
+    const freeReview = data.freeReview?.trim()
+
     const answers: ReviewAnswerRequest[] = [
       {
         sequence: 1,
@@ -172,12 +215,12 @@ export const useInterviewForm = () => {
         sequence: 5,
         question_id: 6, // 한줄평 (SINGLE_SUBJECTIVE)
         question_type: QuestionType.SingleSubjective,
-        value: data.oneLineComment,
+        value: oneLineComment,
       },
     ]
 
     // 동적 QA 항목 추가 (MULTIPLE_SUBJECTIVE)
-    data.qaItems.forEach((qa) => {
+    qaItems.forEach((qa) => {
       answers.push({
         sequence: answers.length + 1,
         question_id: 4,
@@ -186,21 +229,21 @@ export const useInterviewForm = () => {
       })
     })
 
-    if (data.tip) {
+    if (tip) {
       answers.push({
         sequence: answers.length + 1,
         question_id: 5, // TIP (SINGLE_SUBJECTIVE)
         question_type: QuestionType.SingleSubjective,
-        value: data.tip,
+        value: tip,
       })
     }
 
-    if (data.freeReview) {
+    if (freeReview) {
       answers.push({
         sequence: answers.length + 1,
         question_id: 6, // 자유후기 (SINGLE_SUBJECTIVE)
         question_type: QuestionType.SingleSubjective,
-        value: data.freeReview,
+        value: freeReview,
       })
     }
 
@@ -214,7 +257,7 @@ export const useInterviewForm = () => {
     }
 
     return {
-      title: data.oneLineComment,
+      title: oneLineComment,
       category: ReviewCategory.Interview,
       rate: data.rate,
       result,
@@ -242,5 +285,7 @@ export const useInterviewForm = () => {
     goToPreviousStep,
     onSubmit,
     isSubmitting: postBasicReviewMutation.isPending,
+    isStep1Complete,
+    isStep2Complete,
   }
 }

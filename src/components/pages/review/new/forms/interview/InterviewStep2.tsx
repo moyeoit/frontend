@@ -37,11 +37,11 @@ export default function InterviewStep2({ form }: InterviewStep2Props) {
                 {...field}
                 placeholder="면접에서 느낀 가장 핵심적인 소감이나 느낌을 요약해 주세요."
                 className="min-h-[60px]"
-                maxLength={30}
+                maxLength={20}
               />
             </FormControl>
             <div className="text-right typo-caption-m text-grey-color-3">
-              {field.value?.length || 0}/30
+              {field.value?.length || 0}/20
             </div>
             <FormMessage />
           </FormItem>
@@ -54,7 +54,7 @@ export default function InterviewStep2({ form }: InterviewStep2Props) {
         name="qaItems"
         title="면접에서 기억나는 질문과 답변"
         questionPlaceholder="면접에서 받은 질문을 작성해주세요."
-        answerPlaceholder="질문에 대해 어떻게 답변했는지 공유해주세요."
+        answerPlaceholder="질문에 대한 답변을 작성해주세요."
       />
 
       {/* 다음 지원자들을 위한 면접 TIP */}
@@ -69,7 +69,7 @@ export default function InterviewStep2({ form }: InterviewStep2Props) {
             <FormControl>
               <Textarea
                 {...field}
-                placeholder="면접 합격을 결정했다고 생각하는 본인만의 전략이나 팁을 공유해 주세요."
+                placeholder="면접 당일 합격의 당락을 결정했다고 생각하는 본인만의 전략이나 팁을 공유해 주세요."
                 className="min-h-[120px]"
                 maxLength={300}
               />
@@ -94,7 +94,7 @@ export default function InterviewStep2({ form }: InterviewStep2Props) {
             <FormControl>
               <Textarea
                 {...field}
-                placeholder="면접 준비 과정, 면접 분위기, 면접장 환경 등 자유롭게 공유해주세요."
+                placeholder="서류 합격 직후부터 면접 준비, 그리고 당일 면접장 입장까지의 과정이나, 현장에서의 느꼈던 분위기, 예상치 못한 상황, 면접관과의 상호작용 등 전체적인 경험을 자유롭게 작성해 주세요."
                 className="min-h-[120px]"
                 maxLength={300}
               />

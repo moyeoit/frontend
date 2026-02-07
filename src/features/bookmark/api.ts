@@ -89,7 +89,10 @@ export async function getBookmarkedBlogReviews(
   return res.data
 }
 
-type ReviewBookmarkType = Extract<BookmarkType, 'INTERVIEW_REVIEW' | 'ACTIVITY_REVIEW'>
+type ReviewBookmarkType = Extract<
+  BookmarkType,
+  'INTERVIEW_REVIEW' | 'ACTIVITY_REVIEW'
+>
 
 interface CheckReviewBookmarkOptions {
   pageSize?: number
@@ -115,7 +118,9 @@ export async function checkReviewBookmarkedFromLists(
         : await getBookmarkedInterviewReviews({ page, size: pageSize })
 
     const pageData = response.data
-    const isBookmarked = pageData.content.some((item) => item.reviewId === reviewId)
+    const isBookmarked = pageData.content.some(
+      (item) => item.reviewId === reviewId,
+    )
     if (isBookmarked) {
       return true
     }

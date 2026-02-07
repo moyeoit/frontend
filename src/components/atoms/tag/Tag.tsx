@@ -9,7 +9,7 @@ export type TagKind =
   | 'clubDetail'
   | 'blogReview'
 export type TagSize = 'small' | 'large' | 'none'
-export type TagColor = 'white' | 'lightPurple' | 'purple'
+export type TagColor = 'white' | 'lightPurple' | 'purple' | 'light'
 
 export interface TagProps
   extends
@@ -68,6 +68,7 @@ const CLUB_DETAIL: Record<TagColor, string> = {
   white: 'bg-white-color text-black-color',
   lightPurple: 'bg-main-color-3 text-main-color-1',
   purple: 'bg-main-color-1 text-white-color',
+  light: 'bg-light-color-2 text-black-color',
 }
 
 export const Tag: React.FC<TagProps> = ({

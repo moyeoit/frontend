@@ -1,6 +1,7 @@
 import { GoogleAnalytics } from '@next/third-parties/google'
 import type { Metadata } from 'next'
 import Script from 'next/script'
+import { Environment } from '@/shared/configs/environment'
 import { AuthProvider } from '@/shared/providers/auth-provider'
 import MSWProvider from '@/shared/providers/msw-provider'
 import ReactQueryProvider from '@/shared/providers/react-query-provider'
@@ -73,7 +74,8 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const clarityId = process.env.NEXT_PUBLIC_CLARITY_ID
+  const gaId = Environment.gaId()
+  const clarityId = Environment.clarityId()
 
   return (
     <html lang="ko">
@@ -83,9 +85,7 @@ export default function RootLayout({
             <AuthProvider>{children}</AuthProvider>
           </ReactQueryProvider>
         </MSWProvider>
-        {process.env.NEXT_PUBLIC_GA_ID && (
-          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
-        )}
+        {gaId && <GoogleAnalytics gaId={gaId} />}
         {clarityId && (
           <Script id="microsoft-clarity" strategy="afterInteractive">
             {`

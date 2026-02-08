@@ -56,6 +56,7 @@ export default function PopularCommunityCardOverlay({
     <CommunityCard
       type="horizontal"
       postType={post.postType}
+      postId={post.postId}
       className={cn(
         'gap-6 group cursor-pointer relative',
         isDesktop ? 'gap-6' : 'gap-4',

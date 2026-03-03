@@ -2,7 +2,6 @@
 
 import React, { useMemo, useState } from 'react'
 import { Button } from '@/components/atoms/Button'
-import { Checkbox } from '@/components/atoms/checkbox'
 import {
   Select,
   SelectContent,
@@ -11,6 +10,7 @@ import {
   SelectValue,
 } from '@/components/atoms/Select/Select'
 import { Textarea } from '@/components/atoms/Textarea'
+import { Checkbox } from '@/components/atoms/checkbox'
 import {
   WithdrawFormState,
   WithdrawalReason,
@@ -83,7 +83,8 @@ export default function WithdrawPage() {
 
           <div className="flex flex-col gap-2">
             <p className="typo-button-m text-grey-color-4">
-              더 나은 서비스 제공을 위해 모여잇의 보완이 필요한 지점을 제안해 주세요.
+              더 나은 서비스 제공을 위해 모여잇의 보완이 필요한 지점을 제안해
+              주세요.
             </p>
             <Textarea
               value={form.feedback}
@@ -112,7 +113,8 @@ export default function WithdrawPage() {
                 className="h-5 w-5 rounded-[3px] border-[1.5px] border-light-color-4 mt-[2px]"
               />
               <span className="typo-caption-1 text-grey-color-3">
-                회원 탈퇴를 진행하여 ‘모여잇’ 계정에 귀속된 모든 정보를 삭제하는 데 동의합니다.
+                회원 탈퇴를 진행하여 ‘모여잇’ 계정에 귀속된 모든 정보를 삭제하는
+                데 동의합니다.
               </span>
             </label>
           </div>

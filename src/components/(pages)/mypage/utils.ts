@@ -1,12 +1,18 @@
 import axios from 'axios'
-import { NullableUserProfile, MyPageQuerySection, MyPageSectionKey } from './types'
+import {
+  NullableUserProfile,
+  MyPageQuerySection,
+  MyPageSectionKey,
+} from './types'
 
 export const MY_PAGE_SECTIONS: MyPageSectionKey[] = [
   'profile-basic',
   'settings-account',
 ]
 
-export function normalizeSection(section: MyPageQuerySection): MyPageSectionKey {
+export function normalizeSection(
+  section: MyPageQuerySection,
+): MyPageSectionKey {
   if (!section) return 'profile-basic'
   if (MY_PAGE_SECTIONS.includes(section as MyPageSectionKey)) {
     return section as MyPageSectionKey

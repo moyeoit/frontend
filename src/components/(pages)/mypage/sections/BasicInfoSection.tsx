@@ -10,9 +10,9 @@ import {
   SelectValue,
 } from '@/components/atoms/Select/Select'
 import { JobItem } from '@/features/jobs'
+import { cn } from '@/shared/utils/cn'
 import { NullableUserProfile } from '../types'
 import { FormRow, SectionShell } from './SectionPrimitives'
-import { cn } from '@/shared/utils/cn'
 
 interface BasicInfoSectionProps {
   isDesktop: boolean
@@ -51,7 +51,8 @@ export function BasicInfoSection({
 }: BasicInfoSectionProps) {
   const isBusy = isUploadingImage || isUpdatingImage
   const imageSrc = tempImageUrl || profile?.profileImageUrl
-  const jobValue = typeof selectedJobId === 'number' ? String(selectedJobId) : ''
+  const jobValue =
+    typeof selectedJobId === 'number' ? String(selectedJobId) : ''
 
   return (
     <SectionShell

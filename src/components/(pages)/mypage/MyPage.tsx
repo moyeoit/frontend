@@ -133,11 +133,7 @@ export default function MyPage() {
 
   const handleOpenWithdrawPage = () => {
     if (typeof window === 'undefined') return
-    window.open(
-      AppPath.myPageWithdraw(),
-      '_blank',
-      'noopener,noreferrer',
-    )
+    window.open(AppPath.myPageWithdraw(), '_blank', 'noopener,noreferrer')
   }
 
   const handleProfileImageChange = (file?: File) => {
@@ -166,7 +162,10 @@ export default function MyPage() {
       },
       onError: (error) => {
         setProfileErrorMessage(
-          extractApiErrorMessage(error, '이미지 업로드 중 오류가 발생했습니다.'),
+          extractApiErrorMessage(
+            error,
+            '이미지 업로드 중 오류가 발생했습니다.',
+          ),
         )
       },
     })

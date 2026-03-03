@@ -29,10 +29,17 @@ export function NotificationOffConfirmDialog({
         showCloseButton={false}
         className={cn(
           'rounded-[20px] border-none bg-white-color px-4 py-6',
-          isDesktop ? 'w-full max-w-[434px]' : 'w-[calc(100%-2.5rem)] max-w-[276px]',
+          isDesktop
+            ? 'w-full max-w-[434px]'
+            : 'w-[calc(100%-2.5rem)] max-w-[276px]',
         )}
       >
-        <div className={cn('flex flex-col items-center', isDesktop ? 'gap-4' : 'gap-3')}>
+        <div
+          className={cn(
+            'flex flex-col items-center',
+            isDesktop ? 'gap-4' : 'gap-3',
+          )}
+        >
           <DialogTitle
             className={cn(
               'text-center text-black-color',
@@ -47,7 +54,8 @@ export function NotificationOffConfirmDialog({
               isDesktop ? 'typo-body-1-3-m' : 'typo-body-3-2-m',
             )}
           >
-            이메일을 입력하셨더라도,{`\n`}수신 여부를 끄시면 새로운 소식이나 알림을{`\n`}받으실 수 없습니다.
+            이메일을 입력하셨더라도,{`\n`}수신 여부를 끄시면 새로운 소식이나
+            알림을{`\n`}받으실 수 없습니다.
           </p>
         </div>
 

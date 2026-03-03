@@ -56,7 +56,10 @@ export function AccountSection({
               placeholder="알림을 받을 이메일을 입력해주세요"
               disabled={isUpdating}
               onChange={(event) => onChangeEmail(event.target.value)}
-              className={cn('h-[47px]', showEmailActions && 'border-main-color-1')}
+              className={cn(
+                'h-[47px]',
+                showEmailActions && 'border-main-color-1',
+              )}
             />
 
             {showEmailActions && (
@@ -83,7 +86,9 @@ export function AccountSection({
             )}
 
             {emailErrorMessage && (
-              <p className="typo-caption-1 text-failure-color">{emailErrorMessage}</p>
+              <p className="typo-caption-1 text-failure-color">
+                {emailErrorMessage}
+              </p>
             )}
           </div>
         </FormRow>

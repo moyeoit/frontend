@@ -2,257 +2,248 @@
 
 import * as React from 'react'
 import Image from 'next/image'
-import MobileBookmarkEmptyIcon from '@/assets/icons/bookmark-mobile-empty.svg'
-import MobileBookmarkFilledIcon from '@/assets/icons/bookmark-mobile-filled.svg'
-import ClubDetailActivityReviewContent from '@/components/(pages)/club/detail/ClubDetailActivityReviewContent'
-import ClubDetailBlogReviewContent from '@/components/(pages)/club/detail/ClubDetailBlogReviewContent'
-import ClubDetailContent from '@/components/(pages)/club/detail/ClubDetailContent'
-import ClubDetailDocumentInterviewContent from '@/components/(pages)/club/detail/ClubDetailDocumentInterviewContent'
-import { UnderLineTab } from '@/components/atoms/UnderLineTab'
-import { EmailConfirmDialog } from '@/components/molecules/emailConfirmDialog/EmailConfirmDialog'
-import { RecruitmentButtons } from '@/components/molecules/recruitmentButton'
+import { useRouter } from 'next/navigation'
+import { BellFilledIcon, BellIcon } from '@/assets/icons'
+import { ClubAlertEmailDialog } from '@/components/(pages)/club/detail/components/ClubAlertEmailDialog'
+import {
+  buildClubDetailEmailPromptKey,
+  resolveClubDetailPromptOnAlertClick,
+} from '@/components/(pages)/club/detail/utils'
+import { Button } from '@/components/atoms/Button/button'
 import { useToggleClubSubscription } from '@/features/clubs/mutations'
 import {
   useClubDetails,
-  useClubRecruits,
   useUserSubscriptionCheck,
 } from '@/features/clubs/queries'
+import AppPath from '@/shared/configs/appPath'
 import useMediaQuery from '@/shared/hooks/useMediaQuery'
-import { cn } from '@/shared/utils/cn'
+import { useAuth } from '@/shared/providers/auth-provider'
+import { tokenCookies } from '@/shared/utils/cookies'
 
 interface DetailProps {
   clubId: number
 }
 
-/**
- * 동아리 상세 페이지 (썸네일, 동아리명, 구독 버튼, 슬로건, 상세 내용, 후기, 모집 정보)
- */
-
 export default function Detail({ clubId }: DetailProps) {
-  const { data: recruitsData } = useClubRecruits(clubId)
+  const router = useRouter()
   const { isDesktop } = useMediaQuery()
-
+  const { user, isLoading: isAuthLoading } = useAuth()
   const { data: clubDetails } = useClubDetails(Number(clubId))
-
+  const { data: subscriptionData } = useUserSubscriptionCheck(Number(clubId))
   const toggleSubscriptionMutation = useToggleClubSubscription()
 
-  // 구독 상태 확인
-  const { data: subscriptionData } = useUserSubscriptionCheck(Number(clubId))
+  const [isEmailDialogOpen, setIsEmailDialogOpen] = React.useState(false)
   const isSubscribed = subscriptionData?.subscribed ?? false
 
-  // 이메일 확인 다이얼로그 상태
-  const [isEmailDialogOpen, setIsEmailDialogOpen] = React.useState(false)
+  const promptUserId = React.useMemo(() => {
+    if (user?.id) {
+      return String(user.id)
+    }
 
-  const handleSubscribe = React.useCallback(async () => {
+    return tokenCookies.getUserId()
+  }, [user?.id])
+
+  const promptSeenKey = React.useMemo(() => {
+    if (!promptUserId) return null
+    return buildClubDetailEmailPromptKey(promptUserId)
+  }, [promptUserId])
+
+  const handleOpenHomepage = React.useCallback(() => {
+    if (!clubDetails?.homepageUrl) return
+
+    window.open(clubDetails.homepageUrl, '_blank', 'noopener,noreferrer')
+  }, [clubDetails?.homepageUrl])
+
+  const handleConfirmSubscription = React.useCallback(async () => {
     try {
       await toggleSubscriptionMutation.mutateAsync(Number(clubId))
     } catch (error) {
-      console.error('구독 실패:', error)
+      console.error('알림 구독 토글 실패:', error)
+      throw error
     }
   }, [clubId, toggleSubscriptionMutation])
 
-  // 모집 정보 섹션 내용
-  const recruitmentInfoContent = (
-    <div className="w-full bg-light-color-2 px-8 py-6 rounded-2xl">
-      {/* 모집 파트 */}
-      <div className="flex gap-2 mb-3">
-        <div className="w-18 typo-button-b">모집 파트</div>
-        <div className="flex-1 typo-button-m text-grey-color-5">
-          {recruitsData?.recruitmentPart?.join(', ')}
-        </div>
-      </div>
+  const handleAlertClick = React.useCallback(async () => {
+    if (isAuthLoading) return
 
-      {/* 자격 요건 */}
-      <div className="flex gap-2 mb-3">
-        <div className="w-18 typo-button-b">자격 요건</div>
-        <div className="flex-1 typo-button-m text-grey-color-5">
-          {recruitsData?.qualification}
-        </div>
-      </div>
+    if (!promptUserId) {
+      router.push(AppPath.login())
+      return
+    }
 
-      {/* 모집 일정 */}
-      <div className="flex gap-2 mb-3">
-        <div className="w-18 typo-button-b">모집 일정</div>
-        <div className="flex-1 typo-button-m text-grey-color-5">
-          {recruitsData?.recruitmentSchedule || '-'}
-        </div>
-      </div>
+    const seen =
+      typeof window !== 'undefined' &&
+      promptSeenKey != null &&
+      localStorage.getItem(promptSeenKey) === 'true'
 
-      {/* 활동 기간 */}
-      <div className="flex gap-2 mb-3">
-        <div className="w-18 typo-button-b">활동 기간</div>
-        <div className="flex-1 typo-button-m text-grey-color-5">
-          {recruitsData?.activityPeriod || '-'}
-        </div>
-      </div>
+    const promptDecision = resolveClubDetailPromptOnAlertClick(Boolean(seen))
 
-      {/* 활동 방식 */}
-      <div className="flex gap-2 mb-3">
-        <div className="w-18 typo-button-b">활동 방식</div>
-        <div className="flex-1 typo-button-m text-grey-color-5">
-          {recruitsData?.activityMethod || '-'}
-        </div>
-      </div>
+    if (promptDecision.shouldOpenDialog) {
+      if (typeof window !== 'undefined' && promptSeenKey != null) {
+        localStorage.setItem(promptSeenKey, String(promptDecision.nextSeen))
+      }
+      setIsEmailDialogOpen(true)
+      return
+    }
 
-      {/* 활동비 */}
-      <div className="flex gap-2">
-        <div className="w-18 typo-button-b">활동비</div>
-        <div className="flex-1 typo-button-m text-grey-color-5">
-          {recruitsData?.activityFee || '-'}
-        </div>
-      </div>
-    </div>
-  )
+    await handleConfirmSubscription()
+  }, [
+    handleConfirmSubscription,
+    isAuthLoading,
+    promptSeenKey,
+    promptUserId,
+    router,
+  ])
 
-  // 버튼 섹션 내용
-  const recruitmentButtonsContent = (
-    <RecruitmentButtons
-      homepageUrl={recruitsData?.homepageUrl}
-      noticeUrl={recruitsData?.noticeUrl || undefined}
-      isDesktop={isDesktop}
-      onNoticeClick={() => setIsEmailDialogOpen(true)}
-    />
-  )
+  const detailContent =
+    clubDetails?.detailContent?.trim() ||
+    '동아리 상세 정보가 아직 등록되지 않았습니다.'
 
   return (
-    <div
-      className={cn(
-        isDesktop
-          ? 'flex justify-center py-36 w-full mx-auto max-w-[1440px]'
-          : 'flex flex-col w-full mx-auto max-w-[1440px] py-4',
-      )}
-    >
-      <div className={isDesktop ? 'w-180 max-w-[720px]' : 'w-full'}>
-        {/* Detail 섹션 */}
-        <div className="px-5">
-          <div
-            className={`relative w-full aspect-3/2 border border-light-color-3 rounded-lg overflow-hidden mb-12 ${isDesktop ? 'mb-6' : 'mb-4 px-5'}`}
-          >
+    <>
+      <div
+        className={
+          isDesktop
+            ? 'mx-auto w-full max-w-[920px] px-5 pb-[144px] pt-[56px]'
+            : 'w-full pb-[140px] pt-4'
+        }
+      >
+        <div
+          className={isDesktop ? 'h-[306px] w-full' : 'h-[232px] w-full px-5'}
+        >
+          <div className="relative h-full w-full overflow-hidden rounded-xl border border-light-color-3">
             <Image
-              src={clubDetails?.club.imageUrl || '/images/default.svg'}
-              alt={`${clubDetails?.club.name} 썸네일`}
+              src={clubDetails?.imageUrl || '/images/default.svg'}
+              alt={clubDetails?.clubName || '동아리 썸네일'}
               fill
-              className="w-full h-full object-cover"
+              className="object-cover"
             />
           </div>
+        </div>
 
-          {/* 동아리 정보 섹션 */}
-          <div className={`relative ${isDesktop ? 'mb-12' : 'mb-4'}`}>
-            {/* 로고, 동아리명, 구독 버튼 */}
-            <div
-              className={`flex items-center gap-4 ${isDesktop ? 'mb-6' : 'mb-4'}`}
-            >
-              {/* 로고 */}
+        <div className={isDesktop ? 'mt-6 px-5' : 'mt-4 px-5'}>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex min-w-0 flex-1 items-center gap-4">
               <div
-                className={`${isDesktop ? 'w-14 h-14' : 'w-12 h-12'} border border-light-color-3 rounded-[16px] shrink-0`}
+                className={
+                  isDesktop
+                    ? 'h-14 w-14 shrink-0 overflow-hidden rounded-2xl border border-light-color-3'
+                    : 'h-12 w-12 shrink-0 overflow-hidden rounded-2xl border border-light-color-3'
+                }
               >
-                {clubDetails?.club.imageUrl && (
-                  <Image
-                    src={clubDetails?.club.imageUrl || '/images/default.svg'}
-                    alt={clubDetails?.club.name || ''}
-                    width={isDesktop ? 56 : 48}
-                    height={isDesktop ? 56 : 48}
-                    className="w-full h-full object-cover rounded-[16px]"
-                  />
-                )}
+                <Image
+                  src={clubDetails?.imageUrl || '/images/default.svg'}
+                  alt={clubDetails?.clubName || '동아리 로고'}
+                  width={isDesktop ? 56 : 48}
+                  height={isDesktop ? 56 : 48}
+                  className="h-full w-full object-cover"
+                />
               </div>
-              {/* 동아리명 */}
-              <div className="flex-1">
-                <div
-                  className={`${isDesktop ? 'typo-title-1-3-m' : 'typo-title-3'}`}
+              <h1
+                className={
+                  isDesktop
+                    ? 'min-w-0 flex-1 truncate typo-title-1-3-m text-black-color'
+                    : 'min-w-0 flex-1 truncate typo-title-3 text-black-color'
+                }
+              >
+                {clubDetails?.clubName || '동아리명'}
+              </h1>
+            </div>
+
+            {isDesktop && (
+              <div className="flex shrink-0 items-center gap-2">
+                <Button
+                  type="button"
+                  variant="solid"
+                  size="medium"
+                  className="h-12 px-6 typo-body-3-b"
+                  onClick={handleOpenHomepage}
+                  disabled={!clubDetails?.homepageUrl}
                 >
-                  {clubDetails?.club.name}
-                </div>
+                  홈페이지 지원
+                </Button>
+                <button
+                  type="button"
+                  className="flex h-12 w-12 items-center justify-center rounded-full border border-light-color-4 text-grey-color-2"
+                  onClick={handleAlertClick}
+                  disabled={toggleSubscriptionMutation.isPending}
+                  aria-label={isSubscribed ? '알림 구독 해제' : '알림 구독'}
+                >
+                  {isSubscribed ? (
+                    <BellFilledIcon width={24} height={24} />
+                  ) : (
+                    <BellIcon width={24} height={24} />
+                  )}
+                </button>
               </div>
-              {/* 구독 버튼 */}
-              <button
-                onClick={handleSubscribe}
-                className="flex items-center justify-center transition-opacity duration-200 hover:opacity-70 focus:outline-none shrink-0"
-                aria-label={isSubscribed ? '구독 해제' : '구독'}
-              >
-                {isSubscribed ? (
-                  <MobileBookmarkFilledIcon className="w-6 h-6" />
-                ) : (
-                  <MobileBookmarkEmptyIcon className="w-6 h-6" />
-                )}
-              </button>
-            </div>
-
-            {/* 슬로건 */}
-            <div className="bg-light-color-2 rounded-2xl py-4 px-6">
-              <div
-                className={`text-center text-grey-color-4 ${isDesktop ? 'typo-body-3-2-m ' : 'typo-button-m'}`}
-              >
-                {clubDetails?.club.slogan}
-              </div>
-            </div>
+            )}
           </div>
         </div>
 
-        {/* 모바일: 모집 정보 섹션 */}
-        {!isDesktop && (
-          <div className={`${isDesktop ? 'mt-8 mb-12 ' : 'pb-8 mt-4 px-5'}`}>
-            {recruitmentInfoContent}
-          </div>
-        )}
-
-        <div className={isDesktop ? '' : '[&>div:first-child]:pl-5'}>
-          <UnderLineTab
-            defaultValue="상세 내용"
-            tabs={[
-              {
-                value: '상세 내용',
-                label: '상세 내용',
-                content: <ClubDetailContent clubDetails={clubDetails} />,
-              },
-              {
-                value: '활동 후기',
-                label: '활동 후기',
-                content: (
-                  <ClubDetailActivityReviewContent
-                    clubId={clubId}
-                    clubDetails={clubDetails}
-                    recruitsData={recruitsData || null}
-                  />
-                ),
-              },
-              {
-                value: '서류/면접 후기',
-                label: '서류/면접 후기',
-                content: <ClubDetailDocumentInterviewContent clubId={clubId} />,
-              },
-              {
-                value: '블로그 후기',
-                label: '블로그 후기',
-                content: <ClubDetailBlogReviewContent clubId={clubId} />,
-              },
-            ]}
-          />
+        <div className={isDesktop ? 'mt-6 px-5' : 'mt-4 px-5'}>
+          <section
+            className={
+              isDesktop
+                ? 'rounded-2xl bg-light-color-2 p-6'
+                : 'rounded-2xl bg-light-color-2 p-6'
+            }
+          >
+            <h2
+              className={
+                isDesktop
+                  ? 'typo-title-3 text-black-color'
+                  : 'typo-body-1-b text-black-color'
+              }
+            >
+              동아리 소개
+            </h2>
+            <p
+              className={
+                isDesktop
+                  ? 'mt-4 whitespace-pre-wrap typo-body-3-3-r text-black-color'
+                  : 'mt-4 whitespace-pre-wrap typo-button-m text-black-color'
+              }
+            >
+              {detailContent}
+            </p>
+          </section>
         </div>
       </div>
-      {/* 데스크톱: 모집 정보 섹션 */}
-      {isDesktop && (
-        <div className="w-90 px-5 sticky top-5 self-start">
-          {recruitmentInfoContent}
-          {/* 버튼들 */}
-          <div className="mt-4 space-y-2">
-            <div className="space-y-2">{recruitmentButtonsContent}</div>
+
+      {!isDesktop && (
+        <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-light-color-3 bg-white-color px-5 pb-5 pt-3">
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outlined-secondary"
+              size="medium"
+              className="flex-1"
+              onClick={handleAlertClick}
+              disabled={toggleSubscriptionMutation.isPending}
+            >
+              <BellFilledIcon width={20} height={20} role="img" />
+              모집 알림 받기
+            </Button>
+            <Button
+              type="button"
+              variant="solid"
+              size="medium"
+              className="flex-1"
+              onClick={handleOpenHomepage}
+              disabled={!clubDetails?.homepageUrl}
+            >
+              홈페이지 바로가기
+            </Button>
           </div>
         </div>
       )}
 
-      {/* 모바일: 버튼들 */}
-      {!isDesktop && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white-color px-5 py-3 pb-5 ">
-          <div className="flex flex-row gap-2">{recruitmentButtonsContent}</div>
-        </div>
-      )}
-
-      {/* 이메일 확인 다이얼로그 */}
-      <EmailConfirmDialog
+      <ClubAlertEmailDialog
         open={isEmailDialogOpen}
+        isDesktop={isDesktop}
         onOpenChange={setIsEmailDialogOpen}
+        onConfirmSubscription={handleConfirmSubscription}
       />
-    </div>
+    </>
   )
 }

@@ -5,6 +5,7 @@ export { getPosts, getPopularPosts, createPost, getPostDetail } from './api'
 export {
   usePosts,
   usePopularPosts,
+  useSearchPosts,
   usePostDetail,
   usePostComments,
 } from './queries'

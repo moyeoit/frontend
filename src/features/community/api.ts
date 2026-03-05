@@ -40,6 +40,18 @@ export async function getPopularPosts(params?: {
   return res.data.data
 }
 
+export async function getSearchPosts(params: {
+  keyword: string
+  page?: number
+  size?: number
+  sort?: string
+}): Promise<PostPage> {
+  const res = await apiClient.get<ApiResponse<PostPage>>('/api/v2/post/search', {
+    params,
+  })
+  return res.data.data
+}
+
 // 커뮤니티 게시글 생성
 export async function createPost(
   data: PostCreateRequest,

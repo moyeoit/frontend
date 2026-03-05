@@ -10,6 +10,13 @@ export const communityKeys = {
   popular: () => [...communityKeys.all(), 'popular'] as const,
   popularPosts: (params?: { page?: number; size?: number; sort?: string }) =>
     [...communityKeys.popular(), params ?? {}] as const,
+  searchPosts: () => [...communityKeys.all(), 'search-posts'] as const,
+  searchPost: (params: {
+    keyword: string
+    page?: number
+    size?: number
+    sort?: string
+  }) => [...communityKeys.searchPosts(), params] as const,
   // 게시글 상세 조회
   postDetails: () => [...communityKeys.all(), 'post-details'] as const,
   postDetail: (postId: string) =>

@@ -3,6 +3,7 @@
 import * as React from 'react'
 import type useEmblaCarousel from 'embla-carousel-react'
 import Image from 'next/image'
+import CommunitySearchResult from '@/components/(pages)/community/CommunitySearchResult'
 import { Button } from '@/components/atoms/Button'
 import { Carousel } from '@/components/atoms/Carousel'
 import { Tag } from '@/components/atoms/tag'
@@ -10,9 +11,11 @@ import { CommunityCard } from '@/components/molecules/communityCard'
 import { PaginationWithHook } from '@/components/molecules/pagination'
 import { PopularCommunityCard } from '@/components/molecules/popularCommunityCard'
 import { PostButton } from '@/components/molecules/postButton'
+import SearchCore from '@/components/molecules/search/SearchCore'
 import { usePopularPosts, usePosts } from '@/features/community/queries'
 import { HERO_IMAGES } from '@/shared/constants/category'
 import useMediaQuery from '@/shared/hooks/useMediaQuery'
+import useQueryState from '@/shared/hooks/useQueryState'
 import { cn } from '@/shared/utils/cn'
 import { formatTimeAgo } from '@/shared/utils/dateFormat'
 
@@ -30,6 +33,8 @@ const CATEGORIES = [
 
 export function Community() {
   const { isDesktop } = useMediaQuery()
+  const [searchKeyword, setSearchKeyword] = useQueryState('keyword')
+  const [searchTotalElements, setSearchTotalElements] = React.useState(0)
   const [selectedCategory, setSelectedCategory] = React.useState<string>('전체')
   const [popularPage, setPopularPage] = React.useState(0)
   const [currentPage, setCurrentPage] = React.useState(0)
@@ -91,6 +96,21 @@ export function Community() {
     }
   }, [carouselApi, isFirst, popularPage])
 
+  const handleCommunitySearchSubmit = React.useCallback(
+    (keyword: string) => {
+      const trimmedKeyword = keyword.trim()
+      if (!trimmedKeyword) return
+      setSearchKeyword(trimmedKeyword, { replace: false })
+    },
+    [setSearchKeyword],
+  )
+
+  const handleClearCommunitySearch = React.useCallback(() => {
+    setSearchKeyword(null, { replace: false })
+  }, [setSearchKeyword])
+
+  const isSearchMode = (searchKeyword ?? '').trim().length > 0
+
   return (
     <div>
       {/* Hero 섹션 */}
@@ -104,7 +124,37 @@ export function Community() {
         />
       </div>
       <div className={cn('flex flex-col max-w-[1100px] mx-auto')}>
-        {isDesktop && (
+        <div
+          className={cn(
+            'mt-8 px-5 desktop:px-0 desktop:flex desktop:items-center',
+            'desktop:justify-end',
+          )}
+        >
+          {isSearchMode && (
+            <p className="typo-body-3-3-r text-grey-color-3 shrink-0 desktop:mr-4">
+              검색 결과 {searchTotalElements}건
+            </p>
+          )}
+          <SearchCore
+            className={cn(
+              'w-full desktop:mx-0',
+              isSearchMode ? 'max-w-[450px]' : 'max-w-[400px]',
+            )}
+            placeholder="검색어를 입력해주세요"
+            keyword={searchKeyword ?? ''}
+            showCloseButton={isSearchMode}
+            onClose={isSearchMode ? handleClearCommunitySearch : undefined}
+            hideResults
+            onSubmit={handleCommunitySearchSubmit}
+          />
+        </div>
+        {isSearchMode && (
+          <CommunitySearchResult
+            keyword={(searchKeyword ?? '').trim()}
+            onTotalElementsChange={setSearchTotalElements}
+          />
+        )}
+        {!isSearchMode && isDesktop && (
           <>
             <div className="flex items-center justify-between mb-4 mt-8">
               <div className="typo-title-2-b text-black-color">
@@ -214,90 +264,92 @@ export function Community() {
           </>
         )}
 
-        <div
-          className={cn(
-            'mt-8 max-w-[800px] mx-auto',
-            !isDesktop && 'w-full overflow-x-hidden',
-          )}
-        >
-          {/* 카테고리 및 글 작성 버튼 */}
+        {!isSearchMode && (
           <div
             className={cn(
-              'flex items-center gap-2 max-w-[800px] mx-auto',
-              !isDesktop && 'overflow-x-auto flex-nowrap pl-5',
-              !isDesktop &&
-                '[&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]',
+              'mt-8 max-w-[800px] mx-auto',
+              !isDesktop && 'w-full overflow-x-hidden',
             )}
           >
-            {CATEGORIES.map((category) => (
-              <Button
-                key={category}
-                variant={
-                  selectedCategory === category ? 'solid' : 'outlined-primary'
-                }
-                size="small"
-                onClick={() => handleCategoryChange(category)}
-                className="shrink-0 cursor-pointer"
-              >
-                {category}
-              </Button>
-            ))}
-            <div className="ml-[42px]">
-              <PostButton />
+            {/* 카테고리 및 글 작성 버튼 */}
+            <div
+              className={cn(
+                'flex items-center gap-2 max-w-[800px] mx-auto',
+                !isDesktop && 'overflow-x-auto flex-nowrap pl-5',
+                !isDesktop &&
+                  '[&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]',
+              )}
+            >
+              {CATEGORIES.map((category) => (
+                <Button
+                  key={category}
+                  variant={
+                    selectedCategory === category ? 'solid' : 'outlined-primary'
+                  }
+                  size="small"
+                  onClick={() => handleCategoryChange(category)}
+                  className="shrink-0 cursor-pointer"
+                >
+                  {category}
+                </Button>
+              ))}
+              <div className="ml-[42px]">
+                <PostButton />
+              </div>
+            </div>
+            <div className={cn('mt-4 mb-28', !isDesktop && 'px-5')}>
+              {posts.map((post) => (
+                <CommunityCard
+                  key={post.postId}
+                  type="horizontal"
+                  postType={post.postType}
+                  postId={post.postId}
+                  className={cn(
+                    'gap-6 pt-8 group cursor-pointer relative',
+                    isDesktop ? 'gap-6' : 'gap-4',
+                  )}
+                >
+                  <CommunityCard.Content className="max-w-[656px] flex-col">
+                    <div className="flex flex-row gap-[5px] mb-2">
+                      <Tag
+                        label={post.categoryName}
+                        kind="blogReview"
+                        size={isDesktop ? 'large' : 'small'}
+                        className="shrink-0"
+                      />
+                    </div>
+                    <CommunityCard.Title>{post.title}</CommunityCard.Title>
+                    <CommunityCard.Description>
+                      {post.excerpt}
+                    </CommunityCard.Description>
+                    <CommunityCard.Meta
+                      nickname={post.authorNickname}
+                      timeAgo={formatTimeAgo(post.createdAt)}
+                      views={post.viewCount}
+                      likes={post.likeCount}
+                      comments={post.commentCount}
+                      className="mt-4"
+                    />
+                  </CommunityCard.Content>
+                  <CommunityCard.Image
+                    logoUrl={post.thumbnailUrl}
+                    alt={post.title}
+                  />
+                </CommunityCard>
+              ))}
+              {totalPages > 1 && (
+                <div className="mt-8">
+                  <PaginationWithHook
+                    totalPages={totalPages}
+                    maxVisiblePages={5}
+                    initialPage={currentPage + 1}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
+              )}
             </div>
           </div>
-          <div className={cn('mt-4 mb-28', !isDesktop && 'px-5')}>
-            {posts.map((post) => (
-              <CommunityCard
-                key={post.postId}
-                type="horizontal"
-                postType={post.postType}
-                postId={post.postId}
-                className={cn(
-                  'gap-6 pt-8 group cursor-pointer relative',
-                  isDesktop ? 'gap-6' : 'gap-4',
-                )}
-              >
-                <CommunityCard.Content className="max-w-[656px] flex-col">
-                  <div className="flex flex-row gap-[5px] mb-2">
-                    <Tag
-                      label={post.categoryName}
-                      kind="blogReview"
-                      size={isDesktop ? 'large' : 'small'}
-                      className="shrink-0"
-                    />
-                  </div>
-                  <CommunityCard.Title>{post.title}</CommunityCard.Title>
-                  <CommunityCard.Description>
-                    {post.excerpt}
-                  </CommunityCard.Description>
-                  <CommunityCard.Meta
-                    nickname={post.authorNickname}
-                    timeAgo={formatTimeAgo(post.createdAt)}
-                    views={post.viewCount}
-                    likes={post.likeCount}
-                    comments={post.commentCount}
-                    className="mt-4"
-                  />
-                </CommunityCard.Content>
-                <CommunityCard.Image
-                  logoUrl={post.thumbnailUrl}
-                  alt={post.title}
-                />
-              </CommunityCard>
-            ))}
-            {totalPages > 1 && (
-              <div className="mt-8">
-                <PaginationWithHook
-                  totalPages={totalPages}
-                  maxVisiblePages={5}
-                  initialPage={currentPage + 1}
-                  onPageChange={handlePageChange}
-                />
-              </div>
-            )}
-          </div>
-        </div>
+        )}
       </div>
     </div>
   )

@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { DummyProfileIcon, SearchMainIcon, XIcon } from '@/assets/icons'
 import { Button } from '@/components/atoms/Button'
@@ -14,6 +14,7 @@ export interface SearchCoreProps {
   className?: string
   placeholder?: string
   autoFocus?: boolean
+  hideResults?: boolean
   /**
    * Callback when a result item is selected.
    */
@@ -87,8 +88,10 @@ export function SearchCore(props: SearchCoreProps) {
     onSubmit,
     onClose,
     showCloseButton = true,
+    hideResults = false,
   } = props
   const [inputValue, setInputValue] = useState(controlledKeyword ?? '')
+  const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (controlledKeyword !== undefined && controlledKeyword !== inputValue) {
@@ -112,7 +115,7 @@ export function SearchCore(props: SearchCoreProps) {
       size: 8,
       search: trimmedInput,
     }),
-    enabled: trimmedInput.length > 0,
+    enabled: !hideResults && trimmedInput.length > 0,
   })
 
   const items = data?.content ?? []
@@ -122,6 +125,7 @@ export function SearchCore(props: SearchCoreProps) {
     const trimmed = inputValue.trim()
     if (!trimmed) return
     onSubmit?.(trimmed)
+    inputRef.current?.blur()
   }
 
   return (
@@ -138,21 +142,25 @@ export function SearchCore(props: SearchCoreProps) {
           role="search"
           aria-label="search"
         >
-          <div className="h-12 rounded-full bg-white-color flex items-center justify-between border border-main-color-1 px-4 py-3">
+          <div className="group h-12 rounded-[12px] bg-white-color flex items-center justify-between border border-light-color-4 focus-within:border-main-color-1 px-4 py-3">
             <Input
+              ref={inputRef}
               autoFocus={autoFocus}
               placeholder={placeholder}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               aria-label="search"
-              className="bg-transparent border-none"
+              className="bg-transparent border-none placeholder:text-light-color-3"
             />
-            <SearchMainIcon
-              width={24}
-              height={24}
-              role="img"
-              aria-label="search"
-            />
+            <button type="submit" aria-label="search">
+              <SearchMainIcon
+                width={24}
+                height={24}
+                role="img"
+                aria-label="search"
+                className="text-grey-color-4 group-focus-within:text-main-color-1"
+              />
+            </button>
           </div>
         </form>
         {showCloseButton && (
@@ -167,64 +175,69 @@ export function SearchCore(props: SearchCoreProps) {
         )}
       </div>
 
-      <div className="desktop:min-h-[340px] max-desktop:max-h-[calc(100vh-200px)] overflow-auto">
-        {isLoading ? (
-          <div></div>
-        ) : items.length === 0 ? (
-          (emptyState ?? (
-            <div className="flex flex-col gap-2 items-center justify-center">
-              <p className="typo-title-3 max-desktop:typo-body-1-b text-grey-color-5 px-1 py-2">
-                검색 결과가 없어요
-              </p>
-              <div className="flex flex-col items-center justify-center mb-4">
-                <p className="typo-button-m max-desktop:typo-caption-m text-grey-color-3">
-                  찾으시는 IT 동아리가 없나요?
+      {!hideResults && (
+        <div className="desktop:min-h-[340px] max-desktop:max-h-[calc(100vh-200px)] overflow-auto">
+          {isLoading ? (
+            <div></div>
+          ) : items.length === 0 ? (
+            (emptyState ?? (
+              <div className="flex flex-col gap-2 items-center justify-center">
+                <p className="typo-title-3 max-desktop:typo-body-1-b text-grey-color-5 px-1 py-2">
+                  검색 결과가 없어요
                 </p>
-                <p className="typo-button-m max-desktop:typo-caption-m text-grey-color-3">
-                  요청해주시면 빠르게 확인해드릴게요.
-                </p>
-              </div>
-              <Button
-                variant="solid"
-                size="small"
-                onClick={() => {
-                  window.location.href =
-                    'https://docs.google.com/forms/d/e/1FAIpQLSc7dWNU-ghxS1Ajwpk4P2VLMj-6wk7ohOF-BsbqvuvcrZGLKw/viewform'
-                }}
-              >
-                <span className="typo-caption-m">IT 동아리 등록 요청</span>
-              </Button>
-            </div>
-          ))
-        ) : (
-          <ul className="flex flex-col gap-1">
-            {items?.map((it) => (
-              <li key={it.clubId}>
+                <div className="flex flex-col items-center justify-center mb-4">
+                  <p className="typo-button-m max-desktop:typo-caption-m text-grey-color-3">
+                    찾으시는 IT 동아리가 없나요?
+                  </p>
+                  <p className="typo-button-m max-desktop:typo-caption-m text-grey-color-3">
+                    요청해주시면 빠르게 확인해드릴게요.
+                  </p>
+                </div>
                 <Button
-                  variant="none"
-                  className="w-full text-left px-3 py-3 justify-start rounded-[8px] hover:bg-light-color-2 focus:bg-light-color-2 transition-colors hover:ring-0 focus:ring-0 focus:outline-none focus:ring-offset-0 [&:hover_.typo-body-3-2-m]:text-black-color [&:focus_.typo-body-3-2-m]:text-black-color"
-                  onClick={() => onSelect?.(it.clubId)}
+                  variant="solid"
+                  size="small"
+                  onClick={() => {
+                    window.location.href =
+                      'https://docs.google.com/forms/d/e/1FAIpQLSc7dWNU-ghxS1Ajwpk4P2VLMj-6wk7ohOF-BsbqvuvcrZGLKw/viewform'
+                  }}
                 >
-                  {renderItem ? (
-                    renderItem({
-                      clubId: it.clubId,
-                      clubName: it.clubName,
-                      imgUrl: it.logoUrl,
-                    })
-                  ) : (
-                    <div className="flex flex-row items-center gap-2">
-                      <SearchResultAvatar src={it.logoUrl} alt={it.clubName} />
-                      <span className="typo-body-3-2-m text-grey-color-4">
-                        {it.clubName}
-                      </span>
-                    </div>
-                  )}
+                  <span className="typo-caption-m">IT 동아리 등록 요청</span>
                 </Button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+              </div>
+            ))
+          ) : (
+            <ul className="flex flex-col gap-1">
+              {items?.map((it) => (
+                <li key={it.clubId}>
+                  <Button
+                    variant="none"
+                    className="w-full text-left px-3 py-3 justify-start rounded-[8px] hover:bg-light-color-2 focus:bg-light-color-2 transition-colors hover:ring-0 focus:ring-0 focus:outline-none focus:ring-offset-0 [&:hover_.typo-body-3-2-m]:text-black-color [&:focus_.typo-body-3-2-m]:text-black-color"
+                    onClick={() => onSelect?.(it.clubId)}
+                  >
+                    {renderItem ? (
+                      renderItem({
+                        clubId: it.clubId,
+                        clubName: it.clubName,
+                        imgUrl: it.logoUrl,
+                      })
+                    ) : (
+                      <div className="flex flex-row items-center gap-2">
+                        <SearchResultAvatar
+                          src={it.logoUrl}
+                          alt={it.clubName}
+                        />
+                        <span className="typo-body-3-2-m text-grey-color-4">
+                          {it.clubName}
+                        </span>
+                      </div>
+                    )}
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
     </div>
   )
 }

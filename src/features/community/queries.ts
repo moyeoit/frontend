@@ -19,6 +19,15 @@ export function usePopularPosts(params?: {
   return useQuery(communityQueries.popular(params))
 }
 
+export function useSearchPosts(params: {
+  keyword: string
+  page?: number
+  size?: number
+  sort?: string
+}): UseQueryResult<PostPage, Error> {
+  return useQuery(communityQueries.search(params))
+}
+
 // 게시글 상세 조회
 export function usePostDetail(
   postId: string,

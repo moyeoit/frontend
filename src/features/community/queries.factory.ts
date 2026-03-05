@@ -2,6 +2,7 @@ import { queryOptions } from '@tanstack/react-query'
 import {
   getPosts,
   getPopularPosts,
+  getSearchPosts,
   getPostDetail,
   getPostComments,
 } from './api'
@@ -24,6 +25,18 @@ export const communityQueries = {
     queryOptions<PopularPostPage>({
       queryKey: communityKeys.popularPosts(params),
       queryFn: () => getPopularPosts(params),
+      staleTime: 60_000,
+    }),
+  search: (params: {
+    keyword: string
+    page?: number
+    size?: number
+    sort?: string
+  }) =>
+    queryOptions<PostPage>({
+      queryKey: communityKeys.searchPost(params),
+      queryFn: () => getSearchPosts(params),
+      enabled: params.keyword.trim().length > 0,
       staleTime: 60_000,
     }),
   // 게시글 상세 조회

@@ -32,6 +32,6 @@ export {
 export {
   useUserActivate,
   useUpdateUserProfileImage,
-  // useUpdateUserProfile,
+  useUpdateUserProfile,
   useUpdateUserManage,
 } from './mutations'

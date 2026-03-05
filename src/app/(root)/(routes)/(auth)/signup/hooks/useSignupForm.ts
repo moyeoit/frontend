@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { z } from 'zod'
+import { buildPopupStorageKey } from '@/components/(pages)/club/explore/utils'
 import { useUserActivate } from '@/features/user'
 import AppPath from '@/shared/configs/appPath'
 import { appValidation } from '@/shared/configs/appValidation'
@@ -142,6 +143,25 @@ export const useSignupForm = () => {
 
             // OAuth 데이터 정리
             sessionStorage.removeItem('oauth_data')
+
+            if (typeof window !== 'undefined') {
+              const popupEligibleKey = buildPopupStorageKey(
+                oauthData.userId,
+                'eligible',
+              )
+              const popupNeverShowKey = buildPopupStorageKey(
+                oauthData.userId,
+                'never-show',
+              )
+              const popupSessionDismissedKey = buildPopupStorageKey(
+                oauthData.userId,
+                'session-dismissed',
+              )
+
+              localStorage.setItem(popupEligibleKey, 'true')
+              localStorage.removeItem(popupNeverShowKey)
+              sessionStorage.removeItem(popupSessionDismissedKey)
+            }
 
             // 홈으로 이동
             router.push(AppPath.home())

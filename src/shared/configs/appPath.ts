@@ -3,6 +3,7 @@ import { Environment } from '@/shared/configs/environment'
 const AppPath = {
   home: () => '/' as const,
   myPage: () => '/mypage' as const,
+  myPageWithdraw: () => '/mypage/withdraw' as const,
   login: () => '/login' as const,
   logout: () => '/logout' as const,
   signup: () => '/signup' as const,

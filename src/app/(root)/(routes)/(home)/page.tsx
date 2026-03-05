@@ -1,5 +1,7 @@
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
+
+export const dynamic = 'force-dynamic'
 import HomePage from '@/components/(pages)/(home)/HomePage'
 import { Footer } from '@/components/molecules/layout'
 

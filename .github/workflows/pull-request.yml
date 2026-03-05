@@ -13,6 +13,8 @@ jobs:
   test-and-build:
     timeout-minutes: 10
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
 
     steps:
       # 해당 저장소의 코드를 가져옵니다.
@@ -39,6 +41,9 @@ jobs:
       # 빌드를 수행합니다.
       - name: Build
         run: pnpm build
+        env:
+          NEXT_PUBLIC_API_ADDRESS: http://localhost:8080
+          NEXT_PUBLIC_API_MOCKING: disabled
 
       # 테스트를 수행합니다.
       - name: Run tests

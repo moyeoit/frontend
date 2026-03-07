@@ -236,7 +236,7 @@ export function Community() {
                           label={post.categoryName}
                           kind="blogReview"
                           size="large"
-                          className="shrink-0"
+                          className="shrink-0 typo-caption-2"
                         />
                         <Tag
                           label="인기"

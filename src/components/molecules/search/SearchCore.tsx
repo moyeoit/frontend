@@ -142,7 +142,7 @@ export function SearchCore(props: SearchCoreProps) {
           role="search"
           aria-label="search"
         >
-          <div className="group h-12 rounded-[12px] bg-white-color flex items-center justify-between border border-light-color-4 focus-within:border-main-color-1 px-4 py-3">
+          <div className="group h-12 rounded-[12px] bg-white-color flex items-center justify-between border border-light-color-3 focus-within:border-main-color-1 px-4 py-3">
             <Input
               ref={inputRef}
               autoFocus={autoFocus}
@@ -150,7 +150,7 @@ export function SearchCore(props: SearchCoreProps) {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               aria-label="search"
-              className="bg-transparent border-none placeholder:text-light-color-3"
+              className="bg-transparent border-none placeholder:text-light-color-4"
             />
             <button type="submit" aria-label="search">
               <SearchMainIcon

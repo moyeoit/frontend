@@ -13,8 +13,8 @@ export default function Footer() {
         <div className="flex flex-col gap-5 desktop:gap-8">
           <div className="flex flex-col gap-5 desktop:flex-row desktop:justify-between">
             <MoyeoitFullLogo
-              width={144}
-              height={40}
+              width={110}
+              height={17}
               role="img"
               aria-label="logo"
             />

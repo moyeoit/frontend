@@ -1,38 +1,9 @@
-// Domain types for Clubs
-
-export interface ClubActivity {
-  hashtag: string
-  activityName: string
-  activityDescribe: string
-  imageUrl: string | null
-  activityOrder: number
-}
-
-export interface ClubSchedule {
-  periodValue: number
-  period: string
-  activity: string
-}
-
 export interface ClubDetailsData {
-  club: {
-    name: string
-    slogan: string
-    bio: string
-    establishment: number
-    totalParticipant: number
-    operation: number
-    offline: string | null
-    online: string | null
-    location: string | null
-    address: string | null
-    recruiting: boolean
-    imageUrl: string | null
-    process: string[]
-    significant: string
-  }
-  activities: ClubActivity[]
-  clubSchedules: ClubSchedule[]
+  clubId: number
+  clubName: string
+  imageUrl: string | null
+  detailContent: string
+  homepageUrl: string | null
 }
 
 export interface ClubsListItem {

@@ -4,7 +4,7 @@ import * as React from 'react'
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import {
   ProfileIcon,
   SearchIcon,
@@ -20,10 +20,13 @@ import { ReviewWriteDropdown } from './sections'
 
 export default function Header() {
   const router = useRouter()
+  const pathname = usePathname()
   const { setOpen } = useSearchUrlState()
   const { user } = useAuth()
   const { data: profile } = useUserProfile()
   const [mounted, setMounted] = useState(false)
+  const isClubActive = pathname.startsWith('/club')
+  const isCommunityActive = pathname.startsWith('/community')
 
   useEffect(() => {
     setMounted(true)
@@ -33,13 +36,13 @@ export default function Header() {
     <div className="w-full text-grey-color-5 max-desktop:hidden">
       <header className="mx-auto px-4 z-20 relative">
         <h1 className="sr-only">moyeoit 모여잇</h1>
-        <div className="h-14 w-full bg-white rounded-full flex items-center justify-between px-6 shadow-sm ">
+        <div className="h-14 w-full bg-white flex items-center justify-between px-6 ">
           {/* Left: Logo placeholder */}
           <div className="flex items-center gap-14">
             <Link href={AppPath.home()} className="block">
               <MoyeoitFullLogo
-                width={132}
-                height={20}
+                width={110}
+                height={17}
                 role="img"
                 aria-label="moyeoit logo"
               />
@@ -48,21 +51,23 @@ export default function Header() {
             <nav className="flex items-center gap-6 typo-body-3-b text-black-color">
               <Link
                 href={AppPath.clubExplore()}
-                className="hover:text-main-color-1 focus:text-main-color-1 transition-colors"
+                className={`hover:text-main-color-1 focus:text-main-color-1 transition-colors ${
+                  isClubActive ? 'text-main-color-1' : ''
+                }`}
               >
                 탐색하기
               </Link>
-              <span className="text-light-color-4">비교 노트</span>
-              <span className="text-light-color-4">지원 준비</span>
-              <Link
+              {/* <Link
                 href={AppPath.reviewExplore()}
                 className="hover:text-main-color-1 focus:text-main-color-1 transition-colors"
               >
                 후기
-              </Link>
+              </Link> */}
               <Link
                 href={AppPath.community()}
-                className="hover:text-main-color-1 focus:text-main-color-1 transition-colors"
+                className={`hover:text-main-color-1 focus:text-main-color-1 transition-colors ${
+                  isCommunityActive ? 'text-main-color-1' : ''
+                }`}
               >
                 커뮤니티
               </Link>
@@ -70,7 +75,7 @@ export default function Header() {
           </div>
           {/* Right: search, profile, cta */}
           <div className="flex items-center gap-4">
-            <Button
+            {/* <Button
               variant="none"
               size="none"
               aria-label="search"
@@ -83,10 +88,10 @@ export default function Header() {
                 role="img"
                 aria-label="search"
               />
-            </Button>
+            </Button> */}
             {user && mounted ? (
               <>
-                <Button
+                {/* <Button
                   variant="none"
                   size="none"
                   aria-label="bookmark"
@@ -99,7 +104,7 @@ export default function Header() {
                     role="img"
                     aria-label="bookmark"
                   />
-                </Button>
+                </Button> */}
                 <Button
                   variant="none"
                   size="none"
@@ -111,7 +116,7 @@ export default function Header() {
                     <Image
                       src={profile.profileImageUrl}
                       alt="profile"
-                      className="w-full h-full object-cover rounded-full"
+                      className="w-10 h-10 object-cover rounded-full"
                       width={40}
                       height={40}
                     />
@@ -133,7 +138,21 @@ export default function Header() {
                 회원가입/로그인
               </Link>
             )}
-            <ReviewWriteDropdown />
+            <Button
+              size="small"
+              variant="solid"
+              className="typo-button"
+              asChild
+            >
+              <Link
+                href="https://forms.gle/XLS2enY5zT5K2ZKt5"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                의견 남기기
+              </Link>
+            </Button>
+            {/* <ReviewWriteDropdown /> */}
           </div>
         </div>
       </header>

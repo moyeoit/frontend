@@ -1,11 +1,12 @@
+export type ExploreSort = '인기순' | '이름순'
+
 // API 요청 타입
 export interface ExploreRequest {
   // 필터 파라미터
-  field?: string
   part?: string
   way?: string
   target?: string
-  sort?: '인기순' | '이름순' | '최신순'
+  sort?: ExploreSort
   // 페이지네이션 파라미터
   page?: number
   size?: number

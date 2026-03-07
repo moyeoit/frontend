@@ -1,7 +1,9 @@
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
-import HomePage from '@/components/(pages)/(home)/HomePage'
-import { Footer } from '@/components/molecules/layout'
+// import HomePage from '@/components/(pages)/(home)/HomePage'
+import Landing from '@/components/(pages)/landing/Landing'
+
+// import { Footer } from '@/components/molecules/layout'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,9 +22,9 @@ export default function Home() {
   return (
     <div>
       <Suspense fallback={null}>
-        <HomePage />
+        <Landing />
       </Suspense>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   )
 }

@@ -3,6 +3,8 @@
 import * as React from 'react'
 import Image from 'next/image'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { CLUB_EXPLORE_BANNER_MOBILE } from '@/assets/images'
+import { CLUB_EXPLORE_BANNER_PC } from '@/assets/videos'
 import CardOverlay from '@/components/molecules/card/CardOverlay'
 import MobileFilterBar from '@/components/molecules/filterBar/MobileFilterBar'
 import { MultiDropDown } from '@/components/molecules/multiDropDown/MultiDropDown'
@@ -10,7 +12,6 @@ import TabOverlay from '@/components/molecules/tab/TabOverlay'
 import { useToggleBookmark, useBookmarkedClubs } from '@/features/bookmark'
 import { useExploreClubs } from '@/features/explore/queries'
 import AppPath from '@/shared/configs/appPath'
-import { HERO_IMAGES } from '@/shared/constants/category'
 import {
   PART_OPTIONS,
   TARGET_OPTIONS,
@@ -289,14 +290,29 @@ export function Explore() {
 
   return (
     <div className="bg-white-color">
-      <div className="relative h-[280px] flex items-end justify-center px-5 py-18 overflow-hidden">
-        <Image
-          src={HERO_IMAGES.all}
-          alt="탐색하기 히어로 이미지"
-          fill
-          className="object-cover"
-          priority
-        />
+      <div
+        className={`relative w-full overflow-hidden ${
+          isDesktop ? 'aspect-[1440/320]' : 'aspect-[360/88]'
+        }`}
+      >
+        {isDesktop ? (
+          <video
+            src={CLUB_EXPLORE_BANNER_PC}
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <Image
+            src={CLUB_EXPLORE_BANNER_MOBILE}
+            alt="탐색하기 히어로 이미지"
+            fill
+            className="object-cover"
+            priority
+          />
+        )}
       </div>
 
       <div

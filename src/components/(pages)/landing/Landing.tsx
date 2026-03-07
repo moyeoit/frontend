@@ -10,7 +10,10 @@ export default function Landing() {
           <h1 className="typo-title-1-b text-black-color">
             IT직군을 위한 정보 플랫폼
           </h1>
-          <h1 className="typo-title-2 mb-8">
+          <h1
+            className="mb-8 text-[112px] font-bold leading-none"
+            style={{ fontFamily: 'Figtree' }}
+          >
             <span className="text-black-color">MOYEO-</span>
             <span className="text-main-color-1">IT</span>
           </h1>

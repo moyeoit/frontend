@@ -41,8 +41,8 @@ export default function Header() {
           <div className="flex items-center gap-14">
             <Link href={AppPath.home()} className="block">
               <MoyeoitFullLogo
-                width={132}
-                height={20}
+                width={110}
+                height={17}
                 role="img"
                 aria-label="moyeoit logo"
               />

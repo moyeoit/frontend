@@ -166,8 +166,8 @@ export default function CommunityPostEdit() {
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="block">
             <MoyeoitFullLogo
-              width={132}
-              height={20}
+              width={110}
+              height={17}
               role="img"
               aria-label="moyeoit logo"
             />

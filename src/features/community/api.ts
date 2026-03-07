@@ -46,9 +46,12 @@ export async function getSearchPosts(params: {
   size?: number
   sort?: string
 }): Promise<PostPage> {
-  const res = await apiClient.get<ApiResponse<PostPage>>('/api/v2/post/search', {
-    params,
-  })
+  const res = await apiClient.get<ApiResponse<PostPage>>(
+    '/api/v2/post/search',
+    {
+      params,
+    },
+  )
   return res.data.data
 }
 

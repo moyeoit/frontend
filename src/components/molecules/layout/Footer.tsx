@@ -19,7 +19,7 @@ export default function Footer() {
               aria-label="logo"
             />
             <div className="flex flex-row gap-4 text-black-color typo-button-m desktop:typo-body-2-2-m">
-              <Link href={AppPath.home()}>서비스 소개</Link>
+              <Link href="/landing">서비스 소개</Link>
               <Link
                 href="https://forms.gle/XLS2enY5zT5K2ZKt5"
                 target="_blank"

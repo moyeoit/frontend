@@ -1,5 +1,7 @@
 import { GoogleAnalytics } from '@next/third-parties/google'
 import type { Metadata } from 'next'
+import Script from 'next/script'
+import { Environment } from '@/shared/configs/environment'
 import { AuthProvider } from '@/shared/providers/auth-provider'
 import MSWProvider from '@/shared/providers/msw-provider'
 import ReactQueryProvider from '@/shared/providers/react-query-provider'
@@ -72,6 +74,9 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const gaId = Environment.gaId()
+  const clarityId = Environment.clarityId()
+
   return (
     <html lang="ko">
       <body className="antialiased">
@@ -80,8 +85,17 @@ export default function RootLayout({
             <AuthProvider>{children}</AuthProvider>
           </ReactQueryProvider>
         </MSWProvider>
-        {process.env.NEXT_PUBLIC_GA_ID && (
-          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+        {gaId && <GoogleAnalytics gaId={gaId} />}
+        {clarityId && (
+          <Script id="microsoft-clarity" strategy="afterInteractive">
+            {`
+              (function(c,l,a,r,i,t,y){
+                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+              })(window, document, "clarity", "script", "${clarityId}");
+            `}
+          </Script>
         )}
       </body>
     </html>

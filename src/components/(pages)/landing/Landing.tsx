@@ -24,7 +24,12 @@ export default function Landing() {
             <br />
             IT 직군 현직자 · 지망생들과 생생한 이야기를 나눠보세요
           </p>
-          <Button variant="solid" size="medium" className="mx-auto mt-4 w-fit md:mx-0" asChild>
+          <Button
+            variant="solid"
+            size="medium"
+            className="mx-auto mt-4 w-fit md:mx-0"
+            asChild
+          >
             <Link href="/club/explore">모여잇 시작하기</Link>
           </Button>
         </div>

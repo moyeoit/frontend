@@ -35,6 +35,7 @@ export function MobileCard({
   ...props
 }: MobileCardProps) {
   const src = resolveImageSrc(logoUrl, fallbackSrc)
+  const isExternalSrc = src.startsWith('http://') || src.startsWith('https://')
 
   const handleBookmarkClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation()
@@ -64,6 +65,7 @@ export function MobileCard({
           src={src}
           alt={alt || clubName || ''}
           fill
+          unoptimized={isExternalSrc}
           className={cn(
             'object-cover transition-transform duration-300 ease-out will-change-transform transform-gpu group-hover:scale-105 group-active:scale-105',
           )}

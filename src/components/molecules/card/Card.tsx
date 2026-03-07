@@ -168,6 +168,7 @@ export function CardImage({
   const src = failed
     ? resolveImageSrc(fallbackSrc, '/images/default.svg')
     : baseSrc
+  const isExternalSrc = src.startsWith('http://') || src.startsWith('https://')
 
   const ratio = ratioOverride || p.ratio
 
@@ -202,6 +203,7 @@ export function CardImage({
         fill
         priority={priority}
         sizes={sizes}
+        unoptimized={isExternalSrc}
         className={cn(
           'object-cover  transition-transform duration-300 ease-out will-change-transform transform-gpu',
           interactive && 'group-hover:scale-105',

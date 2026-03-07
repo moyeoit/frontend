@@ -10,7 +10,7 @@ import MobileFilterBar from '@/components/molecules/filterBar/MobileFilterBar'
 import { MultiDropDown } from '@/components/molecules/multiDropDown/MultiDropDown'
 import TabOverlay from '@/components/molecules/tab/TabOverlay'
 import { useToggleBookmark, useBookmarkedClubs } from '@/features/bookmark'
-import { useExploreClubs } from '@/features/explore/queries'
+import { useInfiniteExploreClubs } from '@/features/explore/queries'
 import AppPath from '@/shared/configs/appPath'
 import {
   PART_OPTIONS,
@@ -261,7 +261,6 @@ export function Explore() {
 
   const queryParams = React.useMemo(
     () => ({
-      page: 0,
       size: 14,
       part: currentPart && currentPart !== 'all' ? currentPart : undefined,
       way: currentWay && currentWay !== 'all' ? currentWay : undefined,
@@ -272,13 +271,37 @@ export function Explore() {
     [currentPart, currentSort, currentTarget, currentWay],
   )
 
-  const { data: clubsData } = useExploreClubs(queryParams)
+  const {
+    data: clubsData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteExploreClubs(queryParams)
   const { data: bookmarkedClubsData } = useBookmarkedClubs()
   const toggleBookmark = useToggleBookmark()
 
-  const clubs = clubsData?.content || []
+  const clubs = clubsData?.pages.flatMap((page) => page.content) ?? []
   const bookmarkedClubs = bookmarkedClubsData?.data?.content || []
   const bookmarkedClubIds = new Set(bookmarkedClubs.map((club) => club.clubId))
+
+  const sentinelRef = React.useRef<HTMLDivElement>(null)
+
+  React.useEffect(() => {
+    const sentinel = sentinelRef.current
+    if (!sentinel) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage()
+        }
+      },
+      { threshold: 0.1 },
+    )
+
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage])
 
   const handleBookmarkClick = React.useCallback(
     (event: React.MouseEvent<HTMLButtonElement>, clubId: number) => {
@@ -428,8 +451,8 @@ export function Explore() {
         <div
           className={`grid ${
             isDesktop
-              ? 'grid-cols-3 gap-8 pb-12 min-h-[400px]'
-              : 'grid-cols-1 gap-4 px-5 pb-12'
+              ? 'grid-cols-3 gap-8 min-h-100'
+              : 'grid-cols-1 gap-4 px-5'
           }`}
         >
           {clubs.map((club) => (
@@ -442,6 +465,7 @@ export function Explore() {
             />
           ))}
         </div>
+        <div ref={sentinelRef} className="pb-12" />
       </div>
 
       <ExploreEmailPromptDialog

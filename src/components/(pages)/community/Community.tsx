@@ -2,7 +2,6 @@
 
 import * as React from 'react'
 import type useEmblaCarousel from 'embla-carousel-react'
-import Image from 'next/image'
 import CommunitySearchResult from '@/components/(pages)/community/CommunitySearchResult'
 import { Button } from '@/components/atoms/Button'
 import { Carousel } from '@/components/atoms/Carousel'
@@ -13,7 +12,6 @@ import { PopularCommunityCard } from '@/components/molecules/popularCommunityCar
 import { PostButton } from '@/components/molecules/postButton'
 import SearchCore from '@/components/molecules/search/SearchCore'
 import { usePopularPosts, usePosts } from '@/features/community/queries'
-import { HERO_IMAGES } from '@/shared/constants/category'
 import useMediaQuery from '@/shared/hooks/useMediaQuery'
 import useQueryState from '@/shared/hooks/useQueryState'
 import { cn } from '@/shared/utils/cn'
@@ -115,12 +113,15 @@ export function Community() {
     <div>
       {/* Hero 섹션 */}
       <div className="relative h-70 flex justify-center overflow-hidden w-full mx-auto">
-        <Image
-          src={HERO_IMAGES.all}
-          alt="커뮤니티 히어로 이미지"
-          fill
-          className="object-cover"
-          priority
+        <video
+          src="/videos/community_banner.mp4"
+          className="absolute inset-0 h-full w-full object-cover"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="metadata"
+          aria-label="커뮤니티 히어로 배너"
         />
       </div>
       <div className={cn('flex flex-col max-w-[1100px] mx-auto')}>

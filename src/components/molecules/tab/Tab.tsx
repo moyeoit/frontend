@@ -51,7 +51,7 @@ function Tab({
     <div className={className}>
       <div className="desktop:block ">
         <Tabs value={current} onValueChange={(value) => set(value as Tab)}>
-          <TabsList className="h-10 rounded-full bg-white p-1 text-typo-button-m text-grey-color-2 w-full flex">
+          <TabsList className="h-10 rounded-full bg-light-color-2 p-1 text-typo-button-m text-grey-color-2 w-full flex">
             {options.map((o) => (
               <TabsTrigger
                 key={o.value}
@@ -59,7 +59,7 @@ function Tab({
                 disabled={o.disabled}
                 className={cn(
                   'h-[33px] rounded-full px-4 py-1.5 text-sm flex-1',
-                  'data-[state=active]:bg-light-color-2 data-[state=active]:typo-button-b  data-[state=active]:text-black',
+                  'data-[state=active]:bg-white data-[state=active]:typo-button-b  data-[state=active]:text-black',
                 )}
               >
                 {o.label}

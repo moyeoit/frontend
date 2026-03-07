@@ -3,9 +3,9 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { MoyeoitLandingImage } from '@/assets/images'
 import { Button } from '@/components/atoms/Button/button'
 import Footer from '@/components/molecules/layout/Footer'
-import { MoyeoitLandingImage } from '@/assets/images'
 
 export default function Landing() {
   const [isVideoReady, setIsVideoReady] = useState(false)

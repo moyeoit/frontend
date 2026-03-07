@@ -3,7 +3,7 @@
 import * as React from 'react'
 import Image from 'next/image'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { CLUB_EXPLORE_BANNER_MOBILE } from '@/assets/images'
+import { MoyeoitExploreImage } from '@/assets/images'
 import { CLUB_EXPLORE_BANNER_PC } from '@/assets/videos'
 import CardOverlay from '@/components/molecules/card/CardOverlay'
 import MobileFilterBar from '@/components/molecules/filterBar/MobileFilterBar'
@@ -52,6 +52,7 @@ function writeStorageBoolean(storage: Storage, key: string, value: boolean) {
 }
 
 export function Explore() {
+  const [isVideoReady, setIsVideoReady] = React.useState(false)
   const { isDesktop } = useMediaQuery()
   const { user } = useAuth()
   const router = useRouter()
@@ -292,21 +293,32 @@ export function Explore() {
     <div className="bg-white-color">
       <div
         className={`relative w-full overflow-hidden ${
-          isDesktop ? 'aspect-[1440/320]' : 'aspect-[360/88]'
+          isDesktop ? 'aspect-1440/240' : 'aspect-360/88'
         }`}
       >
         {isDesktop ? (
-          <video
-            src={CLUB_EXPLORE_BANNER_PC}
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover"
-          />
+          <>
+            {!isVideoReady && (
+              <Image
+                src={MoyeoitExploreImage}
+                alt="탐색하기 히어로 이미지"
+                fill
+                className="object-cover"
+              />
+            )}
+            <video
+              src={CLUB_EXPLORE_BANNER_PC}
+              autoPlay
+              muted
+              loop
+              playsInline
+              className={`absolute inset-0 w-full h-full object-cover ${isVideoReady ? 'visible' : 'invisible'}`}
+              onCanPlayThrough={() => setIsVideoReady(true)}
+            />
+          </>
         ) : (
           <Image
-            src={CLUB_EXPLORE_BANNER_MOBILE}
+            src={MoyeoitExploreImage}
             alt="탐색하기 히어로 이미지"
             fill
             className="object-cover"

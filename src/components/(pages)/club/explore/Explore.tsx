@@ -450,9 +450,7 @@ export function Explore() {
 
         <div
           className={`grid ${
-            isDesktop
-              ? 'grid-cols-3 gap-8 min-h-100'
-              : 'grid-cols-1 gap-4 px-5'
+            isDesktop ? 'grid-cols-3 gap-8 min-h-100' : 'grid-cols-1 gap-4 px-5'
           }`}
         >
           {clubs.map((club) => (

@@ -12,7 +12,8 @@ export const exploreQueries = {
     queryFn: ({ pageParam }: { pageParam: number }) =>
       getExploreClubs({ ...params, page: pageParam }),
     initialPageParam: 0,
-    getNextPageParam: (lastPage: Awaited<ReturnType<typeof getExploreClubs>>) =>
-      lastPage.last ? undefined : lastPage.number + 1,
+    getNextPageParam: (
+      lastPage: Awaited<ReturnType<typeof getExploreClubs>>,
+    ) => (lastPage.last ? undefined : lastPage.number + 1),
   }),
 }

@@ -62,7 +62,7 @@ export function CommunityCard({
         }
         className={cn(
           'w-full border-b border-light-color-3 py-4',
-          type === 'vertical' ? 'flex flex-col' : 'flex flex-row',
+          type === 'vertical' ? 'flex flex-col' : 'flex flex-row flex-wrap',
           className,
         )}
         {...props}
@@ -83,7 +83,7 @@ export function CommunityCardContent({
     <div
       data-slot="community-card-content"
       className={cn(
-        type === 'vertical' ? 'flex flex-col' : 'flex-1 flex flex-col ',
+        type === 'vertical' ? 'flex flex-col' : 'flex-1 min-w-0 flex flex-col',
         className,
       )}
       {...props}
@@ -148,6 +148,7 @@ export function CommunityCardImage({
 
 export function CommunityCardMeta({
   nickname,
+  authorJobName,
   timeAgo,
   views,
   likes,
@@ -156,12 +157,18 @@ export function CommunityCardMeta({
   ...props
 }: React.ComponentProps<'div'> & {
   nickname?: string
+  authorJobName?: string
   timeAgo?: string
   views?: number
   likes?: number
   comments?: number
 }) {
-  const leftParts = [nickname?.trim(), timeAgo?.trim()].filter(Boolean)
+  const displayName = nickname?.trim()
+    ? authorJobName?.trim()
+      ? `${nickname.trim()} [${authorJobName.trim()}]`
+      : nickname.trim()
+    : undefined
+  const leftParts = [displayName, timeAgo?.trim()].filter(Boolean)
   const hasViews = views !== undefined
   const { isDesktop } = useMediaQuery()
 
@@ -171,7 +178,7 @@ export function CommunityCardMeta({
     <div
       data-slot="community-card-meta"
       className={cn(
-        'flex items-center text-grey-color-3',
+        'flex items-center text-grey-color-3 overflow-hidden',
         isDesktop ? 'typo-body-3-3-r' : 'typo-smallbody-0',
         className,
       )}

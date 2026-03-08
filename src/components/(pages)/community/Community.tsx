@@ -306,8 +306,8 @@ export function Community() {
                   postType={post.postType}
                   postId={post.postId}
                   className={cn(
-                    'gap-6 pt-8 group cursor-pointer relative',
-                    isDesktop ? 'gap-6' : 'gap-4',
+                    'pt-8 group cursor-pointer relative',
+                    isDesktop ? 'gap-6' : 'gap-y-2 gap-x-4',
                   )}
                 >
                   <CommunityCard.Content className="max-w-[656px] flex-col">
@@ -323,19 +323,33 @@ export function Community() {
                     <CommunityCard.Description>
                       {post.excerpt}
                     </CommunityCard.Description>
-                    <CommunityCard.Meta
-                      nickname={post.authorNickname}
-                      timeAgo={formatTimeAgo(post.createdAt)}
-                      views={post.viewCount}
-                      likes={post.likeCount}
-                      comments={post.commentCount}
-                      className="mt-4"
-                    />
+                    {isDesktop && (
+                      <CommunityCard.Meta
+                        nickname={post.authorNickname}
+                        authorJobName={post.authorJobName}
+                        timeAgo={formatTimeAgo(post.createdAt)}
+                        views={post.viewCount}
+                        likes={post.likeCount}
+                        comments={post.commentCount}
+                        className="mt-4"
+                      />
+                    )}
                   </CommunityCard.Content>
                   <CommunityCard.Image
                     logoUrl={post.thumbnailUrl}
                     alt={post.title}
                   />
+                  {!isDesktop && (
+                    <CommunityCard.Meta
+                      nickname={post.authorNickname}
+                      authorJobName={post.authorJobName}
+                      timeAgo={formatTimeAgo(post.createdAt)}
+                      views={post.viewCount}
+                      likes={post.likeCount}
+                      comments={post.commentCount}
+                      className="w-full"
+                    />
+                  )}
                 </CommunityCard>
               ))}
               {totalPages > 1 && (

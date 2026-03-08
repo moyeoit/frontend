@@ -43,14 +43,14 @@ export function extractApiErrorMessage(
   fallback: string,
 ): string {
   if (axios.isAxiosError(error)) {
+    const status = error.response?.status
+    if (status !== undefined && status >= 500) {
+      return fallback
+    }
     const responseMessage = error.response?.data?.message
     if (typeof responseMessage === 'string' && responseMessage.trim()) {
       return responseMessage
     }
-  }
-
-  if (error instanceof Error && error.message.trim()) {
-    return error.message
   }
 
   return fallback

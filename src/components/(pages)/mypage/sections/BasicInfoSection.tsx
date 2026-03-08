@@ -26,8 +26,10 @@ interface BasicInfoSectionProps {
   isUploadingImage: boolean
   isUpdatingImage: boolean
   isUpdatingProfile: boolean
+  showNicknameActions: boolean
   onNicknameChange: (value: string) => void
-  onNicknameBlur: () => void
+  onCancelNickname: () => void
+  onSaveNickname: () => void
   onSelectJob: (jobId: number) => void
   onProfileImageSelect: (file?: File) => void
 }
@@ -44,8 +46,10 @@ export function BasicInfoSection({
   isUploadingImage,
   isUpdatingImage,
   isUpdatingProfile,
+  showNicknameActions,
   onNicknameChange,
-  onNicknameBlur,
+  onCancelNickname,
+  onSaveNickname,
   onSelectJob,
   onProfileImageSelect,
 }: BasicInfoSectionProps) {
@@ -103,16 +107,43 @@ export function BasicInfoSection({
         </FormRow>
 
         <div className={cn('flex flex-col', isDesktop ? 'gap-8' : 'gap-6')}>
-          <FormRow label="닉네임" isDesktop={isDesktop}>
-            <Input
-              value={nickname}
-              placeholder="닉네임"
-              disabled={isUpdatingProfile}
-              onChange={(event) => onNicknameChange(event.target.value)}
-              onBlur={onNicknameBlur}
-              className="h-[47px]"
-              maxLength={10}
-            />
+          <FormRow label="닉네임" isDesktop={isDesktop} alignTop>
+            <div className="flex flex-col gap-3 w-full">
+              <Input
+                value={nickname}
+                placeholder="닉네임"
+                disabled={isUpdatingProfile}
+                onChange={(event) => onNicknameChange(event.target.value)}
+                className={cn(
+                  'h-[47px]',
+                  showNicknameActions && 'border-main-color-1',
+                )}
+                maxLength={10}
+              />
+
+              {showNicknameActions && (
+                <div className="flex items-center justify-end gap-2">
+                  <Button
+                    variant="outlined-primary"
+                    size="small"
+                    className="w-[77px]"
+                    onClick={onCancelNickname}
+                    disabled={isUpdatingProfile}
+                  >
+                    취소
+                  </Button>
+                  <Button
+                    variant="outlined-primary"
+                    size="small"
+                    className="w-[77px] border-main-color-1 text-main-color-1 bg-main-color-3 hover:bg-main-color-3"
+                    onClick={onSaveNickname}
+                    disabled={isUpdatingProfile}
+                  >
+                    저장
+                  </Button>
+                </div>
+              )}
+            </div>
           </FormRow>
 
           <FormRow label="분야" isDesktop={isDesktop}>

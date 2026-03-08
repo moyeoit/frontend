@@ -123,22 +123,7 @@ export default function Detail({ clubId }: DetailProps) {
 
         <div className={isDesktop ? 'mt-6 px-5' : 'mt-4 px-5'}>
           <div className="flex items-center justify-between gap-2">
-            <div className="flex min-w-0 flex-1 items-center gap-4">
-              <div
-                className={
-                  isDesktop
-                    ? 'h-14 w-14 shrink-0 overflow-hidden rounded-2xl border border-light-color-3'
-                    : 'h-12 w-12 shrink-0 overflow-hidden rounded-2xl border border-light-color-3'
-                }
-              >
-                <Image
-                  src={clubDetails?.imageUrl || '/images/default.svg'}
-                  alt={clubDetails?.clubName || '동아리 로고'}
-                  width={isDesktop ? 56 : 48}
-                  height={isDesktop ? 56 : 48}
-                  className="h-full w-full object-cover"
-                />
-              </div>
+            <div className="flex min-w-0 flex-1 items-center gap-4 pl-2">
               <h1
                 className={
                   isDesktop

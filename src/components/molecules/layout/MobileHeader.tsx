@@ -22,10 +22,10 @@ export default function MobileHeader() {
   }, [])
 
   return (
-    <div className="w-full text-grey-color-5 min-w-[320px] desktop:hidden">
-      <header className="mx-auto px-4 z-20 relative">
+    <div className="w-full text-grey-color-5 min-w-[320px] desktop:hidden sticky top-0 z-20">
+      <header className="mx-auto">
         <h1 className="sr-only">moyeoit 모여잇</h1>
-        <div className="h-14 w-full bg-white rounded-full flex items-center justify-between px-6 shadow-sm ">
+        <div className="h-14 w-full bg-white flex items-center justify-between px-6 shadow-xs ">
           {/* Left: Logo placeholder */}
           <div className="flex items-center gap-14">
             <Link href={AppPath.home()} className="block">

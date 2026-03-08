@@ -29,6 +29,7 @@ import {
 import { useUserProfile } from '@/features/user/queries'
 import AppPath from '@/shared/configs/appPath'
 import { cn } from '@/shared/utils/cn'
+import { tokenCookies } from '@/shared/utils/cookies'
 import { formatDateToYYMMDD } from '@/shared/utils/dateFormat'
 
 export default function CommunityDetailView() {
@@ -158,8 +159,18 @@ export default function CommunityDetailView() {
   const trimmedComment = commentInput.trim()
   const trimmedReply = replyInput.trim()
 
+  const requireLogin = () => {
+    const hasAccessToken = Boolean(tokenCookies.getAccessToken())
+    if (hasAccessToken) return true
+
+    alert('로그인 후 이용하세요')
+    router.push(AppPath.login())
+    return false
+  }
+
   const handleSubmitComment = (e?: React.FormEvent) => {
     e?.preventDefault()
+    if (!requireLogin()) return
     if (
       !trimmedComment ||
       isPostingComment ||
@@ -191,6 +202,7 @@ export default function CommunityDetailView() {
 
   const handleReplySubmit = (parentCommentId: number, e?: React.FormEvent) => {
     e?.preventDefault()
+    if (!requireLogin()) return
     if (!trimmedReply || isPostingComment || isSubmittingCommentRef.current)
       return
     isSubmittingCommentRef.current = true
@@ -232,6 +244,7 @@ export default function CommunityDetailView() {
 
   const handleToggleLike = () => {
     if (isTogglingLike) return
+    if (!requireLogin()) return
     toggleLike()
   }
 
@@ -319,6 +332,7 @@ export default function CommunityDetailView() {
                       type="button"
                       className="text-grey-color-2"
                       onClick={() => {
+                        if (!requireLogin()) return
                         setReplyTargetId(comment.id)
                         setReplyInput('')
                       }}

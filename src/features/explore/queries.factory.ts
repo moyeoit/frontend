@@ -7,4 +7,13 @@ export const exploreQueries = {
     queryKey: ['explore', params] as const,
     queryFn: () => getExploreClubs(params),
   }),
+  infiniteList: (params?: Omit<Request, 'page'>) => ({
+    queryKey: ['explore', 'infinite', params] as const,
+    queryFn: ({ pageParam }: { pageParam: number }) =>
+      getExploreClubs({ ...params, page: pageParam }),
+    initialPageParam: 0,
+    getNextPageParam: (
+      lastPage: Awaited<ReturnType<typeof getExploreClubs>>,
+    ) => (lastPage.last ? undefined : lastPage.number + 1),
+  }),
 }

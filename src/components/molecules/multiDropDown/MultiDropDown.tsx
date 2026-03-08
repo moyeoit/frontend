@@ -29,7 +29,7 @@ const triggerVariants = cva(
       variant: {
         selected: 'bg-main-color-3 border-main-color-1 text-main-color-1',
         outline:
-          'border-[var(--moyeoit-light-3)] bg-[var(--moyeoit-light-2)] text-[var(--moyeoit-black)]',
+          'border-[var(--moyeoit-light-3)] bg-white text-[var(--moyeoit-black)]',
         solid:
           'bg-[var(--moyeoit-main-3)] border-[var(--moyeoit-main-1)] text-[var(--moyeoit-main-1)]',
       },

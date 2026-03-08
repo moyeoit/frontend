@@ -27,7 +27,7 @@ export function PostButton({ className }: PostButtonProps) {
 
   const popoverContent = (
     <PopoverContent
-      className={cn('w-35 h-28 border-light-color-4 p-0', className)}
+      className={cn('w-35 h-28 border-light-color-4 bg-white p-0', className)}
       align="end"
       sideOffset={isDesktop ? 15 : 11}
     >

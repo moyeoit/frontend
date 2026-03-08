@@ -34,16 +34,12 @@ export default function LoginPage() {
 
   return (
     <div className="w-full h-full">
-      <main className="flex flex-col gap-2 px-5 h-screen justify-center w-full desktop:max-w-[360px] mx-auto">
-        <div className="flex flex-col typo-title-1 text-black-color justify-center items-center mb-4">
-          <div>나와 잘 맞는 IT 활동,</div>
-          <div>
-            <span className="text-main-color-1">모여잇</span>에서 쉽게
-            찾아보세요!
-          </div>
+      <main className="flex flex-col gap-2 px-5 h-screen justify-center w-full desktop:max-w-[400px] mx-auto">
+        <div className="flex flex-col typo-title-1 text-black-color justify-center items-center mb-4 text-center">
+          <div>IT직군을 위한 실전 성장 플랫폼</div>
         </div>
-        <div className="typo-body-2-2 text-grey-color-3 text-center mb-16">
-          다양한 IT 동아리의 솔직한 후기를 확인할 수 있어요
+        <div className="typo-body-2-2 text-grey-color-3 text-center mb-16 break-keep whitespace-nowrap">
+          IT 직군 현직자 · 지망생들과 생생한 이야기를 나눠보세요
         </div>
         <div className="flex flex-col gap-4">
           <Button

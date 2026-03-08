@@ -3,14 +3,14 @@
 import * as React from 'react'
 import Image from 'next/image'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { CLUB_EXPLORE_BANNER_MOBILE } from '@/assets/images'
+import { MoyeoitExploreImage } from '@/assets/images'
 import { CLUB_EXPLORE_BANNER_PC } from '@/assets/videos'
 import CardOverlay from '@/components/molecules/card/CardOverlay'
 import MobileFilterBar from '@/components/molecules/filterBar/MobileFilterBar'
 import { MultiDropDown } from '@/components/molecules/multiDropDown/MultiDropDown'
 import TabOverlay from '@/components/molecules/tab/TabOverlay'
 import { useToggleBookmark, useBookmarkedClubs } from '@/features/bookmark'
-import { useExploreClubs } from '@/features/explore/queries'
+import { useInfiniteExploreClubs } from '@/features/explore/queries'
 import AppPath from '@/shared/configs/appPath'
 import {
   PART_OPTIONS,
@@ -52,6 +52,7 @@ function writeStorageBoolean(storage: Storage, key: string, value: boolean) {
 }
 
 export function Explore() {
+  const [isVideoReady, setIsVideoReady] = React.useState(false)
   const { isDesktop } = useMediaQuery()
   const { user } = useAuth()
   const router = useRouter()
@@ -261,7 +262,6 @@ export function Explore() {
 
   const queryParams = React.useMemo(
     () => ({
-      page: 0,
       size: 14,
       part: currentPart && currentPart !== 'all' ? currentPart : undefined,
       way: currentWay && currentWay !== 'all' ? currentWay : undefined,
@@ -272,13 +272,37 @@ export function Explore() {
     [currentPart, currentSort, currentTarget, currentWay],
   )
 
-  const { data: clubsData } = useExploreClubs(queryParams)
+  const {
+    data: clubsData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteExploreClubs(queryParams)
   const { data: bookmarkedClubsData } = useBookmarkedClubs()
   const toggleBookmark = useToggleBookmark()
 
-  const clubs = clubsData?.content || []
+  const clubs = clubsData?.pages.flatMap((page) => page.content) ?? []
   const bookmarkedClubs = bookmarkedClubsData?.data?.content || []
   const bookmarkedClubIds = new Set(bookmarkedClubs.map((club) => club.clubId))
+
+  const sentinelRef = React.useRef<HTMLDivElement>(null)
+
+  React.useEffect(() => {
+    const sentinel = sentinelRef.current
+    if (!sentinel) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage()
+        }
+      },
+      { threshold: 0.1 },
+    )
+
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage])
 
   const handleBookmarkClick = React.useCallback(
     (event: React.MouseEvent<HTMLButtonElement>, clubId: number) => {
@@ -292,21 +316,32 @@ export function Explore() {
     <div className="bg-white-color">
       <div
         className={`relative w-full overflow-hidden ${
-          isDesktop ? 'aspect-[1440/320]' : 'aspect-[360/88]'
+          isDesktop ? 'aspect-1440/240' : 'aspect-360/88'
         }`}
       >
         {isDesktop ? (
-          <video
-            src={CLUB_EXPLORE_BANNER_PC}
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover"
-          />
+          <>
+            {!isVideoReady && (
+              <Image
+                src={MoyeoitExploreImage}
+                alt="탐색하기 히어로 이미지"
+                fill
+                className="object-cover"
+              />
+            )}
+            <video
+              src={CLUB_EXPLORE_BANNER_PC}
+              autoPlay
+              muted
+              loop
+              playsInline
+              className={`absolute inset-0 w-full h-full object-cover ${isVideoReady ? 'visible' : 'invisible'}`}
+              onCanPlayThrough={() => setIsVideoReady(true)}
+            />
+          </>
         ) : (
           <Image
-            src={CLUB_EXPLORE_BANNER_MOBILE}
+            src={MoyeoitExploreImage}
             alt="탐색하기 히어로 이미지"
             fill
             className="object-cover"
@@ -427,9 +462,7 @@ export function Explore() {
 
         <div
           className={`grid ${
-            isDesktop
-              ? 'grid-cols-3 gap-8 pb-12 min-h-[400px]'
-              : 'grid-cols-1 gap-4 px-5 pb-12'
+            isDesktop ? 'grid-cols-3 gap-8 min-h-100' : 'grid-cols-1 gap-4 px-5'
           }`}
         >
           {clubs.map((club) => (
@@ -442,6 +475,7 @@ export function Explore() {
             />
           ))}
         </div>
+        <div ref={sentinelRef} className="pb-12" />
       </div>
 
       <ExploreEmailPromptDialog

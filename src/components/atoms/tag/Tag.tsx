@@ -25,7 +25,7 @@ const tagVariants = cva(['inline-flex items-center justify-center'].join(' '), {
   variants: {
     size: {
       small: 'px-2 py-[2px] rounded-[40px] typo-caption-2',
-      large: 'px-3 py-1 rounded-[40px] typo-body-3-b',
+      large: 'px-3 py-1 rounded-[40px] typo-caption-2',
       none: 'p-0 m-0',
     },
   },

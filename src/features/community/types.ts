@@ -23,6 +23,7 @@ export interface CommunityPostItem {
   categoryName: string
   postType: string
   authorNickname: string
+  authorJobName?: string
   viewCount: number
   likeCount: number
   commentCount: number

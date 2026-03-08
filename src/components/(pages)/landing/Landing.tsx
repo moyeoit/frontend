@@ -1,8 +1,15 @@
+'use client'
+
+import { useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
+import { MoyeoitLandingImage } from '@/assets/images'
 import { Button } from '@/components/atoms/Button/button'
 import Footer from '@/components/molecules/layout/Footer'
 
 export default function Landing() {
+  const [isVideoReady, setIsVideoReady] = useState(false)
+
   return (
     <>
       <div className="flex min-h-[80svh] flex-col items-center justify-center overflow-hidden md:flex-row">
@@ -34,14 +41,25 @@ export default function Landing() {
           </Button>
         </div>
 
-        <video
-          className="mt-6 size-56 rotate-[5deg] md:mt-0 md:size-209"
-          src="/videos/landing.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
-        />
+        <div className="relative mt-6 size-56 rotate-[5deg] md:mt-0 md:size-209">
+          {!isVideoReady && (
+            <Image
+              src={MoyeoitLandingImage}
+              alt="모여잇 랜딩"
+              fill
+              className="object-cover"
+            />
+          )}
+          <video
+            className={`size-full ${isVideoReady ? 'visible' : 'invisible'}`}
+            src="/videos/landing.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            onCanPlayThrough={() => setIsVideoReady(true)}
+          />
+        </div>
       </div>
       <Footer />
     </>

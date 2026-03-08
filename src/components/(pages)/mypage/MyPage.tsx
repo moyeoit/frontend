@@ -118,6 +118,13 @@ export default function MyPage() {
     manageSnapshotRef.current = snapshot
   }, [manageInfo])
 
+  const showNicknameActions = useMemo(
+    () =>
+      profileForm.nickname.trim() !==
+      profileSnapshotRef.current.nickname.trim(),
+    [profileForm.nickname],
+  )
+
   const showEmailActions = useMemo(
     () =>
       isEmailDirty(
@@ -171,11 +178,18 @@ export default function MyPage() {
     })
   }
 
-  const handleNicknameBlur = () => {
-    if (isUpdatingProfile) return
+  const handleCancelNicknameEdit = () => {
+    setProfileForm((prev) => ({
+      ...prev,
+      nickname: profileSnapshotRef.current.nickname,
+    }))
+    setProfileErrorMessage(null)
+  }
+
+  const handleSaveNickname = () => {
+    if (!showNicknameActions || isUpdatingProfile) return
 
     const trimmedNickname = profileForm.nickname.trim()
-    const snapshotNickname = profileSnapshotRef.current.nickname.trim()
 
     if (!trimmedNickname) {
       setProfileErrorMessage('닉네임을 입력해주세요.')
@@ -183,11 +197,6 @@ export default function MyPage() {
         ...prev,
         nickname: profileSnapshotRef.current.nickname,
       }))
-      return
-    }
-
-    if (trimmedNickname === snapshotNickname) {
-      setProfileErrorMessage(null)
       return
     }
 
@@ -225,7 +234,7 @@ export default function MyPage() {
     setProfileForm((prev) => ({ ...prev, jobId }))
 
     updateProfile(
-      { jobId },
+      { nickname: profileSnapshotRef.current.nickname, jobId },
       {
         onSuccess: () => {
           profileSnapshotRef.current = {
@@ -431,7 +440,9 @@ export default function MyPage() {
                     setProfileForm((prev) => ({ ...prev, nickname: value }))
                     setProfileErrorMessage(null)
                   }}
-                  onNicknameBlur={handleNicknameBlur}
+                  showNicknameActions={showNicknameActions}
+                  onCancelNickname={handleCancelNicknameEdit}
+                  onSaveNickname={handleSaveNickname}
                   onSelectJob={handleSelectJob}
                   onProfileImageSelect={handleProfileImageChange}
                 />
@@ -493,7 +504,9 @@ export default function MyPage() {
                       setProfileForm((prev) => ({ ...prev, nickname: value }))
                       setProfileErrorMessage(null)
                     }}
-                    onNicknameBlur={handleNicknameBlur}
+                    showNicknameActions={showNicknameActions}
+                  onCancelNickname={handleCancelNicknameEdit}
+                  onSaveNickname={handleSaveNickname}
                     onSelectJob={handleSelectJob}
                     onProfileImageSelect={handleProfileImageChange}
                   />

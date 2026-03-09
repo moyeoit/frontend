@@ -307,9 +307,15 @@ export function Explore() {
   const handleBookmarkClick = React.useCallback(
     (event: React.MouseEvent<HTMLButtonElement>, clubId: number) => {
       event.stopPropagation()
-      toggleBookmark.mutate({ targetId: clubId, type: 'CLUB' })
+      const hasAccessToken = tokenCookies.getAccessToken()
+      if (hasAccessToken) {
+        toggleBookmark.mutate({ targetId: clubId, type: 'CLUB' })
+      } else {
+        alert('로그인 후 이용해주세요.')
+        router.push(AppPath.login())
+      }
     },
-    [toggleBookmark],
+    [toggleBookmark, router],
   )
 
   return (

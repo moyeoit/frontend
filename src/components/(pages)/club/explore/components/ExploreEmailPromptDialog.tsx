@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { XIcon } from '@/assets/icons'
 import { Button } from '@/components/atoms/Button'
 import {
@@ -29,7 +30,7 @@ export function ExploreEmailPromptDialog({
       <DialogContent
         showCloseButton={false}
         className={cn(
-          'border-none bg-main-color-3',
+          'border-none bg-light-color-1',
           isDesktop
             ? 'w-full max-w-[493px] rounded-[24px] px-5 py-6'
             : 'w-full max-w-[303px] rounded-[16px] px-6 py-6',
@@ -64,15 +65,29 @@ export function ExploreEmailPromptDialog({
               isDesktop ? 'typo-title-1-2-sb' : 'typo-body-2-2-sb',
             )}
           >
-            버튼 하나만 클릭해도{`\n`}동아리 지원 소식을 바로 받아요!
+            {isDesktop ? (
+              <>
+                모집 알림 받기 버튼 하나만 클릭하면{`\n`}원하는 동아리의 모집
+                소식을 바로 받아요!
+              </>
+            ) : (
+              <>버튼 하나만 클릭해도{`\n`}동아리 지원 소식을 바로 받아요!</>
+            )}
           </div>
 
           <div
             className={cn(
-              'bg-white-color rounded-[8px] w-full',
-              isDesktop ? 'max-w-[280px] h-[241px]' : 'h-[197px]',
+              'flex items-center justify-center w-full',
+              isDesktop ? 'max-w-[280px]' : '',
             )}
-          />
+          >
+            <Image
+              src="/icons/email-connect.svg"
+              alt="이메일 등록 안내"
+              width={isDesktop ? 280 : 247}
+              height={isDesktop ? 280 : 245}
+            />
+          </div>
 
           <div className={cn('w-full', isDesktop ? 'pt-2' : 'pt-0')}>
             <Button

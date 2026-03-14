@@ -19,6 +19,7 @@ import {
 } from '@/shared/constants/filters'
 import useMediaQuery from '@/shared/hooks/useMediaQuery'
 import useQueryState from '@/shared/hooks/useQueryState'
+import { useUserProfile } from '@/features/user'
 import { useAuth } from '@/shared/providers/auth-provider'
 import { tokenCookies } from '@/shared/utils/cookies'
 import { ExploreEmailPromptDialog } from './components/ExploreEmailPromptDialog'
@@ -65,6 +66,7 @@ export function Explore() {
   const [way, setWay] = useQueryState('way')
   const [target, setTarget] = useQueryState('target')
 
+  const { data: userProfile } = useUserProfile()
   const [isEmailPromptOpen, setIsEmailPromptOpen] = React.useState(false)
 
   const normalizedLegacyQuery = React.useMemo(
@@ -129,7 +131,7 @@ export function Explore() {
   }, [user?.id])
 
   React.useEffect(() => {
-    if (!popupUserId || typeof window === 'undefined') {
+    if (!popupUserId || typeof window === 'undefined' || !userProfile) {
       setIsEmailPromptOpen(false)
       return
     }
@@ -141,6 +143,9 @@ export function Explore() {
       'session-dismissed',
     )
 
+    const isEligible = !userProfile.subscriptionEmail
+    writeStorageBoolean(localStorage, eligibleKey, isEligible)
+
     const eligible = readStorageBoolean(localStorage, eligibleKey)
     const neverShow = readStorageBoolean(localStorage, neverShowKey)
     const sessionDismissed = readStorageBoolean(
@@ -151,7 +156,7 @@ export function Explore() {
     setIsEmailPromptOpen(
       shouldOpenEmailPrompt({ eligible, neverShow, sessionDismissed }),
     )
-  }, [popupUserId])
+  }, [popupUserId, userProfile])
 
   const handleCloseEmailPrompt = React.useCallback(() => {
     if (!popupUserId || typeof window === 'undefined') {

@@ -154,6 +154,30 @@
   font-weight: 700;
 }
 
+@utility typo-medibody-m3 {
+  font-size: var(--text-body-2);
+  line-height: 1.9;
+  font-weight: 500;
+}
+
+@utility typo-medibody-m2 {
+  font-size: var(--text-button);
+  line-height: 1.7;
+  font-weight: 500;
+}
+
+@utility typo-medibody-m {
+  font-size: var(--text-button);
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+@utility typo-medibody-b {
+  font-size: var(--text-button);
+  line-height: 1.5;
+  font-weight: 600;
+}
+
 /* 이전버전 */
 @utility typo-title-1 {
   font-size: var(--text-title-1);

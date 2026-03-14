@@ -505,8 +505,8 @@ export default function MyPage() {
                       setProfileErrorMessage(null)
                     }}
                     showNicknameActions={showNicknameActions}
-                  onCancelNickname={handleCancelNicknameEdit}
-                  onSaveNickname={handleSaveNickname}
+                    onCancelNickname={handleCancelNicknameEdit}
+                    onSaveNickname={handleSaveNickname}
                     onSelectJob={handleSelectJob}
                     onProfileImageSelect={handleProfileImageChange}
                   />

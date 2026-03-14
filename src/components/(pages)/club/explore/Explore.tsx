@@ -11,6 +11,7 @@ import { MultiDropDown } from '@/components/molecules/multiDropDown/MultiDropDow
 import TabOverlay from '@/components/molecules/tab/TabOverlay'
 import { useToggleBookmark, useBookmarkedClubs } from '@/features/bookmark'
 import { useInfiniteExploreClubs } from '@/features/explore/queries'
+import { useUserProfile } from '@/features/user'
 import AppPath from '@/shared/configs/appPath'
 import {
   PART_OPTIONS,
@@ -19,7 +20,6 @@ import {
 } from '@/shared/constants/filters'
 import useMediaQuery from '@/shared/hooks/useMediaQuery'
 import useQueryState from '@/shared/hooks/useQueryState'
-import { useUserProfile } from '@/features/user'
 import { useAuth } from '@/shared/providers/auth-provider'
 import { tokenCookies } from '@/shared/utils/cookies'
 import { ExploreEmailPromptDialog } from './components/ExploreEmailPromptDialog'

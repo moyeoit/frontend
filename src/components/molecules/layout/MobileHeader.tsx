@@ -66,7 +66,7 @@ export default function MobileHeader() {
                 회원가입/로그인
               </Link>
             )}
-            <Button
+            {/* <Button
               variant="none"
               size="none"
               aria-label="search"
@@ -79,8 +79,8 @@ export default function MobileHeader() {
                 role="img"
                 aria-label="search"
               />
-            </Button>
-            {user && mounted && (
+            </Button> */}
+            {/* {user && mounted && (
               <Button
                 variant="none"
                 size="none"
@@ -95,7 +95,7 @@ export default function MobileHeader() {
                   aria-label="bookmark"
                 />
               </Button>
-            )}
+            )} */}
 
             <Drawer
               direction="right"
